@@ -1,4 +1,4 @@
-# Rustmaninoff
+# Rustmaninoff: IaC Security Scanner
 
 <p align="center">
   <img src="docs/rustmaninoff-banner.jpg" alt="Rustmaninoff, IaC security scanner" width="720">
