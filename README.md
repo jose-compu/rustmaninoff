@@ -116,30 +116,33 @@ trivy config --quiet --skip-check-update CORPUS
 
 ### Engine stages
 
-Release build, same synthetic corpus, measured twice on this machine. Findings stayed at 9,476. These times are in-process. They do not include CLI startup or report formatting, which is why they are lower than the CLI rows above.
+Release build, same synthetic corpus, Apple M2. Findings were 9,476. These times are in-process. They do not include CLI startup or report formatting, which is why they are lower than the CLI rows above.
 
-| Stage | Before | After |
-| --- | ---: | ---: |
-| Terraform, 40 files, 1,080 resources | 222 ms | 13.3 ms |
-| Terraform, those files in parallel | 44.2 ms | 2.7 ms |
-| One Terraform file, 400 resources | 77.9 ms | 3.2 ms |
-| CloudFormation, 20 files, 300 resources | 31.3 ms | 2.8 ms |
-| Kubernetes, 20 files, 160 resources | 18.4 ms | 4.3 ms |
-| Full builtin pack on 1,540 resources | 17.4 ms | 7.9 ms |
-| `CKV_AWS_3` on 2,000 volumes | 2.64 ms | 2.06 ms |
-| Attribute lookup, 200,000 single keys | 29.7 ms | 5.9 ms |
+| Stage | Time |
+| --- | ---: |
+| Terraform, 40 files, 1,080 resources | 13.3 ms |
+| Terraform, those files in parallel | 2.7 ms |
+| One Terraform file, 400 resources | 3.2 ms |
+| CloudFormation, 20 files, 300 resources | 2.8 ms |
+| Kubernetes, 20 files, 160 resources | 4.3 ms |
+| Full builtin pack on 1,540 resources | 7.9 ms |
+| `CKV_AWS_3` on 2,000 volumes | 2.06 ms |
+| Attribute lookup, 200,000 single keys | 5.9 ms |
 
 ```mermaid
-%%{init: {"themeVariables": {"xyChart": {"plotColorPalette": "#7B6CF6, #E9C46A", "titleColor": "#C44536", "xAxisLineColor": "#E07A3D", "yAxisLineColor": "#2A9D8F", "xAxisTickColor": "#E9C46A", "yAxisTickColor": "#7B6CF6"}}}}%%
+%%{init: {"themeVariables": {"xyChart": {"plotColorPalette": "#E07A3D, #2A9D8F, #3D5A80, #E9C46A, #7B6CF6", "titleColor": "#C44536", "xAxisLineColor": "#E07A3D", "yAxisLineColor": "#2A9D8F", "xAxisTickColor": "#E9C46A", "yAxisTickColor": "#7B6CF6"}}}}%%
 xychart-beta
-    title "Parse time, before and after"
+    title "In-process stage time"
     x-axis ["TF", "TF parallel", "TF 400", "CFN", "K8s"]
-    y-axis "milliseconds" 0 --> 230
-    bar "Before" [222, 44, 78, 31, 18]
-    bar "After" [13, 3, 3, 3, 4]
+    y-axis "milliseconds" 0 --> 16
+    bar "TF" [13.3, 0, 0, 0, 0]
+    bar "TF parallel" [0, 2.7, 0, 0, 0]
+    bar "TF 400" [0, 0, 3.2, 0, 0]
+    bar "CFN" [0, 0, 0, 2.8, 0]
+    bar "K8s" [0, 0, 0, 0, 4.3]
 ```
 
-Violet is the earlier build. Gold is the current parser. Builtin YAML is parsed once per process (about 6 ms) and reused. Repeat the stage measurement with `cargo run --release -p rustmaninoff --example stages`.
+Builtin YAML is parsed once per process (about 6 ms) and reused. Repeat the stage measurement with `cargo run --release -p rustmaninoff --example stages`.
 
 ## Release
 
