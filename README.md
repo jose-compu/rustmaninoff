@@ -1,7 +1,7 @@
 # Rustmaninoff
 
 <p align="center">
-  <img src="docs/rustmaninoff-logo.jpg" alt="Rustmaninoff, IaC security scanner" width="720">
+  <img src="docs/rustmaninoff-banner.jpg" alt="Rustmaninoff, IaC security scanner" width="720">
 </p>
 
 Attribute scanner for Terraform, CloudFormation, and Kubernetes. Policies are Checkov-compatible YAML and reuse published CKV ids. The engine is not a port of the Checkov Python runtime.
@@ -82,20 +82,29 @@ Wall-clock time of each CLI on one synthetic corpus, Apple M2, macOS 14.8. Media
 On the full corpus that is about 225 times the Rustmaninoff time for Checkov, and about 285 times for Trivy. The catalogs are not the same: Rustmaninoff runs 162 attribute checks, Checkov runs its built-in checks for the selected frameworks, and Trivy runs its misconfiguration policies.
 
 ```mermaid
+%%{init: {"themeVariables": {"xyChart": {"plotColorPalette": "#E07A3D, #2A9D8F, #3D5A80", "titleColor": "#C44536", "xAxisLineColor": "#E07A3D", "yAxisLineColor": "#2A9D8F", "xAxisTickColor": "#E9C46A", "yAxisTickColor": "#7B6CF6"}}}}%%
 xychart-beta
     title "CLI wall time on the full corpus"
     x-axis [Rustmaninoff, Checkov, Trivy]
     y-axis "seconds" 0 --> 6
-    bar [0.02, 4.51, 5.71]
+    bar "Rustmaninoff" [0.02, 0, 0]
+    bar "Checkov" [0, 4.51, 0]
+    bar "Trivy" [0, 0, 5.71]
 ```
 
+Copper is Rustmaninoff, teal is Checkov, and steel blue is Trivy.
+
 ```mermaid
+%%{init: {"themeVariables": {"xyChart": {"plotColorPalette": "#E07A3D, #2A9D8F, #E9C46A, #3D5A80, #C44536, #7B6CF6", "titleColor": "#C44536", "xAxisLineColor": "#E07A3D", "yAxisLineColor": "#2A9D8F", "xAxisTickColor": "#E9C46A", "yAxisTickColor": "#7B6CF6"}}}}%%
 xychart-beta
     title "Times slower than Rustmaninoff"
-    x-axis ["TF Checkov", "TF Trivy", "CFN Checkov", "CFN Trivy", "K8s Checkov", "K8s Trivy"]
+    x-axis [Terraform, CloudFormation, Kubernetes]
     y-axis "times slower" 0 --> 360
-    bar [345, 247, 288, 137, 263, 234]
+    bar "Checkov" [345, 288, 263]
+    bar "Trivy" [247, 137, 234]
 ```
+
+Copper is Checkov. Teal is Trivy.
 
 Commands, release binary versus the other CLIs:
 
@@ -121,15 +130,16 @@ Release build, same synthetic corpus, measured twice on this machine. Findings s
 | Attribute lookup, 200,000 single keys | 29.7 ms | 5.9 ms |
 
 ```mermaid
+%%{init: {"themeVariables": {"xyChart": {"plotColorPalette": "#7B6CF6, #E9C46A", "titleColor": "#C44536", "xAxisLineColor": "#E07A3D", "yAxisLineColor": "#2A9D8F", "xAxisTickColor": "#E9C46A", "yAxisTickColor": "#7B6CF6"}}}}%%
 xychart-beta
     title "Parse time, before and after"
     x-axis ["TF", "TF parallel", "TF 400", "CFN", "K8s"]
     y-axis "milliseconds" 0 --> 230
-    bar [222, 44, 78, 31, 18]
-    bar [13, 3, 3, 3, 4]
+    bar "Before" [222, 44, 78, 31, 18]
+    bar "After" [13, 3, 3, 3, 4]
 ```
 
-The taller series is the earlier build. The shorter series is the current parser. Builtin YAML is parsed once per process (about 6 ms) and reused. Repeat the stage measurement with `cargo run --release -p rustmaninoff --example stages`.
+Violet is the earlier build. Gold is the current parser. Builtin YAML is parsed once per process (about 6 ms) and reused. Repeat the stage measurement with `cargo run --release -p rustmaninoff --example stages`.
 
 ## Release
 
