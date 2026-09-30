@@ -1,0 +1,18 @@
+metadata:
+  id: CKV_AWS_87
+  name: Redshift cluster should not be publicly accessible
+  category: NETWORKING
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_87. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_redshift_cluster
+definition:
+  cond_type: attribute
+  attribute: publicly_accessible
+  operator: not_equals
+  value: true
+  missing: pass
+fixtures:
+  fail: "resource \"aws_redshift_cluster\" \"bad\" {\n  publicly_accessible = true\n}\n"
+  pass: "resource \"aws_redshift_cluster\" \"good\" {\n  publicly_accessible = false\n}\n"

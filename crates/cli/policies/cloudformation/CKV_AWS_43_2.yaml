@@ -1,0 +1,19 @@
+metadata:
+  id: CKV_AWS_43
+  name: Ensure Kinesis Stream is securely encrypted
+  category: ENCRYPTION
+  severity: HIGH
+  framework: cloudformation
+  guidelines: Adapted from Checkov CKV_AWS_43. https://github.com/bridgecrewio/checkov
+resource_types:
+- AWS::Kinesis::Stream
+definition:
+  cond_type: attribute
+  attribute: StreamEncryption.EncryptionType
+  operator: equals
+  value: KMS
+fixtures:
+  fail: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Bad:\n    Type: AWS::Kinesis::Stream\n    Properties:\n \
+    \     StreamEncryption:\n        EncryptionType: NONE\n"
+  pass: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Good:\n    Type: AWS::Kinesis::Stream\n    Properties:\n\
+    \      StreamEncryption:\n        EncryptionType: KMS\n"

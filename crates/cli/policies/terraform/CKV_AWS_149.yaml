@@ -1,0 +1,16 @@
+metadata:
+  id: CKV_AWS_149
+  name: Ensure that Secrets Manager secret is encrypted using KMS CMK
+  category: ENCRYPTION
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_149. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_secretsmanager_secret
+definition:
+  cond_type: attribute
+  attribute: kms_key_id
+  operator: exists
+fixtures:
+  fail: "resource \"aws_secretsmanager_secret\" \"bad\" {\n  name = \"app\"\n}\n"
+  pass: "resource \"aws_secretsmanager_secret\" \"good\" {\n  kms_key_id = \"arn:aws:kms:us-east-1:123:key/abc\"\n}\n"

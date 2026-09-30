@@ -1,0 +1,17 @@
+metadata:
+  id: CKV_AWS_64
+  name: Ensure all data stored in the Redshift cluster is securely encrypted at rest
+  category: ENCRYPTION
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_64. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_redshift_cluster
+definition:
+  cond_type: attribute
+  attribute: encrypted
+  operator: equals
+  value: true
+fixtures:
+  fail: "resource \"aws_redshift_cluster\" \"bad\" {\n  encrypted = false\n}\n"
+  pass: "resource \"aws_redshift_cluster\" \"good\" {\n  encrypted = true\n}\n"

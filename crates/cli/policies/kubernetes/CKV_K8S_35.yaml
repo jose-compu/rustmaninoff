@@ -1,0 +1,28 @@
+metadata:
+  id: CKV_K8S_35
+  name: Prefer using secrets as files over secrets as environment variables
+  category: KUBERNETES
+  severity: HIGH
+  framework: kubernetes
+  guidelines: Adapted from Checkov CKV_K8S_35. https://github.com/bridgecrewio/checkov
+resource_types:
+- Pod
+- Deployment
+- StatefulSet
+- DaemonSet
+- Job
+- CronJob
+- ReplicaSet
+definition:
+  cond_type: no_element
+  attribute: _containers.env
+  where:
+    cond_type: attribute
+    attribute: valueFrom.secretKeyRef.name
+    operator: exists
+fixtures:
+  fail: "apiVersion: v1\nkind: Pod\nmetadata:\n  name: bad\n  namespace: prod\nspec:\n  containers:\n    - name: app\n   \
+    \   image: nginx:1.25\n      env:\n        - name: TOKEN\n          valueFrom:\n            secretKeyRef:\n          \
+    \    name: db\n              key: password\n"
+  pass: "apiVersion: v1\nkind: Pod\nmetadata:\n  name: good\n  namespace: prod\nspec:\n  containers:\n    - name: app\n  \
+    \    image: nginx:1.25\n      env:\n        - name: LOG\n          value: info\n"

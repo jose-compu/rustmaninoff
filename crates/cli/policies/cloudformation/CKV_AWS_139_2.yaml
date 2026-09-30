@@ -1,0 +1,19 @@
+metadata:
+  id: CKV_AWS_139
+  name: Ensure that RDS clusters have deletion protection enabled
+  category: BACKUP_AND_RECOVERY
+  severity: MEDIUM
+  framework: cloudformation
+  guidelines: Adapted from Checkov CKV_AWS_139. https://github.com/bridgecrewio/checkov
+resource_types:
+- AWS::RDS::DBCluster
+definition:
+  cond_type: attribute
+  attribute: DeletionProtection
+  operator: equals
+  value: true
+fixtures:
+  fail: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Bad:\n    Type: AWS::RDS::DBCluster\n    Properties:\n  \
+    \    DeletionProtection: false\n"
+  pass: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Good:\n    Type: AWS::RDS::DBCluster\n    Properties:\n \
+    \     DeletionProtection: true\n"

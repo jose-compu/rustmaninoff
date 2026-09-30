@@ -1,0 +1,27 @@
+metadata:
+  id: CKV_AWS_133
+  name: Ensure that RDS instances have a backup retention period
+  category: BACKUP_AND_RECOVERY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_133. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_db_instance
+- aws_rds_cluster
+definition:
+  or:
+  - cond_type: attribute
+    attribute: backup_retention_period
+    operator: not_exists
+  - and:
+    - cond_type: attribute
+      attribute: backup_retention_period
+      operator: greater_than
+      value: 0
+    - cond_type: attribute
+      attribute: backup_retention_period
+      operator: less_than_or_equal
+      value: 35
+fixtures:
+  fail: "resource \"aws_db_instance\" \"bad\" {\n  backup_retention_period = 0\n}\n"
+  pass: "resource \"aws_db_instance\" \"good\" {\n  backup_retention_period = 7\n}\n"

@@ -1,0 +1,17 @@
+metadata:
+  id: CKV_AWS_106
+  name: Ensure EBS default encryption is enabled
+  category: ENCRYPTION
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_106. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_ebs_encryption_by_default
+definition:
+  cond_type: attribute
+  attribute: enabled
+  operator: equals
+  value: true
+fixtures:
+  fail: "resource \"aws_ebs_encryption_by_default\" \"bad\" {\n  enabled = false\n}\n"
+  pass: "resource \"aws_ebs_encryption_by_default\" \"good\" {\n  enabled = true\n}\n"

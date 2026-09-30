@@ -1,0 +1,11 @@
+[package]
+name = "rustmaninoff-report"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Text, JSON, SARIF, and JUnit renderers for Rustmaninoff"
+
+[dependencies]
+rustmaninoff-engine.workspace = true
+rustmaninoff-ir.workspace = true
+serde_json.workspace = true

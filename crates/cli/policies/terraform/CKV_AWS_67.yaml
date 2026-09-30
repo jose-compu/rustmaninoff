@@ -1,0 +1,17 @@
+metadata:
+  id: CKV_AWS_67
+  name: Ensure CloudTrail is enabled in all Regions
+  category: LOGGING
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_67. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_cloudtrail
+definition:
+  cond_type: attribute
+  attribute: is_multi_region_trail
+  operator: equals
+  value: true
+fixtures:
+  fail: "resource \"aws_cloudtrail\" \"bad\" {\n  is_multi_region_trail = false\n}\n"
+  pass: "resource \"aws_cloudtrail\" \"good\" {\n  is_multi_region_trail = true\n}\n"

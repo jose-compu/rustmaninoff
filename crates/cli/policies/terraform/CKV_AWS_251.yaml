@@ -1,0 +1,17 @@
+metadata:
+  id: CKV_AWS_251
+  name: Ensure CloudTrail logging is enabled
+  category: LOGGING
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_251. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_cloudtrail
+definition:
+  cond_type: attribute
+  attribute: enable_logging
+  operator: equals
+  value: true
+fixtures:
+  fail: "resource \"aws_cloudtrail\" \"bad\" {\n  enable_logging = false\n}\n"
+  pass: "resource \"aws_cloudtrail\" \"good\" {\n  enable_logging = true\n}\n"

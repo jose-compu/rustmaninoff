@@ -1,0 +1,52 @@
+metadata:
+  id: CKV_AWS_110
+  name: Ensure IAM policies do not allow common privilege-escalation actions
+  category: IAM
+  severity: CRITICAL
+  framework: cloudformation
+  guidelines: Adapted from Checkov CKV_AWS_110. https://github.com/bridgecrewio/checkov
+resource_types:
+- AWS::IAM::Policy
+definition:
+  cond_type: no_element
+  attribute: PolicyDocument.Statement
+  where:
+    and:
+    - cond_type: attribute
+      attribute: Effect
+      operator: equals
+      value: Allow
+    - cond_type: attribute
+      attribute: Action
+      operator: intersects
+      value:
+      - iam:CreatePolicyVersion
+      - iam:SetDefaultPolicyVersion
+      - iam:PassRole
+      - iam:CreateAccessKey
+      - iam:CreateLoginProfile
+      - iam:UpdateLoginProfile
+      - iam:AttachUserPolicy
+      - iam:AttachGroupPolicy
+      - iam:AttachRolePolicy
+      - iam:PutUserPolicy
+      - iam:PutGroupPolicy
+      - iam:PutRolePolicy
+      - iam:AddUserToGroup
+      - iam:UpdateAssumeRolePolicy
+      - sts:AssumeRole
+      - lambda:CreateFunction
+      - lambda:UpdateFunctionCode
+      - lambda:AddPermission
+      - glue:CreateDevEndpoint
+      - glue:UpdateDevEndpoint
+      - cloudformation:CreateStack
+      - datapipeline:CreatePipeline
+      - datapipeline:PutPipelineDefinition
+fixtures:
+  fail: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Bad:\n    Type: AWS::IAM::Policy\n    Properties:\n     \
+    \ PolicyDocument:\n        Version: \"2012-10-17\"\n        Statement:\n          - Effect: Allow\n            Action:\
+    \ iam:PassRole\n            Resource: '*'\n"
+  pass: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Good:\n    Type: AWS::IAM::Policy\n    Properties:\n    \
+    \  PolicyDocument:\n        Version: \"2012-10-17\"\n        Statement:\n          - Effect: Allow\n            Action:\
+    \ \"s3:GetObject\"\n            Resource: \"arn:aws:s3:::bucket/*\"\n"

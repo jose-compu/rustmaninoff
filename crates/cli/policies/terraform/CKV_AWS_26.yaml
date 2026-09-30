@@ -1,0 +1,16 @@
+metadata:
+  id: CKV_AWS_26
+  name: Ensure all data stored in the SNS topic is encrypted
+  category: ENCRYPTION
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_26. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_sns_topic
+definition:
+  cond_type: attribute
+  attribute: kms_master_key_id
+  operator: exists
+fixtures:
+  fail: "resource \"aws_sns_topic\" \"bad\" {\n  name = \"plain\"\n}\n"
+  pass: "resource \"aws_sns_topic\" \"good\" {\n  kms_master_key_id = \"alias/aws/sns\"\n}\n"

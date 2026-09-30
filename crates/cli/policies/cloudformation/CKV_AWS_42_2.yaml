@@ -1,0 +1,19 @@
+metadata:
+  id: CKV_AWS_42
+  name: Ensure EFS is securely encrypted
+  category: ENCRYPTION
+  severity: HIGH
+  framework: cloudformation
+  guidelines: Adapted from Checkov CKV_AWS_42. https://github.com/bridgecrewio/checkov
+resource_types:
+- AWS::EFS::FileSystem
+definition:
+  cond_type: attribute
+  attribute: Encrypted
+  operator: equals
+  value: true
+fixtures:
+  fail: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Bad:\n    Type: AWS::EFS::FileSystem\n    Properties:\n \
+    \     Encrypted: false\n"
+  pass: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Good:\n    Type: AWS::EFS::FileSystem\n    Properties:\n\
+    \      Encrypted: true\n"

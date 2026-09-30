@@ -1,0 +1,18 @@
+metadata:
+  id: CKV_AWS_158
+  name: Ensure that CloudWatch Log Group is encrypted by KMS
+  category: ENCRYPTION
+  severity: HIGH
+  framework: cloudformation
+  guidelines: Adapted from Checkov CKV_AWS_158. https://github.com/bridgecrewio/checkov
+resource_types:
+- AWS::Logs::LogGroup
+definition:
+  cond_type: attribute
+  attribute: KmsKeyId
+  operator: exists
+fixtures:
+  fail: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Bad:\n    Type: AWS::Logs::LogGroup\n    Properties:\n  \
+    \    LogGroupName: /app\n"
+  pass: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Good:\n    Type: AWS::Logs::LogGroup\n    Properties:\n \
+    \     KmsKeyId: alias/logs\n"

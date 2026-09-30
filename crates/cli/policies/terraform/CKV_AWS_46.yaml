@@ -1,0 +1,18 @@
+metadata:
+  id: CKV_AWS_46
+  name: Ensure no hard-coded secrets exist in EC2 user data
+  category: SECRETS
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_46. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_instance
+definition:
+  cond_type: attribute
+  attribute: user_data
+  operator: not_regex_match
+  value: AKIA[0-9A-Z]{16}
+  missing: pass
+fixtures:
+  fail: "resource \"aws_instance\" \"bad\" {\n  user_data = \"export KEY=AKIAIOSFODNN7EXAMPLE\"\n}\n"
+  pass: "resource \"aws_instance\" \"good\" {\n  user_data = \"echo hello\"\n}\n"

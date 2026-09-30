@@ -1,0 +1,15 @@
+metadata:
+  id: CKV_AWS_40
+  name: Ensure IAM user policy attachments are not used
+  category: IAM
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_40. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_iam_user_policy_attachment
+definition:
+  cond_type: forbid_resource
+fixtures:
+  fail: "resource \"aws_iam_user_policy_attachment\" \"bad\" {\n  user       = \"alice\"\n  policy_arn = \"arn:aws:iam::aws:policy/ReadOnlyAccess\"\
+    \n}\n"
+  pass: "resource \"aws_iam_role\" \"good\" {\n  name = \"app\"\n}\n"

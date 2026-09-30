@@ -1,0 +1,14 @@
+metadata:
+  id: CKV_AWS_198
+  name: Ensure no aws_db_security_group resources exist
+  category: NETWORKING
+  severity: LOW
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_198. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_db_security_group
+definition:
+  cond_type: forbid_resource
+fixtures:
+  fail: "resource \"aws_db_security_group\" \"bad\" {\n  name = \"legacy\"\n}\n"
+  pass: "resource \"aws_security_group\" \"good\" {\n  description = \"modern\"\n}\n"

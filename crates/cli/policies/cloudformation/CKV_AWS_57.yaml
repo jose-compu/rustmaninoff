@@ -1,0 +1,20 @@
+metadata:
+  id: CKV_AWS_57
+  name: Ensure the S3 bucket does not allow WRITE permissions to everyone
+  category: STORAGE
+  severity: HIGH
+  framework: cloudformation
+  guidelines: Adapted from Checkov CKV_AWS_57. https://github.com/bridgecrewio/checkov
+resource_types:
+- AWS::S3::Bucket
+definition:
+  cond_type: attribute
+  attribute: AccessControl
+  operator: not_equals
+  value: PublicReadWrite
+  missing: pass
+fixtures:
+  fail: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Bad:\n    Type: AWS::S3::Bucket\n    Properties:\n      AccessControl:\
+    \ PublicReadWrite\n"
+  pass: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Good:\n    Type: AWS::S3::Bucket\n    Properties:\n     \
+    \ AccessControl: Private\n"

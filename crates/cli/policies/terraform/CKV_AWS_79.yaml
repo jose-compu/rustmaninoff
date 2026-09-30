@@ -1,0 +1,24 @@
+metadata:
+  id: CKV_AWS_79
+  name: Ensure Instance Metadata Service Version 1 is not enabled
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_79. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_instance
+- aws_launch_template
+definition:
+  or:
+  - cond_type: attribute
+    attribute: metadata_options.http_tokens
+    operator: equals
+    value: required
+  - cond_type: attribute
+    attribute: metadata_options.http_endpoint
+    operator: equals
+    value: disabled
+fixtures:
+  fail: "resource \"aws_instance\" \"bad\" {\n  metadata_options {\n    http_tokens   = \"optional\"\n    http_endpoint =\
+    \ \"enabled\"\n  }\n}\n"
+  pass: "resource \"aws_instance\" \"good\" {\n  metadata_options {\n    http_tokens = \"required\"\n  }\n}\n"

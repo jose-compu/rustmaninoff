@@ -1,0 +1,17 @@
+metadata:
+  id: CKV_AWS_3
+  name: Ensure all data stored in the EBS is securely encrypted
+  category: ENCRYPTION
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_3. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_ebs_volume
+definition:
+  cond_type: attribute
+  attribute: encrypted
+  operator: equals
+  value: true
+fixtures:
+  fail: "resource \"aws_ebs_volume\" \"bad\" {\n  encrypted = false\n}\n"
+  pass: "resource \"aws_ebs_volume\" \"good\" {\n  encrypted = true\n}\n"

@@ -1,0 +1,17 @@
+metadata:
+  id: CKV_AWS_135
+  name: Ensure that EC2 is EBS optimized
+  category: GENERAL_SECURITY
+  severity: LOW
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_135. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_instance
+definition:
+  cond_type: attribute
+  attribute: ebs_optimized
+  operator: equals
+  value: true
+fixtures:
+  fail: "resource \"aws_instance\" \"bad\" {\n  ebs_optimized = false\n}\n"
+  pass: "resource \"aws_instance\" \"good\" {\n  ebs_optimized = true\n}\n"

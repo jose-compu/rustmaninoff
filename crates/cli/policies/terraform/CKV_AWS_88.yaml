@@ -1,0 +1,18 @@
+metadata:
+  id: CKV_AWS_88
+  name: EC2 instance should not have public IP
+  category: NETWORKING
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_88. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_instance
+definition:
+  cond_type: attribute
+  attribute: associate_public_ip_address
+  operator: not_equals
+  value: true
+  missing: pass
+fixtures:
+  fail: "resource \"aws_instance\" \"bad\" {\n  associate_public_ip_address = true\n}\n"
+  pass: "resource \"aws_instance\" \"good\" {\n  associate_public_ip_address = false\n}\n"

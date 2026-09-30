@@ -1,0 +1,21 @@
+metadata:
+  id: CKV_AWS_19
+  name: Ensure the S3 bucket has server-side-encryption enabled
+  category: ENCRYPTION
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_19. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_s3_bucket_server_side_encryption_configuration
+definition:
+  cond_type: attribute
+  attribute: rule.apply_server_side_encryption_by_default.sse_algorithm
+  operator: within
+  value:
+  - AES256
+  - aws:kms
+fixtures:
+  fail: "resource \"aws_s3_bucket_server_side_encryption_configuration\" \"bad\" {\n  bucket = \"data\"\n  rule {\n    apply_server_side_encryption_by_default\
+    \ {\n      sse_algorithm = \"none\"\n    }\n  }\n}\n"
+  pass: "resource \"aws_s3_bucket_server_side_encryption_configuration\" \"good\" {\n  bucket = \"data\"\n  rule {\n    apply_server_side_encryption_by_default\
+    \ {\n      sse_algorithm = \"AES256\"\n    }\n  }\n}\n"

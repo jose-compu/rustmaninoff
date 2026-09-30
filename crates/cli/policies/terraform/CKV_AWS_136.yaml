@@ -1,0 +1,17 @@
+metadata:
+  id: CKV_AWS_136
+  name: Ensure that ECR repositories are encrypted using KMS
+  category: ENCRYPTION
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_136. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_ecr_repository
+definition:
+  cond_type: attribute
+  attribute: encryption_type
+  operator: equals
+  value: KMS
+fixtures:
+  fail: "resource \"aws_ecr_repository\" \"bad\" {\n  encryption_type = \"AES256\"\n}\n"
+  pass: "resource \"aws_ecr_repository\" \"good\" {\n  encryption_type = \"KMS\"\n}\n"

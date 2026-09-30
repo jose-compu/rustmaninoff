@@ -1,0 +1,38 @@
+metadata:
+  id: CKV_AWS_24
+  name: Ensure no security groups allow ingress from 0.0.0.0/0 to port 22
+  category: NETWORKING
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_24. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_security_group
+- aws_security_group_rule
+- aws_vpc_security_group_ingress_rule
+definition:
+  cond_type: no_element
+  attribute: ingress
+  where:
+    and:
+    - cond_type: attribute
+      attribute: from_port
+      operator: less_than_or_equal
+      value: 22
+    - cond_type: attribute
+      attribute: to_port
+      operator: greater_than_or_equal
+      value: 22
+    - or:
+      - cond_type: attribute
+        attribute: cidr_blocks
+        operator: contains
+        value: 0.0.0.0/0
+      - cond_type: attribute
+        attribute: ipv6_cidr_blocks
+        operator: contains
+        value: ::/0
+fixtures:
+  fail: "resource \"aws_security_group\" \"bad\" {\n  description = \"open\"\n  ingress {\n    from_port   = 22\n    to_port\
+    \     = 22\n    protocol    = \"tcp\"\n    cidr_blocks = [\"0.0.0.0/0\"]\n  }\n}\n"
+  pass: "resource \"aws_security_group\" \"good\" {\n  description = \"https\"\n  ingress {\n    from_port   = 443\n    to_port\
+    \     = 443\n    protocol    = \"tcp\"\n    cidr_blocks = [\"0.0.0.0/0\"]\n  }\n}\n"

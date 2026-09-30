@@ -1,0 +1,27 @@
+metadata:
+  id: CKV_AWS_33
+  name: Ensure KMS key policy does not contain wildcard principal
+  category: IAM
+  severity: CRITICAL
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_33. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_kms_key
+definition:
+  cond_type: no_element
+  attribute: policy.Statement
+  where:
+    or:
+    - cond_type: attribute
+      attribute: Principal
+      operator: equals_any
+      value: '*'
+    - cond_type: attribute
+      attribute: Principal.AWS
+      operator: equals_any
+      value: '*'
+fixtures:
+  fail: "resource \"aws_kms_key\" \"bad\" {\n  policy = jsonencode({\n    Statement = [{\n      Effect = \"Allow\"\n     \
+    \ Principal = \"*\"\n      Action = \"kms:*\"\n      Resource = \"*\"\n    }]\n  })\n}\n"
+  pass: "resource \"aws_kms_key\" \"good\" {\n  policy = jsonencode({\n    Statement = [{\n      Effect = \"Allow\"\n    \
+    \  Principal = { AWS = \"arn:aws:iam::123:root\" }\n      Action = \"kms:*\"\n      Resource = \"*\"\n    }]\n  })\n}\n"

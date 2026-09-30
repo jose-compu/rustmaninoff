@@ -1,0 +1,11 @@
+[package]
+name = "rustmaninoff-parser-terraform"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Terraform HCL and JSON parser for Rustmaninoff"
+
+[dependencies]
+hcl-rs = "0.19"
+rustmaninoff-ir.workspace = true
+serde_json.workspace = true

@@ -1,0 +1,17 @@
+metadata:
+  id: CKV_AWS_9
+  name: Ensure IAM password policy expires passwords within 90 days or less
+  category: IAM
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_9. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_iam_account_password_policy
+definition:
+  cond_type: attribute
+  attribute: max_password_age
+  operator: less_than_or_equal
+  value: 90
+fixtures:
+  fail: "resource \"aws_iam_account_password_policy\" \"bad\" {\n  max_password_age = 120\n}\n"
+  pass: "resource \"aws_iam_account_password_policy\" \"good\" {\n  max_password_age = 90\n}\n"

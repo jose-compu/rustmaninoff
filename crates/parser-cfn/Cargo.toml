@@ -1,0 +1,11 @@
+[package]
+name = "rustmaninoff-parser-cfn"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "CloudFormation YAML and JSON parser for Rustmaninoff"
+
+[dependencies]
+rustmaninoff-ir.workspace = true
+serde_json.workspace = true
+serde_yaml.workspace = true

@@ -1,0 +1,17 @@
+metadata:
+  id: CKV_AWS_15
+  name: Ensure IAM password policy requires at least one uppercase letter
+  category: IAM
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_15. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_iam_account_password_policy
+definition:
+  cond_type: attribute
+  attribute: require_uppercase_characters
+  operator: equals
+  value: true
+fixtures:
+  fail: "resource \"aws_iam_account_password_policy\" \"bad\" {\n  require_uppercase_characters = false\n}\n"
+  pass: "resource \"aws_iam_account_password_policy\" \"good\" {\n  require_uppercase_characters = true\n}\n"

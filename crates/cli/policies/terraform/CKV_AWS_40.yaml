@@ -1,0 +1,14 @@
+metadata:
+  id: CKV_AWS_40
+  name: Ensure IAM policies are attached only to groups or roles
+  category: IAM
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_40. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_iam_user_policy
+definition:
+  cond_type: forbid_resource
+fixtures:
+  fail: "resource \"aws_iam_user_policy\" \"bad\" {\n  name = \"inline\"\n  user = \"alice\"\n}\n"
+  pass: "resource \"aws_iam_role\" \"good\" {\n  name = \"app\"\n}\n"

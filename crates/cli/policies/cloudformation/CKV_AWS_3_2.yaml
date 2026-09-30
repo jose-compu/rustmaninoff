@@ -1,0 +1,19 @@
+metadata:
+  id: CKV_AWS_3
+  name: Ensure all data stored in the EBS is securely encrypted
+  category: ENCRYPTION
+  severity: HIGH
+  framework: cloudformation
+  guidelines: Adapted from Checkov CKV_AWS_3. https://github.com/bridgecrewio/checkov
+resource_types:
+- AWS::EC2::Volume
+definition:
+  cond_type: attribute
+  attribute: Encrypted
+  operator: equals
+  value: true
+fixtures:
+  fail: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Bad:\n    Type: AWS::EC2::Volume\n    Properties:\n     \
+    \ Encrypted: false\n"
+  pass: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Good:\n    Type: AWS::EC2::Volume\n    Properties:\n    \
+    \  Encrypted: true\n"

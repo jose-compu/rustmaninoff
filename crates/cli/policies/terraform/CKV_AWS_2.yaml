@@ -1,0 +1,17 @@
+metadata:
+  id: CKV_AWS_2
+  name: Ensure ALB protocol is HTTPS
+  category: ENCRYPTION
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_2. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_lb_listener
+definition:
+  cond_type: attribute
+  attribute: protocol
+  operator: not_equals
+  value: HTTP
+fixtures:
+  fail: "resource \"aws_lb_listener\" \"bad\" {\n  protocol = \"HTTP\"\n}\n"
+  pass: "resource \"aws_lb_listener\" \"good\" {\n  protocol = \"HTTPS\"\n}\n"

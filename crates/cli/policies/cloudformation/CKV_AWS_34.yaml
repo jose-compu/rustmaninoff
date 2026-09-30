@@ -1,0 +1,21 @@
+metadata:
+  id: CKV_AWS_34
+  name: Ensure CloudFront distribution ViewerProtocolPolicy is set to HTTPS
+  category: ENCRYPTION
+  severity: HIGH
+  framework: cloudformation
+  guidelines: Adapted from Checkov CKV_AWS_34. https://github.com/bridgecrewio/checkov
+resource_types:
+- AWS::CloudFront::Distribution
+definition:
+  cond_type: attribute
+  attribute: DistributionConfig.DefaultCacheBehavior.ViewerProtocolPolicy
+  operator: within
+  value:
+  - redirect-to-https
+  - https-only
+fixtures:
+  fail: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Bad:\n    Type: AWS::CloudFront::Distribution\n    Properties:\n\
+    \      DistributionConfig:\n        DefaultCacheBehavior:\n          ViewerProtocolPolicy: allow-all\n"
+  pass: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Good:\n    Type: AWS::CloudFront::Distribution\n    Properties:\n\
+    \      DistributionConfig:\n        DefaultCacheBehavior:\n          ViewerProtocolPolicy: https-only\n"

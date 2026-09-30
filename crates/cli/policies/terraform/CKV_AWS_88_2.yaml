@@ -1,0 +1,20 @@
+metadata:
+  id: CKV_AWS_88
+  name: Launch template should not assign a public IP
+  category: NETWORKING
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_88. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_launch_template
+definition:
+  cond_type: attribute
+  attribute: network_interfaces.associate_public_ip_address
+  operator: not_equals
+  value: true
+  missing: pass
+fixtures:
+  fail: "resource \"aws_launch_template\" \"bad\" {\n  name = \"bad\"\n  network_interfaces {\n    associate_public_ip_address\
+    \ = true\n  }\n}\n"
+  pass: "resource \"aws_launch_template\" \"good\" {\n  name = \"good\"\n  network_interfaces {\n    associate_public_ip_address\
+    \ = false\n  }\n}\n"

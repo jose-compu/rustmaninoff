@@ -1,0 +1,17 @@
+metadata:
+  id: CKV_AWS_161
+  name: Ensure RDS database has IAM authentication enabled
+  category: IAM
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_161. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_db_instance
+definition:
+  cond_type: attribute
+  attribute: iam_database_authentication_enabled
+  operator: equals
+  value: true
+fixtures:
+  fail: "resource \"aws_db_instance\" \"bad\" {\n  iam_database_authentication_enabled = false\n}\n"
+  pass: "resource \"aws_db_instance\" \"good\" {\n  iam_database_authentication_enabled = true\n}\n"

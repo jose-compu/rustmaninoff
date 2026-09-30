@@ -1,0 +1,16 @@
+metadata:
+  id: CKV_AWS_23
+  name: Ensure every security group and rule has a description
+  category: NETWORKING
+  severity: LOW
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_23. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_security_group
+definition:
+  cond_type: attribute
+  attribute: description
+  operator: exists
+fixtures:
+  fail: "resource \"aws_security_group\" \"bad\" {\n  name = \"open\"\n}\n"
+  pass: "resource \"aws_security_group\" \"good\" {\n  description = \"application tier\"\n}\n"

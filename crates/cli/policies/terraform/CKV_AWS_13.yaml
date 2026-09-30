@@ -1,0 +1,17 @@
+metadata:
+  id: CKV_AWS_13
+  name: Ensure IAM password policy prevents password reuse
+  category: IAM
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_13. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_iam_account_password_policy
+definition:
+  cond_type: attribute
+  attribute: password_reuse_prevention
+  operator: greater_than_or_equal
+  value: 24
+fixtures:
+  fail: "resource \"aws_iam_account_password_policy\" \"bad\" {\n  password_reuse_prevention = 1\n}\n"
+  pass: "resource \"aws_iam_account_password_policy\" \"good\" {\n  password_reuse_prevention = 24\n}\n"

@@ -1,0 +1,12 @@
+[package]
+name = "rustmaninoff-ir"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Normalized resource model for Rustmaninoff"
+
+[dependencies]
+regex.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+serde_yaml.workspace = true

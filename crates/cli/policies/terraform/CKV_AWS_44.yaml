@@ -1,0 +1,17 @@
+metadata:
+  id: CKV_AWS_44
+  name: Ensure Neptune storage is securely encrypted
+  category: ENCRYPTION
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_44. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_neptune_cluster
+definition:
+  cond_type: attribute
+  attribute: storage_encrypted
+  operator: equals
+  value: true
+fixtures:
+  fail: "resource \"aws_neptune_cluster\" \"bad\" {\n  storage_encrypted = false\n}\n"
+  pass: "resource \"aws_neptune_cluster\" \"good\" {\n  storage_encrypted = true\n}\n"

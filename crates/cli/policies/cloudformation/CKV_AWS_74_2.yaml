@@ -1,0 +1,19 @@
+metadata:
+  id: CKV_AWS_74
+  name: Ensure DocumentDB is encrypted at rest
+  category: ENCRYPTION
+  severity: HIGH
+  framework: cloudformation
+  guidelines: Adapted from Checkov CKV_AWS_74. https://github.com/bridgecrewio/checkov
+resource_types:
+- AWS::DocDB::DBCluster
+definition:
+  cond_type: attribute
+  attribute: StorageEncrypted
+  operator: equals
+  value: true
+fixtures:
+  fail: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Bad:\n    Type: AWS::DocDB::DBCluster\n    Properties:\n\
+    \      StorageEncrypted: false\n"
+  pass: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Good:\n    Type: AWS::DocDB::DBCluster\n    Properties:\n\
+    \      StorageEncrypted: true\n"

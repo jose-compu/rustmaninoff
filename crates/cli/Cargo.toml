@@ -1,0 +1,28 @@
+[package]
+name = "rustmaninoff"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Fast IaC security scanner with Checkov-compatible policies"
+readme = "../../README.md"
+
+[[bin]]
+name = "rustmaninoff"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+include_dir = "0.7"
+rayon = "1"
+rustmaninoff-engine.workspace = true
+rustmaninoff-ir.workspace = true
+rustmaninoff-parser-cfn.workspace = true
+rustmaninoff-parser-k8s.workspace = true
+rustmaninoff-parser-terraform.workspace = true
+rustmaninoff-report.workspace = true
+serde.workspace = true
+serde_yaml.workspace = true
+
+[dev-dependencies]
+serde_json.workspace = true

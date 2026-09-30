@@ -1,0 +1,16 @@
+metadata:
+  id: CKV_AWS_27
+  name: Ensure all data stored in the SQS queue is encrypted
+  category: ENCRYPTION
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_27. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_sqs_queue
+definition:
+  cond_type: attribute
+  attribute: kms_master_key_id
+  operator: exists
+fixtures:
+  fail: "resource \"aws_sqs_queue\" \"bad\" {\n  name = \"plain\"\n}\n"
+  pass: "resource \"aws_sqs_queue\" \"good\" {\n  kms_master_key_id = \"alias/aws/sqs\"\n}\n"

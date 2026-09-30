@@ -1,0 +1,19 @@
+metadata:
+  id: CKV_AWS_30
+  name: Ensure ElastiCache replication group is encrypted in transit
+  category: ENCRYPTION
+  severity: HIGH
+  framework: cloudformation
+  guidelines: Adapted from Checkov CKV_AWS_30. https://github.com/bridgecrewio/checkov
+resource_types:
+- AWS::ElastiCache::ReplicationGroup
+definition:
+  cond_type: attribute
+  attribute: TransitEncryptionEnabled
+  operator: equals
+  value: true
+fixtures:
+  fail: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Bad:\n    Type: AWS::ElastiCache::ReplicationGroup\n    Properties:\n\
+    \      TransitEncryptionEnabled: false\n"
+  pass: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Good:\n    Type: AWS::ElastiCache::ReplicationGroup\n   \
+    \ Properties:\n      TransitEncryptionEnabled: true\n"

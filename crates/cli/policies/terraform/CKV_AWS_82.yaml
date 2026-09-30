@@ -1,0 +1,19 @@
+metadata:
+  id: CKV_AWS_82
+  name: Ensure Athena workgroup enforces configuration
+  category: ENCRYPTION
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_82. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_athena_workgroup
+definition:
+  cond_type: attribute
+  attribute: configuration.enforce_workgroup_configuration
+  operator: equals
+  value: true
+fixtures:
+  fail: "resource \"aws_athena_workgroup\" \"bad\" {\n  configuration {\n    enforce_workgroup_configuration = false\n  }\n\
+    }\n"
+  pass: "resource \"aws_athena_workgroup\" \"good\" {\n  configuration {\n    enforce_workgroup_configuration = true\n  }\n\
+    }\n"

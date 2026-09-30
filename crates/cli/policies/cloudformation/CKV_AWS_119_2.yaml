@@ -1,0 +1,19 @@
+metadata:
+  id: CKV_AWS_119
+  name: Ensure DynamoDB Tables are encrypted using a KMS Customer Managed CMK
+  category: ENCRYPTION
+  severity: HIGH
+  framework: cloudformation
+  guidelines: Adapted from Checkov CKV_AWS_119. https://github.com/bridgecrewio/checkov
+resource_types:
+- AWS::DynamoDB::Table
+definition:
+  cond_type: attribute
+  attribute: SSESpecification.SSEEnabled
+  operator: equals
+  value: true
+fixtures:
+  fail: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Bad:\n    Type: AWS::DynamoDB::Table\n    Properties:\n \
+    \     SSESpecification:\n        SSEEnabled: false\n"
+  pass: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Good:\n    Type: AWS::DynamoDB::Table\n    Properties:\n\
+    \      SSESpecification:\n        SSEEnabled: true\n        SSEType: KMS\n"

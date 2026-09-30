@@ -1,0 +1,19 @@
+metadata:
+  id: CKV_AWS_8
+  name: Ensure launch configuration EBS volumes are encrypted
+  category: ENCRYPTION
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_8. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_launch_configuration
+definition:
+  cond_type: attribute
+  attribute: root_block_device.encrypted
+  operator: equals
+  value: true
+fixtures:
+  fail: "resource \"aws_launch_configuration\" \"bad\" {\n  image_id = \"ami-123\"\n  root_block_device {\n    encrypted =\
+    \ false\n  }\n}\n"
+  pass: "resource \"aws_launch_configuration\" \"good\" {\n  image_id = \"ami-123\"\n  root_block_device {\n    encrypted\
+    \ = true\n  }\n}\n"

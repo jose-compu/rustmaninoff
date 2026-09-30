@@ -1,0 +1,19 @@
+metadata:
+  id: CKV_AWS_58
+  name: Ensure EKS Cluster has Secrets Encryption Enabled
+  category: ENCRYPTION
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_58. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_eks_cluster
+definition:
+  cond_type: attribute
+  attribute: encryption_config.resources
+  operator: contains
+  value: secrets
+fixtures:
+  fail: "resource \"aws_eks_cluster\" \"bad\" {\n  name = \"bad\"\n  vpc_config {\n    endpoint_public_access = false\n  }\n\
+    }\n"
+  pass: "resource \"aws_eks_cluster\" \"good\" {\n  name = \"good\"\n  encryption_config {\n    resources = [\"secrets\"]\n\
+    \    provider {\n      key_arn = \"arn:aws:kms:us-east-1:123:key/abc\"\n    }\n  }\n}\n"

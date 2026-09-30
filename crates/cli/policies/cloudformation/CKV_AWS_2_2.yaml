@@ -1,0 +1,19 @@
+metadata:
+  id: CKV_AWS_2
+  name: Ensure ALB protocol is HTTPS
+  category: ENCRYPTION
+  severity: HIGH
+  framework: cloudformation
+  guidelines: Adapted from Checkov CKV_AWS_2. https://github.com/bridgecrewio/checkov
+resource_types:
+- AWS::ElasticLoadBalancingV2::Listener
+definition:
+  cond_type: attribute
+  attribute: Protocol
+  operator: not_equals
+  value: HTTP
+fixtures:
+  fail: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Bad:\n    Type: AWS::ElasticLoadBalancingV2::Listener\n \
+    \   Properties:\n      Protocol: HTTP\n"
+  pass: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Good:\n    Type: AWS::ElasticLoadBalancingV2::Listener\n\
+    \    Properties:\n      Protocol: HTTPS\n"

@@ -1,0 +1,10 @@
+[package]
+name = "rustmaninoff-parser-k8s"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Kubernetes manifest parser for Rustmaninoff"
+
+[dependencies]
+rustmaninoff-ir.workspace = true
+serde_yaml.workspace = true

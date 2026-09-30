@@ -1,0 +1,28 @@
+metadata:
+  id: CKV_AWS_38
+  name: Ensure Amazon EKS public endpoint not accessible to 0.0.0.0/0
+  category: KUBERNETES
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_38. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_eks_cluster
+definition:
+  or:
+  - cond_type: attribute
+    attribute: vpc_config.endpoint_public_access
+    operator: equals
+    value: false
+  - and:
+    - cond_type: attribute
+      attribute: vpc_config.public_access_cidrs
+      operator: exists
+    - cond_type: attribute
+      attribute: vpc_config.public_access_cidrs
+      operator: not_contains
+      value: 0.0.0.0/0
+fixtures:
+  fail: "resource \"aws_eks_cluster\" \"bad\" {\n  name = \"bad\"\n  vpc_config {\n    endpoint_public_access = true\n   \
+    \ public_access_cidrs    = [\"0.0.0.0/0\"]\n  }\n}\n"
+  pass: "resource \"aws_eks_cluster\" \"good\" {\n  name = \"good\"\n  vpc_config {\n    endpoint_public_access = true\n \
+    \   public_access_cidrs    = [\"10.0.0.0/8\"]\n  }\n}\n"

@@ -1,0 +1,19 @@
+metadata:
+  id: CKV_AWS_21
+  name: Ensure the S3 bucket has versioning enabled
+  category: BACKUP_AND_RECOVERY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_21. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_s3_bucket_versioning
+definition:
+  cond_type: attribute
+  attribute: versioning_configuration.status
+  operator: equals
+  value: Enabled
+fixtures:
+  fail: "resource \"aws_s3_bucket_versioning\" \"bad\" {\n  bucket = \"data\"\n  versioning_configuration {\n    status =\
+    \ \"Suspended\"\n  }\n}\n"
+  pass: "resource \"aws_s3_bucket_versioning\" \"good\" {\n  bucket = \"data\"\n  versioning_configuration {\n    status =\
+    \ \"Enabled\"\n  }\n}\n"

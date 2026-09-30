@@ -1,0 +1,17 @@
+metadata:
+  id: CKV_AWS_43
+  name: Ensure Kinesis Stream is securely encrypted
+  category: ENCRYPTION
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_43. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_kinesis_stream
+definition:
+  cond_type: attribute
+  attribute: encryption_type
+  operator: equals
+  value: KMS
+fixtures:
+  fail: "resource \"aws_kinesis_stream\" \"bad\" {\n  encryption_type = \"NONE\"\n}\n"
+  pass: "resource \"aws_kinesis_stream\" \"good\" {\n  encryption_type = \"KMS\"\n}\n"

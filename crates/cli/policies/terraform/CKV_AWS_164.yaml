@@ -1,0 +1,19 @@
+metadata:
+  id: CKV_AWS_164
+  name: Ensure Transfer Server is not exposed publicly
+  category: NETWORKING
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_164. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_transfer_server
+definition:
+  cond_type: attribute
+  attribute: endpoint_type
+  operator: within
+  value:
+  - VPC
+  - VPC_ENDPOINT
+fixtures:
+  fail: "resource \"aws_transfer_server\" \"bad\" {\n  endpoint_type = \"PUBLIC\"\n}\n"
+  pass: "resource \"aws_transfer_server\" \"good\" {\n  endpoint_type = \"VPC\"\n}\n"

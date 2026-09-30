@@ -1,0 +1,16 @@
+metadata:
+  id: CKV_AWS_18
+  name: Ensure the S3 bucket has access logging enabled
+  category: LOGGING
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_18. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_s3_bucket_logging
+definition:
+  cond_type: attribute
+  attribute: target_bucket
+  operator: exists
+fixtures:
+  fail: "resource \"aws_s3_bucket_logging\" \"bad\" {\n  bucket = \"data\"\n}\n"
+  pass: "resource \"aws_s3_bucket_logging\" \"good\" {\n  bucket = \"data\"\n  target_bucket = \"logs\"\n}\n"

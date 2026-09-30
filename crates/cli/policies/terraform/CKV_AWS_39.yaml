@@ -1,0 +1,19 @@
+metadata:
+  id: CKV_AWS_39
+  name: Ensure Amazon EKS public endpoint disabled
+  category: KUBERNETES
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_39. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_eks_cluster
+definition:
+  cond_type: attribute
+  attribute: vpc_config.endpoint_public_access
+  operator: equals
+  value: false
+fixtures:
+  fail: "resource \"aws_eks_cluster\" \"bad\" {\n  name = \"bad\"\n  vpc_config {\n    endpoint_public_access = true\n  }\n\
+    }\n"
+  pass: "resource \"aws_eks_cluster\" \"good\" {\n  name = \"good\"\n  vpc_config {\n    endpoint_public_access = false\n\
+    \  }\n}\n"

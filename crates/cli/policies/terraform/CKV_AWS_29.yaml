@@ -1,0 +1,17 @@
+metadata:
+  id: CKV_AWS_29
+  name: Ensure ElastiCache replication group is encrypted at rest
+  category: ENCRYPTION
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_29. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_elasticache_replication_group
+definition:
+  cond_type: attribute
+  attribute: at_rest_encryption_enabled
+  operator: equals
+  value: true
+fixtures:
+  fail: "resource \"aws_elasticache_replication_group\" \"bad\" {\n  at_rest_encryption_enabled = false\n}\n"
+  pass: "resource \"aws_elasticache_replication_group\" \"good\" {\n  at_rest_encryption_enabled = true\n}\n"

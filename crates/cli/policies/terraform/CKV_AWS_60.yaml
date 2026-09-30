@@ -1,0 +1,31 @@
+metadata:
+  id: CKV_AWS_60
+  name: Ensure IAM role allows only specific services or principals to assume it
+  category: IAM
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_60. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_iam_role
+definition:
+  cond_type: no_element
+  attribute: assume_role_policy.Statement
+  where:
+    or:
+    - cond_type: attribute
+      attribute: Principal
+      operator: equals_any
+      value: '*'
+    - cond_type: attribute
+      attribute: Principal.AWS
+      operator: equals_any
+      value: '*'
+    - cond_type: attribute
+      attribute: Principal.Service
+      operator: equals_any
+      value: '*'
+fixtures:
+  fail: "resource \"aws_iam_role\" \"bad\" {\n  assume_role_policy = jsonencode({\n    Statement = [{\n      Effect = \"Allow\"\
+    \n      Principal = \"*\"\n      Action = \"sts:AssumeRole\"\n    }]\n  })\n}\n"
+  pass: "resource \"aws_iam_role\" \"good\" {\n  assume_role_policy = jsonencode({\n    Statement = [{\n      Effect = \"\
+    Allow\"\n      Principal = { Service = \"ec2.amazonaws.com\" }\n      Action = \"sts:AssumeRole\"\n    }]\n  })\n}\n"

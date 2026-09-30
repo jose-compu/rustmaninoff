@@ -1,0 +1,17 @@
+metadata:
+  id: CKV_AWS_8
+  name: Ensure all data stored in the Launch configuration or instance EBS is securely encrypted
+  category: ENCRYPTION
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_8. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_instance
+definition:
+  cond_type: attribute
+  attribute: root_block_device.encrypted
+  operator: equals
+  value: true
+fixtures:
+  fail: "resource \"aws_instance\" \"bad\" {\n  root_block_device {\n    encrypted = false\n  }\n}\n"
+  pass: "resource \"aws_instance\" \"good\" {\n  root_block_device {\n    encrypted = true\n  }\n}\n"

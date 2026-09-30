@@ -1,0 +1,20 @@
+metadata:
+  id: CKV_AWS_5
+  name: Ensure Elasticsearch is encrypted at rest
+  category: ENCRYPTION
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_5. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_elasticsearch_domain
+- aws_opensearch_domain
+definition:
+  cond_type: attribute
+  attribute: encrypt_at_rest.enabled
+  operator: equals
+  value: true
+fixtures:
+  fail: "resource \"aws_opensearch_domain\" \"bad\" {\n  domain_name = \"logs\"\n  encrypt_at_rest {\n    enabled = false\n\
+    \  }\n}\n"
+  pass: "resource \"aws_opensearch_domain\" \"good\" {\n  domain_name = \"logs\"\n  encrypt_at_rest {\n    enabled = true\n\
+    \  }\n}\n"

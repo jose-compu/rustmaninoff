@@ -1,0 +1,20 @@
+metadata:
+  id: CKV_AWS_69
+  name: Ensure Amazon MQ Broker should not have public access
+  category: NETWORKING
+  severity: HIGH
+  framework: cloudformation
+  guidelines: Adapted from Checkov CKV_AWS_69. https://github.com/bridgecrewio/checkov
+resource_types:
+- AWS::AmazonMQ::Broker
+definition:
+  cond_type: attribute
+  attribute: PubliclyAccessible
+  operator: not_equals
+  value: true
+  missing: pass
+fixtures:
+  fail: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Bad:\n    Type: AWS::AmazonMQ::Broker\n    Properties:\n\
+    \      PubliclyAccessible: true\n"
+  pass: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Good:\n    Type: AWS::AmazonMQ::Broker\n    Properties:\n\
+    \      PubliclyAccessible: false\n"

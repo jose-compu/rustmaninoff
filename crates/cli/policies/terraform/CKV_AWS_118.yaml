@@ -1,0 +1,23 @@
+metadata:
+  id: CKV_AWS_118
+  name: Ensure that enhanced monitoring is enabled for Amazon RDS instances
+  category: LOGGING
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_118. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_db_instance
+definition:
+  cond_type: attribute
+  attribute: monitoring_interval
+  operator: within
+  value:
+  - 1
+  - 5
+  - 10
+  - 15
+  - 30
+  - 60
+fixtures:
+  fail: "resource \"aws_db_instance\" \"bad\" {\n  monitoring_interval = 0\n}\n"
+  pass: "resource \"aws_db_instance\" \"good\" {\n  monitoring_interval = 60\n}\n"

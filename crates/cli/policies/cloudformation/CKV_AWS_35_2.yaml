@@ -1,0 +1,18 @@
+metadata:
+  id: CKV_AWS_35
+  name: Ensure CloudTrail logs are encrypted at rest using KMS CMKs
+  category: LOGGING
+  severity: HIGH
+  framework: cloudformation
+  guidelines: Adapted from Checkov CKV_AWS_35. https://github.com/bridgecrewio/checkov
+resource_types:
+- AWS::CloudTrail::Trail
+definition:
+  cond_type: attribute
+  attribute: KMSKeyId
+  operator: exists
+fixtures:
+  fail: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Bad:\n    Type: AWS::CloudTrail::Trail\n    Properties:\n\
+    \      IsLogging: true\n"
+  pass: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Good:\n    Type: AWS::CloudTrail::Trail\n    Properties:\n\
+    \      KMSKeyId: alias/trail\n"

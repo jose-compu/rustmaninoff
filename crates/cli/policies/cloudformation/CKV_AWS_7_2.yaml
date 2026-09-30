@@ -1,0 +1,19 @@
+metadata:
+  id: CKV_AWS_7
+  name: Ensure rotation for customer created CMKs is enabled
+  category: ENCRYPTION
+  severity: MEDIUM
+  framework: cloudformation
+  guidelines: Adapted from Checkov CKV_AWS_7. https://github.com/bridgecrewio/checkov
+resource_types:
+- AWS::KMS::Key
+definition:
+  cond_type: attribute
+  attribute: EnableKeyRotation
+  operator: equals
+  value: true
+fixtures:
+  fail: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Bad:\n    Type: AWS::KMS::Key\n    Properties:\n      EnableKeyRotation:\
+    \ false\n"
+  pass: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Good:\n    Type: AWS::KMS::Key\n    Properties:\n      EnableKeyRotation:\
+    \ true\n"

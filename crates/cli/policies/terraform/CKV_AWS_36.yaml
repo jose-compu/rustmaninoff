@@ -1,0 +1,17 @@
+metadata:
+  id: CKV_AWS_36
+  name: Ensure CloudTrail log file validation is enabled
+  category: LOGGING
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_36. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_cloudtrail
+definition:
+  cond_type: attribute
+  attribute: enable_log_file_validation
+  operator: equals
+  value: true
+fixtures:
+  fail: "resource \"aws_cloudtrail\" \"bad\" {\n  enable_log_file_validation = false\n}\n"
+  pass: "resource \"aws_cloudtrail\" \"good\" {\n  enable_log_file_validation = true\n}\n"

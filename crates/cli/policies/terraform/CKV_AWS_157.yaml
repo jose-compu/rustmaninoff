@@ -1,0 +1,17 @@
+metadata:
+  id: CKV_AWS_157
+  name: Ensure that RDS instances have Multi-AZ enabled
+  category: BACKUP_AND_RECOVERY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_157. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_db_instance
+definition:
+  cond_type: attribute
+  attribute: multi_az
+  operator: equals
+  value: true
+fixtures:
+  fail: "resource \"aws_db_instance\" \"bad\" {\n  multi_az = false\n}\n"
+  pass: "resource \"aws_db_instance\" \"good\" {\n  multi_az = true\n}\n"

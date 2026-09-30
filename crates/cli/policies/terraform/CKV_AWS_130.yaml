@@ -1,0 +1,18 @@
+metadata:
+  id: CKV_AWS_130
+  name: Ensure VPC subnets do not assign public IP by default
+  category: NETWORKING
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_130. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_subnet
+definition:
+  cond_type: attribute
+  attribute: map_public_ip_on_launch
+  operator: not_equals
+  value: true
+  missing: pass
+fixtures:
+  fail: "resource \"aws_subnet\" \"bad\" {\n  map_public_ip_on_launch = true\n}\n"
+  pass: "resource \"aws_subnet\" \"good\" {\n  map_public_ip_on_launch = false\n}\n"

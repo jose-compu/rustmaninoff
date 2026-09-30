@@ -1,0 +1,17 @@
+metadata:
+  id: CKV_AWS_14
+  name: Ensure IAM password policy requires at least one symbol
+  category: IAM
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_14. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_iam_account_password_policy
+definition:
+  cond_type: attribute
+  attribute: require_symbols
+  operator: equals
+  value: true
+fixtures:
+  fail: "resource \"aws_iam_account_password_policy\" \"bad\" {\n  require_symbols = false\n}\n"
+  pass: "resource \"aws_iam_account_password_policy\" \"good\" {\n  require_symbols = true\n}\n"

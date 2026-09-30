@@ -1,0 +1,36 @@
+metadata:
+  id: CKV_AWS_62
+  name: Ensure no IAM policies that allow full administrative privileges are created
+  category: IAM
+  severity: CRITICAL
+  framework: cloudformation
+  guidelines: Adapted from Checkov CKV_AWS_62. https://github.com/bridgecrewio/checkov
+resource_types:
+- AWS::IAM::Policy
+- AWS::IAM::Role
+- AWS::IAM::User
+- AWS::IAM::Group
+definition:
+  cond_type: no_element
+  attribute: PolicyDocument.Statement
+  where:
+    and:
+    - cond_type: attribute
+      attribute: Effect
+      operator: equals
+      value: Allow
+    - cond_type: attribute
+      attribute: Action
+      operator: equals_any
+      value: '*'
+    - cond_type: attribute
+      attribute: Resource
+      operator: equals_any
+      value: '*'
+fixtures:
+  fail: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Bad:\n    Type: AWS::IAM::Policy\n    Properties:\n     \
+    \ PolicyDocument:\n        Version: \"2012-10-17\"\n        Statement:\n          - Effect: Allow\n            Action:\
+    \ '*'\n            Resource: '*'\n"
+  pass: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Good:\n    Type: AWS::IAM::Policy\n    Properties:\n    \
+    \  PolicyDocument:\n        Version: \"2012-10-17\"\n        Statement:\n          - Effect: Allow\n            Action:\
+    \ \"s3:GetObject\"\n            Resource: \"arn:aws:s3:::bucket/*\"\n"

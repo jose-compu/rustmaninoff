@@ -1,0 +1,35 @@
+metadata:
+  id: CKV_AWS_37
+  name: Ensure Amazon EKS control plane logging is enabled for all log types
+  category: LOGGING
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_37. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_eks_cluster
+definition:
+  and:
+  - cond_type: attribute
+    attribute: enabled_cluster_log_types
+    operator: contains
+    value: api
+  - cond_type: attribute
+    attribute: enabled_cluster_log_types
+    operator: contains
+    value: audit
+  - cond_type: attribute
+    attribute: enabled_cluster_log_types
+    operator: contains
+    value: authenticator
+  - cond_type: attribute
+    attribute: enabled_cluster_log_types
+    operator: contains
+    value: controllerManager
+  - cond_type: attribute
+    attribute: enabled_cluster_log_types
+    operator: contains
+    value: scheduler
+fixtures:
+  fail: "resource \"aws_eks_cluster\" \"bad\" {\n  name = \"bad\"\n  enabled_cluster_log_types = [\"api\"]\n}\n"
+  pass: "resource \"aws_eks_cluster\" \"good\" {\n  name = \"good\"\n  enabled_cluster_log_types = [\"api\", \"audit\", \"\
+    authenticator\", \"controllerManager\", \"scheduler\"]\n}\n"

@@ -1,0 +1,21 @@
+metadata:
+  id: CKV_AWS_20
+  name: Ensure the S3 bucket ACL does not allow READ permissions to everyone
+  category: STORAGE
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_20. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_s3_bucket_acl
+definition:
+  cond_type: attribute
+  attribute: acl
+  operator: not_within
+  value:
+  - public-read
+  - public-read-write
+  - authenticated-read
+  missing: pass
+fixtures:
+  fail: "resource \"aws_s3_bucket_acl\" \"bad\" {\n  bucket = \"data\"\n  acl    = \"public-read\"\n}\n"
+  pass: "resource \"aws_s3_bucket_acl\" \"good\" {\n  bucket = \"data\"\n  acl    = \"private\"\n}\n"

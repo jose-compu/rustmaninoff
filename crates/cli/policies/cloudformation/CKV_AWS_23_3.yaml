@@ -1,0 +1,18 @@
+metadata:
+  id: CKV_AWS_23
+  name: Ensure every security group rule has a description
+  category: NETWORKING
+  severity: LOW
+  framework: cloudformation
+  guidelines: Adapted from Checkov CKV_AWS_23. https://github.com/bridgecrewio/checkov
+resource_types:
+- AWS::EC2::SecurityGroup
+definition:
+  cond_type: attribute
+  attribute: GroupDescription
+  operator: exists
+fixtures:
+  fail: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Bad:\n    Type: AWS::EC2::SecurityGroup\n    Properties:\n\
+    \      GroupName: app\n"
+  pass: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Good:\n    Type: AWS::EC2::SecurityGroup\n    Properties:\n\
+    \      GroupDescription: application tier\n"

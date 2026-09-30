@@ -1,0 +1,18 @@
+metadata:
+  id: CKV_AWS_69
+  name: Ensure MQ Broker is not publicly exposed
+  category: NETWORKING
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_69. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_mq_broker
+definition:
+  cond_type: attribute
+  attribute: publicly_accessible
+  operator: not_equals
+  value: true
+  missing: pass
+fixtures:
+  fail: "resource \"aws_mq_broker\" \"bad\" {\n  publicly_accessible = true\n}\n"
+  pass: "resource \"aws_mq_broker\" \"good\" {\n  publicly_accessible = false\n}\n"

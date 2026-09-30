@@ -1,0 +1,28 @@
+metadata:
+  id: CKV_K8S_27
+  name: Do not expose the docker daemon socket to containers
+  category: KUBERNETES
+  severity: CRITICAL
+  framework: kubernetes
+  guidelines: Adapted from Checkov CKV_K8S_27. https://github.com/bridgecrewio/checkov
+resource_types:
+- Pod
+- Deployment
+- StatefulSet
+- DaemonSet
+- Job
+- CronJob
+- ReplicaSet
+definition:
+  cond_type: no_element
+  attribute: _pod_spec.volumes
+  where:
+    cond_type: attribute
+    attribute: hostPath.path
+    operator: contains
+    value: docker.sock
+fixtures:
+  fail: "apiVersion: v1\nkind: Pod\nmetadata:\n  name: bad\n  namespace: prod\nspec:\n  volumes:\n    - name: sock\n     \
+    \ hostPath:\n        path: /var/run/docker.sock\n  containers:\n    - name: app\n      image: nginx:1.25\n"
+  pass: "apiVersion: v1\nkind: Pod\nmetadata:\n  name: good\n  namespace: prod\nspec:\n  containers:\n    - name: app\n  \
+    \    image: nginx:1.25\n"

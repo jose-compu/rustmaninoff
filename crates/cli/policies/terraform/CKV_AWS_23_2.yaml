@@ -1,0 +1,18 @@
+metadata:
+  id: CKV_AWS_23
+  name: Ensure every security group rule has a description
+  category: NETWORKING
+  severity: LOW
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_23. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_security_group_rule
+definition:
+  cond_type: attribute
+  attribute: description
+  operator: exists
+fixtures:
+  fail: "resource \"aws_security_group_rule\" \"bad\" {\n  type = \"ingress\"\n  from_port = 443\n  to_port = 443\n  protocol\
+    \ = \"tcp\"\n  security_group_id = \"sg-123\"\n}\n"
+  pass: "resource \"aws_security_group_rule\" \"good\" {\n  description = \"https\"\n  type = \"ingress\"\n  from_port = 443\n\
+    \  to_port = 443\n  protocol = \"tcp\"\n  security_group_id = \"sg-123\"\n}\n"

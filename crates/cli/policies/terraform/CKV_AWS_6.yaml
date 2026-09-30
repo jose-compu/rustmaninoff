@@ -1,0 +1,20 @@
+metadata:
+  id: CKV_AWS_6
+  name: Ensure Elasticsearch has node-to-node encryption enabled
+  category: ENCRYPTION
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_6. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_elasticsearch_domain
+- aws_opensearch_domain
+definition:
+  cond_type: attribute
+  attribute: node_to_node_encryption.enabled
+  operator: equals
+  value: true
+fixtures:
+  fail: "resource \"aws_opensearch_domain\" \"bad\" {\n  domain_name = \"logs\"\n  node_to_node_encryption {\n    enabled\
+    \ = false\n  }\n}\n"
+  pass: "resource \"aws_opensearch_domain\" \"good\" {\n  domain_name = \"logs\"\n  node_to_node_encryption {\n    enabled\
+    \ = true\n  }\n}\n"

@@ -1,0 +1,17 @@
+metadata:
+  id: CKV_AWS_96
+  name: Ensure all data stored in Aurora is securely encrypted at rest
+  category: ENCRYPTION
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_96. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_rds_cluster
+definition:
+  cond_type: attribute
+  attribute: storage_encrypted
+  operator: equals
+  value: true
+fixtures:
+  fail: "resource \"aws_rds_cluster\" \"bad\" {\n  storage_encrypted = false\n}\n"
+  pass: "resource \"aws_rds_cluster\" \"good\" {\n  storage_encrypted = true\n}\n"
