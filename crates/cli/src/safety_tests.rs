@@ -15,6 +15,7 @@ fn request(path: std::path::PathBuf) -> ScanRequest {
             Framework::Terraform,
             Framework::CloudFormation,
             Framework::Kubernetes,
+            Framework::Docker,
         ],
         checks: vec!["CKV_AWS_3".into()],
         skip_checks: Vec::new(),

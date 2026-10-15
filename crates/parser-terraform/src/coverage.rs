@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use rustmaninoff_ir::lookup;
+use rustmaninoff_ir::{lookup, ResourceKind};
 
 use super::*;
 
@@ -71,6 +71,13 @@ data "aws_ami" "ubuntu" {
 "#;
     let output = parse_file(Path::new("main.tf"), source);
     assert!(output.diagnostics.is_empty(), "{:?}", output.diagnostics);
+    let ami = output
+        .resources
+        .iter()
+        .find(|item| item.resource_type == "data.aws_ami")
+        .expect("data.aws_ami");
+    assert_eq!(ami.kind, ResourceKind::Data);
+    assert_eq!(ami.name, "ubuntu");
     assert!(output
         .resources
         .iter()

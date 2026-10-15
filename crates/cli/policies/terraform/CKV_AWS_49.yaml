@@ -1,0 +1,34 @@
+metadata:
+  id: CKV_AWS_49
+  name: Ensure no IAM policy documents allow "*" as a statement's actions
+  category: IAM
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_49. https://github.com/bridgecrewio/checkov
+resource_types:
+- data.aws_iam_policy_document
+definition:
+  cond_type: no_element
+  attribute: statement
+  where:
+    cond_type: attribute
+    attribute: actions
+    operator: contains
+    value: "*"
+fixtures:
+  fail: |
+    data "aws_iam_policy_document" "bad" {
+      statement {
+        effect    = "Allow"
+        actions   = ["*"]
+        resources = ["*"]
+      }
+    }
+  pass: |
+    data "aws_iam_policy_document" "good" {
+      statement {
+        effect    = "Allow"
+        actions   = ["s3:GetObject"]
+        resources = ["arn:aws:s3:::bucket/*"]
+      }
+    }

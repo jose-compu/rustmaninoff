@@ -4,7 +4,7 @@
   <img src="docs/rustmaninoff-banner.jpg" alt="Rustmaninoff, IaC security scanner" width="720">
 </p>
 
-Attribute scanner for Terraform, CloudFormation, and Kubernetes. Policies are Checkov-compatible YAML and reuse published CKV ids. The engine is not a port of the Checkov Python runtime.
+Attribute scanner for Terraform, CloudFormation, Kubernetes, and Dockerfiles. Policies are Checkov-compatible YAML and reuse published CKV ids. The engine is not a port of the Checkov Python runtime.
 
 Built-in policies are rewritten YAML, attributed to [Checkov](https://github.com/bridgecrewio/checkov) (Bridgecrew / Palo Alto Networks, Apache-2.0).
 
@@ -21,7 +21,7 @@ cargo build --release -p rustmaninoff
 
 ```sh
 rustmaninoff scan [PATH] \
-  --framework terraform,cloudformation,kubernetes \
+  --framework terraform,cloudformation,kubernetes,docker \
   --check CKV_AWS_3 \
   --skip-check CKV_AWS_8 \
   --output cli,json,sarif,junit \
@@ -38,7 +38,7 @@ Inline skip: `# checkov:skip=CKV_AWS_3:reason`. Kubernetes annotation value: `ch
 Optional `.rustmaninoff.yaml`:
 
 ```yaml
-frameworks: [terraform, cloudformation, kubernetes]
+frameworks: [terraform, cloudformation, kubernetes, docker]
 skip_checks: []
 fail_on: HIGH
 excluded_paths: []
@@ -49,17 +49,18 @@ compact: false
 
 Directories named `.git`, `.terraform`, `.terragrunt-cache`, `node_modules`, `vendor`, and `target` are skipped. Symbolic links are not followed. Files larger than 10 MB, and files past the nesting or YAML-alias limits, are reported as diagnostics and are not parsed.
 
-## v0.1 scope
+## v0.2 scope
 
-- Terraform `.tf` and `.tf.json` resource blocks. No module download and no full HCL evaluation. Data sources are not scanned.
+- Terraform `.tf` and `.tf.json` managed `resource` blocks and `data` sources. Data sources are emitted as IR resources with kind `data` and type `data.TYPE` so policies can target them. No module download and no full HCL evaluation.
 - CloudFormation YAML and JSON `Resources`. Attribute paths are relative to `Properties`.
 - Kubernetes multi-document YAML, including `List`.
-- 162 built-in checks (86 Terraform, 46 CloudFormation, 30 Kubernetes). Each check has a pass fixture and a fail fixture.
+- Dockerfiles (`Dockerfile`, `Containerfile`, `*.dockerfile`): FROM, USER, ADD vs COPY, HEALTHCHECK, and privileged-ish RUN patterns.
+- 181 built-in checks (94 Terraform, 51 CloudFormation, 32 Kubernetes, 4 Docker). Each check has a pass fixture and a fail fixture.
 - Text, JSON, SARIF 2.1.0, and JUnit reports.
 
 S3 encryption, versioning, and logging on current Terraform target `aws_s3_bucket_server_side_encryption_configuration`, `aws_s3_bucket_versioning`, and `aws_s3_bucket_logging`. `CKV_AWS_286` matches a static action subset, including `*` and `*:*`. `CKV_K8S_14` accepts a digest or a tag other than `latest`; an image whose last colon is a registry port and which has no tag is treated as pinned.
 
-Not in v0.1: graph checks (`CKV2_*`), Terraform plan JSON, remote modules, Helm, Kustomize, Dockerfiles, secrets, full variable evaluation, and cfn-lint resource-spec validation.
+Not in v0.2: graph checks (`CKV2_*`), Terraform plan JSON, remote modules, Helm, Kustomize, secrets scanning, full variable evaluation, and cfn-lint resource-spec validation.
 
 ## Policy dialect
 
@@ -75,11 +76,11 @@ Wall-clock time of each CLI on one synthetic corpus, Apple M2, macOS 14.8. Media
 
 | Scanner | Full corpus | Terraform | CloudFormation | Kubernetes |
 | --- | ---: | ---: | ---: | ---: |
-| Rustmaninoff 0.1.0 | 20 ms | 11 ms | 9 ms | 11 ms |
+| Rustmaninoff 0.2.0 | 20 ms | 11 ms | 9 ms | 11 ms |
 | Checkov 3.3.21 | 4.51 s | 3.72 s | 2.71 s | 2.92 s |
 | Trivy 0.74.0 | 5.71 s | 2.67 s | 1.29 s | 2.59 s |
 
-On the full corpus that is about 225 times the Rustmaninoff time for Checkov, and about 285 times for Trivy. The catalogs are not the same: Rustmaninoff runs 162 attribute checks, Checkov runs its built-in checks for the selected frameworks, and Trivy runs its misconfiguration policies.
+On the full corpus that is about 225 times the Rustmaninoff time for Checkov, and about 285 times for Trivy. The catalogs are not the same: Rustmaninoff runs 181 attribute checks, Checkov runs its built-in checks for the selected frameworks, and Trivy runs its misconfiguration policies.
 
 ```mermaid
 %%{init: {"themeVariables": {"xyChart": {"plotColorPalette": "#E07A3D, #2A9D8F, #3D5A80", "titleColor": "#C44536", "xAxisLineColor": "#E07A3D", "yAxisLineColor": "#2A9D8F", "xAxisTickColor": "#E9C46A", "yAxisTickColor": "#7B6CF6"}}}}%%
@@ -144,13 +145,20 @@ xychart-beta
 
 Builtin YAML is parsed once per process (about 6 ms) and reused. Repeat the stage measurement with `cargo run --release -p rustmaninoff --example stages`.
 
-## Release
-
-Pushing the tag `v0.1.0` runs `.github/workflows/release.yml`. It publishes Linux and macOS binaries for amd64 and arm64, each with a SHA-256 checksum.
+## Install
 
 ```sh
-git tag v0.1.0
-git push origin v0.1.0
+cargo install rustmaninoff --locked
+rustmaninoff scan .
+```
+
+## Release
+
+Pushing the tag `v0.2.0` runs `.github/workflows/release.yml`. It publishes Linux and macOS binaries for amd64 and arm64, each with a SHA-256 checksum.
+
+```sh
+git tag v0.2.0
+git push origin v0.2.0
 ```
 
 ```yaml

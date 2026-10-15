@@ -5,10 +5,16 @@ fn framework_aliases_and_display() {
     assert_eq!(Framework::parse("tf"), Some(Framework::Terraform));
     assert_eq!(Framework::parse(" cfn "), Some(Framework::CloudFormation));
     assert_eq!(Framework::parse("k8s"), Some(Framework::Kubernetes));
+    assert_eq!(Framework::parse("dockerfile"), Some(Framework::Docker));
+    assert_eq!(Framework::parse("docker"), Some(Framework::Docker));
     assert!(Framework::parse("helm").is_none());
     assert_eq!(Framework::Terraform.to_string(), "terraform");
     assert_eq!(Framework::CloudFormation.to_string(), "cloudformation");
     assert_eq!(Framework::Kubernetes.to_string(), "kubernetes");
+    assert_eq!(Framework::Docker.to_string(), "docker");
+    assert_eq!(ResourceKind::Managed.to_string(), "managed");
+    assert_eq!(ResourceKind::Data.to_string(), "data");
+    assert_eq!(ResourceKind::default(), ResourceKind::Managed);
 }
 
 #[test]

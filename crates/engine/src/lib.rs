@@ -209,6 +209,7 @@ mod tests {
     fn resource(resource_type: &str, name: &str, attributes: Value) -> Resource {
         Resource {
             framework: Framework::Terraform,
+            kind: rustmaninoff_ir::ResourceKind::Managed,
             resource_type: resource_type.to_string(),
             name: name.to_string(),
             attributes,

@@ -1,0 +1,29 @@
+metadata:
+  id: CKV_DOCKER_3
+  name: Ensure that a non-root user for the container has been created
+  category: IAM
+  severity: HIGH
+  framework: docker
+  guidelines: Adapted from Checkov CKV_DOCKER_3. https://github.com/bridgecrewio/checkov
+resource_types:
+- dockerfile
+definition:
+  and:
+  - cond_type: attribute
+    attribute: USER
+    operator: exists
+  - cond_type: attribute
+    attribute: USER
+    operator: not_equals
+    value: root
+  - cond_type: attribute
+    attribute: USER
+    operator: not_equals
+    value: "0"
+fixtures:
+  fail: |
+    FROM nginx:1.27
+    USER root
+  pass: |
+    FROM nginx:1.27
+    USER app

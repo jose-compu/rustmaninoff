@@ -1,0 +1,22 @@
+metadata:
+  id: CKV_DOCKER_4
+  name: Ensure that COPY is used instead of ADD in Dockerfiles
+  category: GENERAL_SECURITY
+  severity: LOW
+  framework: docker
+  guidelines: Adapted from Checkov CKV_DOCKER_4. https://github.com/bridgecrewio/checkov
+resource_types:
+- dockerfile
+definition:
+  cond_type: attribute
+  attribute: ADD
+  operator: not_exists
+fixtures:
+  fail: |
+    FROM nginx:1.27
+    USER app
+    ADD src dest
+  pass: |
+    FROM nginx:1.27
+    USER app
+    COPY src dest

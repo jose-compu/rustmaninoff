@@ -1,0 +1,31 @@
+metadata:
+  id: CKV_AWS_116
+  name: Ensure Lambda function has a dead-letter queue configured
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_116. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_lambda_function
+definition:
+  cond_type: attribute
+  attribute: dead_letter_config.target_arn
+  operator: exists
+fixtures:
+  fail: |
+    resource "aws_lambda_function" "bad" {
+      function_name = "app"
+      role          = "arn:aws:iam::123:role/lambda"
+      handler       = "index.handler"
+      runtime       = "python3.12"
+    }
+  pass: |
+    resource "aws_lambda_function" "good" {
+      function_name = "app"
+      role          = "arn:aws:iam::123:role/lambda"
+      handler       = "index.handler"
+      runtime       = "python3.12"
+      dead_letter_config {
+        target_arn = "arn:aws:sqs:us-east-1:123:dlq"
+      }
+    }

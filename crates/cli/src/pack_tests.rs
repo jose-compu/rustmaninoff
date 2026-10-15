@@ -13,8 +13,8 @@ fn builtin_pack_covers_at_least_160_policies_with_fixtures() {
     let policies = builtin_policies().expect("embedded policies");
     println!("builtin policies: {}", policies.len());
     assert!(
-        policies.len() >= 160,
-        "expected at least 160 builtin policies, found {}",
+        policies.len() >= 175,
+        "expected at least 175 builtin policies, found {}",
         policies.len()
     );
     for policy in &policies {
@@ -48,11 +48,13 @@ fn assert_fixture(
         Framework::Terraform => "fixture.tf",
         Framework::CloudFormation => "fixture.yaml",
         Framework::Kubernetes => "fixture.yaml",
+        Framework::Docker => "Dockerfile",
     };
     let output = match framework {
         Framework::Terraform => rustmaninoff_parser_terraform::parse_file(Path::new(name), source),
         Framework::CloudFormation => rustmaninoff_parser_cfn::parse_file(Path::new(name), source),
         Framework::Kubernetes => rustmaninoff_parser_k8s::parse_file(Path::new(name), source),
+        Framework::Docker => rustmaninoff_parser_docker::parse_file(Path::new(name), source),
     };
     assert!(
         output.diagnostics.is_empty(),
@@ -146,6 +148,7 @@ resource "aws_ebs_volume" "bad" {
             Framework::Terraform,
             Framework::CloudFormation,
             Framework::Kubernetes,
+            Framework::Docker,
         ],
         checks: vec!["CKV_AWS_3".into()],
         skip_checks: Vec::new(),

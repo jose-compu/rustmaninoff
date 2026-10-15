@@ -1,4 +1,4 @@
-//! Rustmaninoff scans Terraform, CloudFormation, and Kubernetes for misconfigurations.
+//! Rustmaninoff scans Terraform, CloudFormation, Kubernetes, and Dockerfiles for misconfigurations.
 
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -42,7 +42,7 @@ pub enum Command {
 pub struct ScanArgs {
     /// Directory or file to scan. Defaults to the current directory.
     pub path: Option<PathBuf>,
-    /// Comma-separated frameworks: terraform,cloudformation,kubernetes.
+    /// Comma-separated frameworks: terraform,cloudformation,kubernetes,docker.
     #[arg(long)]
     pub framework: Option<String>,
     /// Comma-separated check ids to run.
@@ -184,6 +184,7 @@ fn request_from_args(args: ScanArgs) -> anyhow::Result<ScanRequest> {
                 Framework::Terraform,
                 Framework::CloudFormation,
                 Framework::Kubernetes,
+                Framework::Docker,
             ],
         },
     };
@@ -314,10 +315,25 @@ fn walk(dir: &Path, excluded: &[String], out: &mut Vec<PathBuf>) {
 }
 
 fn is_candidate(path: &Path) -> bool {
+    if is_dockerfile_name(path) {
+        return true;
+    }
     match path.extension().and_then(|ext| ext.to_str()) {
         Some("tf" | "json" | "yaml" | "yml") => true,
         _ => path.to_string_lossy().ends_with(".tf.json"),
     }
+}
+
+fn is_dockerfile_name(path: &Path) -> bool {
+    let Some(name) = path.file_name().and_then(|name| name.to_str()) else {
+        return false;
+    };
+    let lower = name.to_ascii_lowercase();
+    lower == "dockerfile"
+        || lower == "containerfile"
+        || lower.starts_with("dockerfile.")
+        || lower.starts_with("containerfile.")
+        || lower.ends_with(".dockerfile")
 }
 
 fn classify_and_parse(path: &Path, frameworks: &[Framework]) -> Option<ParseOutput> {
@@ -344,6 +360,7 @@ fn classify_and_parse(path: &Path, frameworks: &[Framework]) -> Option<ParseOutp
         Framework::Terraform => rustmaninoff_parser_terraform::parse_file(path, &source),
         Framework::CloudFormation => rustmaninoff_parser_cfn::parse_file(path, &source),
         Framework::Kubernetes => rustmaninoff_parser_k8s::parse_file(path, &source),
+        Framework::Docker => rustmaninoff_parser_docker::parse_file(path, &source),
     };
     Some(output)
 }
@@ -360,6 +377,9 @@ fn skipped_file(path: &Path, message: &str) -> ParseOutput {
 }
 
 fn detect(path: &Path, source: &str) -> Option<Framework> {
+    if is_dockerfile_name(path) {
+        return Some(Framework::Docker);
+    }
     let name = path.to_string_lossy();
     if name.ends_with(".tf") || name.ends_with(".tf.json") {
         return Some(Framework::Terraform);

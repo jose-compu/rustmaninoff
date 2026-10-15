@@ -627,6 +627,9 @@ fn image_tag_pinned(value: &Value) -> bool {
     let Some(image) = unwrap_single(value).as_str() else {
         return false;
     };
+    if image.eq_ignore_ascii_case("scratch") {
+        return true;
+    }
     if image.contains('@') {
         return true;
     }

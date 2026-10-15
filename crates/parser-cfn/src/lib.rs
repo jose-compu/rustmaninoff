@@ -39,6 +39,7 @@ pub fn parse_file(path: &Path, source: &str) -> ParseOutput {
         let start_line = find_logical_id_line(source, name);
         output.resources.push(Resource {
             framework: Framework::CloudFormation,
+            kind: rustmaninoff_ir::ResourceKind::Managed,
             resource_type: type_name.to_string(),
             name: name.clone(),
             attributes,

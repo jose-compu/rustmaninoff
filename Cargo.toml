@@ -6,12 +6,13 @@ members = [
     "crates/parser-terraform",
     "crates/parser-cfn",
     "crates/parser-k8s",
+    "crates/parser-docker",
     "crates/report",
     "crates/cli",
 ]
 
 [workspace.package]
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 license = "Apache-2.0"
 
@@ -21,9 +22,10 @@ serde_json = "1"
 serde_yaml = "0.9"
 thiserror = "1"
 regex = "1"
-rustmaninoff-ir = { version = "0.1.0", path = "crates/ir" }
-rustmaninoff-engine = { version = "0.1.0", path = "crates/engine" }
-rustmaninoff-parser-terraform = { version = "0.1.0", path = "crates/parser-terraform" }
-rustmaninoff-parser-cfn = { version = "0.1.0", path = "crates/parser-cfn" }
-rustmaninoff-parser-k8s = { version = "0.1.0", path = "crates/parser-k8s" }
-rustmaninoff-report = { version = "0.1.0", path = "crates/report" }
+rustmaninoff-ir = { version = "0.2.0", path = "crates/ir" }
+rustmaninoff-engine = { version = "0.2.0", path = "crates/engine" }
+rustmaninoff-parser-terraform = { version = "0.2.0", path = "crates/parser-terraform" }
+rustmaninoff-parser-cfn = { version = "0.2.0", path = "crates/parser-cfn" }
+rustmaninoff-parser-k8s = { version = "0.2.0", path = "crates/parser-k8s" }
+rustmaninoff-parser-docker = { version = "0.2.0", path = "crates/parser-docker" }
+rustmaninoff-report = { version = "0.2.0", path = "crates/report" }

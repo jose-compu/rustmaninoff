@@ -26,6 +26,7 @@ fn resources(count: usize) -> Vec<Resource> {
     (0..count)
         .map(|index| Resource {
             framework: Framework::Terraform,
+            kind: rustmaninoff_ir::ResourceKind::Managed,
             resource_type: "aws_ebs_volume".into(),
             name: format!("v{index}"),
             attributes: Value::from_json(serde_json::json!({"encrypted": false, "size": 8})),

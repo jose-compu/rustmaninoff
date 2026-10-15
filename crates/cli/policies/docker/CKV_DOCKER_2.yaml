@@ -1,0 +1,21 @@
+metadata:
+  id: CKV_DOCKER_2
+  name: Ensure that HEALTHCHECK instructions have been added to container images
+  category: NETWORKING
+  severity: MEDIUM
+  framework: docker
+  guidelines: Adapted from Checkov CKV_DOCKER_2. https://github.com/bridgecrewio/checkov
+resource_types:
+- dockerfile
+definition:
+  cond_type: attribute
+  attribute: HEALTHCHECK
+  operator: exists
+fixtures:
+  fail: |
+    FROM nginx:1.27
+    USER app
+  pass: |
+    FROM nginx:1.27
+    USER app
+    HEALTHCHECK CMD wget -q --spider http://localhost/ || exit 1

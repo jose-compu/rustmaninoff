@@ -1,0 +1,23 @@
+metadata:
+  id: CKV_AWS_91
+  name: Ensure CloudWatch Log Group specifies retention days
+  category: LOGGING
+  severity: LOW
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_91. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_cloudwatch_log_group
+definition:
+  cond_type: attribute
+  attribute: retention_in_days
+  operator: exists
+fixtures:
+  fail: |
+    resource "aws_cloudwatch_log_group" "bad" {
+      name = "app"
+    }
+  pass: |
+    resource "aws_cloudwatch_log_group" "good" {
+      name              = "app"
+      retention_in_days = 14
+    }

@@ -1,0 +1,31 @@
+metadata:
+  id: CKV_AWS_163
+  name: Ensure ECR image scanning on push is enabled
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: cloudformation
+  guidelines: Adapted from Checkov CKV_AWS_163. https://github.com/bridgecrewio/checkov
+resource_types:
+- AWS::ECR::Repository
+definition:
+  cond_type: attribute
+  attribute: ImageScanningConfiguration.ScanOnPush
+  operator: equals
+  value: true
+fixtures:
+  fail: |
+    AWSTemplateFormatVersion: "2010-09-09"
+    Resources:
+      Bad:
+        Type: AWS::ECR::Repository
+        Properties:
+          RepositoryName: app
+  pass: |
+    AWSTemplateFormatVersion: "2010-09-09"
+    Resources:
+      Good:
+        Type: AWS::ECR::Repository
+        Properties:
+          RepositoryName: app
+          ImageScanningConfiguration:
+            ScanOnPush: true

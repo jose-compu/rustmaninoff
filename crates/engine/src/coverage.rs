@@ -8,6 +8,7 @@ use super::{evaluate, parse_policy, Severity, Status};
 fn resource(framework: Framework, resource_type: &str, attrs: serde_json::Value) -> Resource {
     Resource {
         framework,
+        kind: rustmaninoff_ir::ResourceKind::Managed,
         resource_type: resource_type.into(),
         name: "n".into(),
         attributes: Value::from_json(attrs),
@@ -75,6 +76,7 @@ fn operators_cover_pass_fail_and_missing() {
         ("  cond_type: attribute\n  attribute: a\n  operator: intersects\n  value: [\"s3:Get\"]", r#"{"a":"*"}"#, Status::Passed),
         ("  cond_type: attribute\n  attribute: a\n  operator: not_intersects\n  value: [\"s3:Get\"]", r#"{"a":["ec2:*"]}"#, Status::Passed),
         ("  cond_type: attribute\n  attribute: a\n  operator: any", r#"{"a":1}"#, Status::Passed),
+        ("  cond_type: attribute\n  attribute: a\n  operator: image_tag_pinned", r#"{"a":"scratch"}"#, Status::Passed),
         ("  cond_type: attribute\n  attribute: a\n  operator: image_tag_pinned", r#"{"a":"nginx:1.2"}"#, Status::Passed),
         ("  cond_type: attribute\n  attribute: a\n  operator: image_tag_pinned", r#"{"a":"nginx@sha256:abc"}"#, Status::Passed),
         ("  cond_type: attribute\n  attribute: a\n  operator: image_tag_pinned", r#"{"a":"nginx:latest"}"#, Status::Failed),

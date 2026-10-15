@@ -12,6 +12,7 @@ pub enum Framework {
     Terraform,
     CloudFormation,
     Kubernetes,
+    Docker,
 }
 
 impl Framework {
@@ -20,6 +21,7 @@ impl Framework {
             "terraform" | "tf" => Some(Self::Terraform),
             "cloudformation" | "cfn" => Some(Self::CloudFormation),
             "kubernetes" | "k8s" => Some(Self::Kubernetes),
+            "docker" | "dockerfile" => Some(Self::Docker),
             _ => None,
         }
     }
@@ -29,6 +31,7 @@ impl Framework {
             Self::Terraform => "terraform",
             Self::CloudFormation => "cloudformation",
             Self::Kubernetes => "kubernetes",
+            Self::Docker => "docker",
         }
     }
 }
@@ -365,7 +368,7 @@ pub const MAX_POLICY_BYTES: u64 = 1_000_000;
 
 /// Reject inputs that can blow the stack or expand YAML aliases without bound.
 ///
-/// One linear pass. Normal Terraform, CloudFormation, and Kubernetes stay under the limits.
+/// One linear pass. Normal Terraform, CloudFormation, Kubernetes, and Dockerfiles stay under the limits.
 pub fn input_limit(source: &str) -> Option<&'static str> {
     const MAX_DEPTH: usize = 128;
     const MAX_ALIASES: usize = 256;
@@ -477,10 +480,35 @@ pub struct LocatedSkip {
     pub skip: Skip,
 }
 
+/// Distinguishes managed resources from Terraform data sources.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize, Default)]
+#[serde(rename_all = "lowercase")]
+pub enum ResourceKind {
+    #[default]
+    Managed,
+    Data,
+}
+
+impl ResourceKind {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Managed => "managed",
+            Self::Data => "data",
+        }
+    }
+}
+
+impl std::fmt::Display for ResourceKind {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
 /// A parsed infrastructure object.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Resource {
     pub framework: Framework,
+    pub kind: ResourceKind,
     pub resource_type: String,
     pub name: String,
     pub attributes: Value,

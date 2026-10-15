@@ -580,7 +580,7 @@ checksum = "d6f6ff9a378485b298a5286656da665ba74413d36db0979633275d2e708145d4"
 
 [[package]]
 name = "rustmaninoff"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "clap",
@@ -589,6 +589,7 @@ dependencies = [
  "rustmaninoff-engine",
  "rustmaninoff-ir",
  "rustmaninoff-parser-cfn",
+ "rustmaninoff-parser-docker",
  "rustmaninoff-parser-k8s",
  "rustmaninoff-parser-terraform",
  "rustmaninoff-report",
@@ -599,7 +600,7 @@ dependencies = [
 
 [[package]]
 name = "rustmaninoff-engine"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "criterion",
  "rayon",
@@ -613,7 +614,7 @@ dependencies = [
 
 [[package]]
 name = "rustmaninoff-ir"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "regex",
  "serde",
@@ -623,7 +624,7 @@ dependencies = [
 
 [[package]]
 name = "rustmaninoff-parser-cfn"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "rustmaninoff-ir",
  "serde_json",
@@ -631,8 +632,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "rustmaninoff-parser-docker"
+version = "0.2.0"
+dependencies = [
+ "rustmaninoff-ir",
+]
+
+[[package]]
 name = "rustmaninoff-parser-k8s"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "rustmaninoff-ir",
  "serde_yaml",
@@ -640,7 +648,7 @@ dependencies = [
 
 [[package]]
 name = "rustmaninoff-parser-terraform"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "hcl-rs",
  "rustmaninoff-ir",
@@ -649,7 +657,7 @@ dependencies = [
 
 [[package]]
 name = "rustmaninoff-report"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "rustmaninoff-engine",
  "rustmaninoff-ir",

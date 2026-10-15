@@ -1,0 +1,26 @@
+metadata:
+  id: CKV_AWS_260
+  name: Ensure ALB drops invalid HTTP headers
+  category: NETWORKING
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_260. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_lb
+- aws_alb
+definition:
+  cond_type: attribute
+  attribute: drop_invalid_header_fields
+  operator: equals
+  value: true
+fixtures:
+  fail: |
+    resource "aws_lb" "bad" {
+      load_balancer_type         = "application"
+      drop_invalid_header_fields = false
+    }
+  pass: |
+    resource "aws_lb" "good" {
+      load_balancer_type         = "application"
+      drop_invalid_header_fields = true
+    }

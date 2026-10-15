@@ -46,6 +46,11 @@ fn scan_paths_frameworks_and_outputs() {
         "Resources:\n  Bucket:\n    Type: AWS::S3::Bucket\n    Properties:\n      BucketName: logs\n",
     )
     .unwrap();
+    fs::write(
+        root.join("Dockerfile"),
+        "FROM nginx:latest\nUSER root\nADD src dest\n",
+    )
+    .unwrap();
     let skipped = root.join("target");
     fs::create_dir(&skipped).unwrap();
     fs::write(
@@ -147,6 +152,21 @@ fn scan_paths_frameworks_and_outputs() {
     ])
     .unwrap();
     assert_eq!(k8s_only, 1);
+    let docker_only = run(&[
+        "rustmaninoff",
+        "scan",
+        root.to_str().unwrap(),
+        "--framework",
+        "docker",
+        "--check",
+        "CKV_DOCKER_1",
+        "--fail-on",
+        "LOW",
+        "--output",
+        "text",
+    ])
+    .unwrap();
+    assert_eq!(docker_only, 1);
     let missing = run(&[
         "rustmaninoff",
         "scan",

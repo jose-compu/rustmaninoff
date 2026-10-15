@@ -1,0 +1,35 @@
+metadata:
+  id: CKV_AWS_50
+  name: Ensure X-Ray tracing is enabled for Lambda
+  category: LOGGING
+  severity: LOW
+  framework: cloudformation
+  guidelines: Adapted from Checkov CKV_AWS_50. https://github.com/bridgecrewio/checkov
+resource_types:
+- AWS::Lambda::Function
+definition:
+  cond_type: attribute
+  attribute: TracingConfig.Mode
+  operator: equals
+  value: Active
+fixtures:
+  fail: |
+    AWSTemplateFormatVersion: "2010-09-09"
+    Resources:
+      Bad:
+        Type: AWS::Lambda::Function
+        Properties:
+          Handler: index.handler
+          Role: arn:aws:iam::123:role/lambda
+          Runtime: python3.12
+  pass: |
+    AWSTemplateFormatVersion: "2010-09-09"
+    Resources:
+      Good:
+        Type: AWS::Lambda::Function
+        Properties:
+          Handler: index.handler
+          Role: arn:aws:iam::123:role/lambda
+          Runtime: python3.12
+          TracingConfig:
+            Mode: Active

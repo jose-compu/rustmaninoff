@@ -1,0 +1,34 @@
+metadata:
+  id: CKV_AWS_116
+  name: Ensure Lambda function has a dead-letter queue configured
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: cloudformation
+  guidelines: Adapted from Checkov CKV_AWS_116. https://github.com/bridgecrewio/checkov
+resource_types:
+- AWS::Lambda::Function
+definition:
+  cond_type: attribute
+  attribute: DeadLetterConfig.TargetArn
+  operator: exists
+fixtures:
+  fail: |
+    AWSTemplateFormatVersion: "2010-09-09"
+    Resources:
+      Bad:
+        Type: AWS::Lambda::Function
+        Properties:
+          Handler: index.handler
+          Role: arn:aws:iam::123:role/lambda
+          Runtime: python3.12
+  pass: |
+    AWSTemplateFormatVersion: "2010-09-09"
+    Resources:
+      Good:
+        Type: AWS::Lambda::Function
+        Properties:
+          Handler: index.handler
+          Role: arn:aws:iam::123:role/lambda
+          Runtime: python3.12
+          DeadLetterConfig:
+            TargetArn: arn:aws:sqs:us-east-1:123:dlq

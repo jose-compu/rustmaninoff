@@ -1,0 +1,28 @@
+metadata:
+  id: CKV_AWS_28
+  name: Ensure DynamoDB point in time recovery is enabled
+  category: BACKUP_AND_RECOVERY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_28. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_dynamodb_table
+definition:
+  cond_type: attribute
+  attribute: point_in_time_recovery.enabled
+  operator: equals
+  value: true
+fixtures:
+  fail: |
+    resource "aws_dynamodb_table" "bad" {
+      name     = "items"
+      hash_key = "id"
+    }
+  pass: |
+    resource "aws_dynamodb_table" "good" {
+      name     = "items"
+      hash_key = "id"
+      point_in_time_recovery {
+        enabled = true
+      }
+    }

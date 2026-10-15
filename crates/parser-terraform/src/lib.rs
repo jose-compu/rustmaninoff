@@ -6,7 +6,7 @@ use std::path::Path;
 use hcl::expr::{Expression, FuncCall, ObjectKey, TemplateExpr};
 use hcl::structure::Body;
 use rustmaninoff_ir::{
-    extract_skip_comments, skips_between, Framework, ParseOutput, Resource, Value,
+    extract_skip_comments, skips_between, Framework, ParseOutput, Resource, ResourceKind, Value,
 };
 
 pub fn parse_file(path: &Path, source: &str) -> ParseOutput {
@@ -32,11 +32,13 @@ fn parse_body(path: &Path, source: &str, body: &Body) -> ParseOutput {
     let spans = index_block_spans(source);
     let skips = extract_skip_comments(source);
     let mut output = ParseOutput::default();
-    let mut seen = HashMap::<(String, String), usize>::new();
+    let mut seen = HashMap::<(String, String, String), usize>::new();
     for block in body.blocks() {
-        if block.identifier() != "resource" {
-            continue;
-        }
+        let kind = match block.identifier() {
+            "resource" => ResourceKind::Managed,
+            "data" => ResourceKind::Data,
+            _ => continue,
+        };
         let labels: Vec<String> = block
             .labels()
             .iter()
@@ -45,26 +47,32 @@ fn parse_body(path: &Path, source: &str, body: &Body) -> ParseOutput {
         if labels.len() < 2 {
             continue;
         }
+        let keyword = block.identifier().to_string();
         let occurrence = *seen
-            .entry((labels[0].clone(), labels[1].clone()))
+            .entry((keyword.clone(), labels[0].clone(), labels[1].clone()))
             .or_insert(0);
-        seen.insert((labels[0].clone(), labels[1].clone()), occurrence + 1);
+        seen.insert(
+            (keyword.clone(), labels[0].clone(), labels[1].clone()),
+            occurrence + 1,
+        );
         let (start_line, end_line) = spans
-            .get(labels[0].as_str())
-            .and_then(|by_name| by_name.get(labels[1].as_str()))
+            .get(&(keyword, labels[0].clone(), labels[1].clone()))
             .and_then(|items| items.get(occurrence))
             .copied()
             .unwrap_or((1, 1));
         let mut attributes = body_to_value(block.body());
         normalize_tree(&mut attributes);
-        if labels[0] == "aws_vpc_security_group_ingress_rule" {
-            insert_type(&mut attributes, "ingress");
-        } else if labels[0] == "aws_vpc_security_group_egress_rule" {
-            insert_type(&mut attributes, "egress");
+        if kind == ResourceKind::Managed {
+            if labels[0] == "aws_vpc_security_group_ingress_rule" {
+                insert_type(&mut attributes, "ingress");
+            } else if labels[0] == "aws_vpc_security_group_egress_rule" {
+                insert_type(&mut attributes, "egress");
+            }
         }
         output.resources.push(Resource {
             framework: Framework::Terraform,
-            resource_type: labels[0].clone(),
+            kind,
+            resource_type: resource_type_name(kind, &labels[0]),
             name: labels[1].clone(),
             attributes,
             file: path.to_path_buf(),
@@ -74,6 +82,13 @@ fn parse_body(path: &Path, source: &str, body: &Body) -> ParseOutput {
         });
     }
     output
+}
+
+fn resource_type_name(kind: ResourceKind, type_name: &str) -> String {
+    match kind {
+        ResourceKind::Data => format!("data.{type_name}"),
+        ResourceKind::Managed => type_name.to_string(),
+    }
 }
 
 fn insert_type(attributes: &mut Value, type_name: &str) {
@@ -266,10 +281,37 @@ fn parse_json(path: &Path, source: &str) -> ParseOutput {
     };
     let skips = skips_between(&extract_skip_comments(source), 1, usize::MAX);
     let mut output = ParseOutput::default();
-    let Some(resources) = parsed.get("resource").and_then(|value| value.as_object()) else {
-        return output;
+    emit_json_section(
+        &mut output,
+        path,
+        &parsed,
+        "resource",
+        ResourceKind::Managed,
+        &skips,
+    );
+    emit_json_section(
+        &mut output,
+        path,
+        &parsed,
+        "data",
+        ResourceKind::Data,
+        &skips,
+    );
+    output
+}
+
+fn emit_json_section(
+    output: &mut ParseOutput,
+    path: &Path,
+    parsed: &serde_json::Value,
+    key: &str,
+    kind: ResourceKind,
+    skips: &[rustmaninoff_ir::Skip],
+) {
+    let Some(section) = parsed.get(key).and_then(|value| value.as_object()) else {
+        return;
     };
-    for (resource_type, named) in resources {
+    for (resource_type, named) in section {
         let Some(named) = named.as_object() else {
             continue;
         };
@@ -286,17 +328,17 @@ fn parse_json(path: &Path, source: &str) -> ParseOutput {
             normalize_tree(&mut attributes);
             output.resources.push(Resource {
                 framework: Framework::Terraform,
-                resource_type: resource_type.clone(),
+                kind,
+                resource_type: resource_type_name(kind, resource_type),
                 name: name.clone(),
                 attributes,
                 file: path.to_path_buf(),
                 start_line: 1,
                 end_line: 1,
-                skips: skips.clone(),
+                skips: skips.to_vec(),
             });
         }
     }
-    output
 }
 
 fn json_value(value: &serde_json::Value) -> Value {
@@ -324,9 +366,9 @@ fn mark_json_templates(value: &mut Value) {
     }
 }
 
-fn index_block_spans(source: &str) -> HashMap<String, HashMap<String, Vec<(usize, usize)>>> {
+fn index_block_spans(source: &str) -> HashMap<(String, String, String), Vec<(usize, usize)>> {
     let bytes = source.as_bytes();
-    let mut spans: HashMap<String, HashMap<String, Vec<(usize, usize)>>> = HashMap::new();
+    let mut spans: HashMap<(String, String, String), Vec<(usize, usize)>> = HashMap::new();
     let mut index = 0usize;
     let mut line = 1usize;
     while index < bytes.len() {
@@ -334,14 +376,12 @@ fn index_block_spans(source: &str) -> HashMap<String, HashMap<String, Vec<(usize
         while cursor < bytes.len() && matches!(bytes[cursor], b' ' | b'\t') {
             cursor += 1;
         }
-        if let Some(hit) = resource_header(bytes, cursor) {
+        if let Some(hit) = labeled_header(bytes, cursor) {
             let end_byte = match_braces(source, hit.open).unwrap_or(hit.open.saturating_add(1));
             let next = end_byte.min(bytes.len());
             let end_line = line + count_newlines(&bytes[index..next]);
             spans
-                .entry(hit.type_name)
-                .or_default()
-                .entry(hit.name)
+                .entry((hit.keyword, hit.type_name, hit.name))
                 .or_default()
                 .push((line, end_line.max(line)));
             line = end_line;
@@ -358,18 +398,23 @@ fn index_block_spans(source: &str) -> HashMap<String, HashMap<String, Vec<(usize
     spans
 }
 
-struct ResourceHeader {
+struct BlockHeader {
+    keyword: String,
     type_name: String,
     name: String,
     open: usize,
 }
 
-fn resource_header(bytes: &[u8], mut cursor: usize) -> Option<ResourceHeader> {
-    let keyword = b"resource";
-    if bytes.get(cursor..cursor + keyword.len()) != Some(keyword.as_slice()) {
+fn labeled_header(bytes: &[u8], cursor: usize) -> Option<BlockHeader> {
+    keyword_header(bytes, cursor, "resource").or_else(|| keyword_header(bytes, cursor, "data"))
+}
+
+fn keyword_header(bytes: &[u8], mut cursor: usize, keyword: &str) -> Option<BlockHeader> {
+    let marker = keyword.as_bytes();
+    if bytes.get(cursor..cursor + marker.len()) != Some(marker) {
         return None;
     }
-    cursor += keyword.len();
+    cursor += marker.len();
     if bytes
         .get(cursor)
         .is_some_and(|byte| byte.is_ascii_alphanumeric() || *byte == b'_' || *byte == b'-')
@@ -384,7 +429,8 @@ fn resource_header(bytes: &[u8], mut cursor: usize) -> Option<ResourceHeader> {
     if bytes.get(cursor) != Some(&b'{') {
         return None;
     }
-    Some(ResourceHeader {
+    Some(BlockHeader {
+        keyword: keyword.to_string(),
         type_name,
         name,
         open: cursor,
@@ -528,6 +574,49 @@ resource "aws_ebs_volume" "x" {
         let output = parse_file(Path::new("vol.tf"), source);
         let resolved = lookup(&output.resources[0].attributes, "encrypted");
         assert!(resolved.unknown);
+    }
+
+    #[test]
+    fn parses_data_sources_apart_from_managed_resources() {
+        let source = r#"
+data "aws_ami" "ubuntu" {
+  most_recent = true
+  owners      = ["099720109477"]
+}
+resource "aws_instance" "web" {
+  ami = data.aws_ami.ubuntu.id
+}
+"#;
+        let output = parse_file(Path::new("main.tf"), source);
+        assert!(output.diagnostics.is_empty(), "{:?}", output.diagnostics);
+        let data = output
+            .resources
+            .iter()
+            .find(|item| item.kind == ResourceKind::Data)
+            .expect("data source");
+        assert_eq!(data.resource_type, "data.aws_ami");
+        assert_eq!(data.name, "ubuntu");
+        assert_eq!(
+            lookup(&data.attributes, "most_recent").values[0],
+            &Value::Bool(true)
+        );
+        assert!(
+            output
+                .resources
+                .iter()
+                .any(|item| item.kind == ResourceKind::Managed
+                    && item.resource_type == "aws_instance")
+        );
+        let json = parse_file(
+            Path::new("main.tf.json"),
+            r#"{"data":{"aws_iam_policy_document":{"allow":{"statement":[{"actions":["s3:*"]}]}}},"resource":{"aws_s3_bucket":{"logs":{"bucket":"logs"}}}}"#,
+        );
+        assert!(json.resources.iter().any(|item| {
+            item.kind == ResourceKind::Data && item.resource_type == "data.aws_iam_policy_document"
+        }));
+        assert!(json.resources.iter().any(|item| {
+            item.kind == ResourceKind::Managed && item.resource_type == "aws_s3_bucket"
+        }));
     }
 }
 

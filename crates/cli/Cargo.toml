@@ -18,6 +18,7 @@ rayon = "1"
 rustmaninoff-engine.workspace = true
 rustmaninoff-ir.workspace = true
 rustmaninoff-parser-cfn.workspace = true
+rustmaninoff-parser-docker.workspace = true
 rustmaninoff-parser-k8s.workspace = true
 rustmaninoff-parser-terraform.workspace = true
 rustmaninoff-report.workspace = true

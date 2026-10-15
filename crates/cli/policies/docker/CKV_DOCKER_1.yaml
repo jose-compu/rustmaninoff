@@ -1,0 +1,20 @@
+metadata:
+  id: CKV_DOCKER_1
+  name: Ensure the base image uses a non-latest tag
+  category: SUPPLY_CHAIN
+  severity: HIGH
+  framework: docker
+  guidelines: Adapted from Checkov CKV_DOCKER_1. https://github.com/bridgecrewio/checkov
+resource_types:
+- dockerfile
+definition:
+  cond_type: attribute
+  attribute: FROM.unpinned
+  operator: is_false
+fixtures:
+  fail: |
+    FROM nginx:latest
+    USER app
+  pass: |
+    FROM nginx:1.27
+    USER app

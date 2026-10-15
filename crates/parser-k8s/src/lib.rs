@@ -91,6 +91,7 @@ fn resource_from_object(
     let end_line = start_line + source[line_byte(source, start_line)..].lines().count();
     Some(Resource {
         framework: Framework::Kubernetes,
+        kind: rustmaninoff_ir::ResourceKind::Managed,
         resource_type: kind,
         name,
         attributes,
