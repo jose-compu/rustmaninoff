@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Roadmap — Rustmaninoff</title>
+  <meta name="description" content="Rustmaninoff roadmap: epics to cover Checkov graph, Terraform plan, Helm, catalog depth, and Trivy secrets/SCA.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://jose-compu.github.io/rustmaninoff/roadmap.html">
+  <link rel="alternate" type="text/plain" href="https://jose-compu.github.io/rustmaninoff/llms.txt" title="llms.txt">
+  <script>
+    (function () {
+      var m = location.pathname.match(/^(.*\/rustmaninoff)\/?/);
+      if (m) {
+        var b = document.createElement("base");
+        b.href = m[1] + "/";
+        document.head.appendChild(b);
+      }
+    })();
+  </script>
+  <link rel="icon" href="img/logo.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="index.html"><img src="img/logo.jpg" alt=""> Rustmaninoff</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="documentation.html">Docs</a>
+        <a class="active" href="roadmap.html">Roadmap</a>
+        <a href="changelog.html">Changelog</a>
+        <a href="https://crates.io/crates/rustmaninoff">crates.io</a>
+        <a href="https://github.com/jose-compu/rustmaninoff">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <p class="kicker" style="margin-top:1.6rem;">Toward Checkov and Trivy coverage</p>
+    <h1 style="margin:0 0 0.7rem;letter-spacing:-0.03em;">Roadmap</h1>
+    <p class="lede" style="margin-left:0;">v0.2 is an attribute scanner. The epics below close Checkov graph/plan/Helm/catalog gaps and Trivy secrets/SCA, without putting a CVE database on the default scan path.</p>
+    <p class="note"><a href="https://github.com/jose-compu/rustmaninoff/blob/main/ROADMAP.md">ROADMAP.md</a> · <a href="https://github.com/jose-compu/rustmaninoff/issues?q=is%3Aissue+label%3Aepic">All epics</a></p>
+
+    <section class="section">
+      <h2>v0.3 — graph and Terraform evaluation</h2>
+      <div class="grid">
+        <article class="card">
+          <h3><a href="https://github.com/jose-compu/rustmaninoff/issues/1">#1 Resource graph / CKV2_*</a></h3>
+          <p>Composite checks across resources. Checkov’s catalog is incomplete without this.</p>
+        </article>
+        <article class="card">
+          <h3><a href="https://github.com/jose-compu/rustmaninoff/issues/2">#2 Terraform eval, modules, plan JSON</a></h3>
+          <p>Variables, locals, OpenTofu, <code>terraform_plan</code>. Interpolations that resolve stop being unknown.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>v0.4 — packaging and more IaC</h2>
+      <div class="grid">
+        <article class="card">
+          <h3><a href="https://github.com/jose-compu/rustmaninoff/issues/3">#3 Helm and Kustomize</a></h3>
+          <p>Render to Kubernetes IR; reuse CKV_K8S_*. Same class of work as Checkov/Trivy config.</p>
+        </article>
+        <article class="card">
+          <h3><a href="https://github.com/jose-compu/rustmaninoff/issues/6">#6 ARM, Bicep, Ansible, Serverless, OpenAPI, SAM</a></h3>
+          <p>Formats Checkov already scans that 0.2 does not.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>v0.5 — catalog, pipelines, secrets</h2>
+      <div class="grid">
+        <article class="card">
+          <h3><a href="https://github.com/jose-compu/rustmaninoff/issues/4">#4 Catalog depth</a></h3>
+          <p>Toward Checkov’s 1000+ policies: remaining AWS, then Azure and GCP. Every check keeps fixtures.</p>
+        </article>
+        <article class="card">
+          <h3><a href="https://github.com/jose-compu/rustmaninoff/issues/5">#5 CI/CD as code</a></h3>
+          <p>GitHub Actions, GitLab CI, Azure Pipelines, CircleCI, Argo Workflows.</p>
+        </article>
+        <article class="card">
+          <h3><a href="https://github.com/jose-compu/rustmaninoff/issues/7">#7 Secrets</a></h3>
+          <p>Checkov <code>secrets</code> and Trivy secret rules, redacted in SARIF.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>v1.0 — compliance and optional Trivy SCA</h2>
+      <div class="grid">
+        <article class="card">
+          <h3><a href="https://github.com/jose-compu/rustmaninoff/issues/10">#10 Compliance and Rego</a></h3>
+          <p>CIS/NSA packs; optional Rego for existing Conftest/Trivy policies.</p>
+        </article>
+        <article class="card">
+          <h3><a href="https://github.com/jose-compu/rustmaninoff/issues/9">#9 Live Kubernetes</a></h3>
+          <p>Trivy <code>k8s</code>-style cluster scan via kubeconfig. No mutation.</p>
+        </article>
+        <article class="card">
+          <h3><a href="https://github.com/jose-compu/rustmaninoff/issues/8">#8 Vulns, licenses, SBOM</a></h3>
+          <p>Opt-in <code>--scanners vuln</code>. Default scan stays IaC-only so CI does not fetch a CVE DB.</p>
+        </article>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span>v0.2.0</span>
+      <a href="https://github.com/jose-compu/rustmaninoff">jose-compu/rustmaninoff</a>
+      <a href="llms.txt">llms.txt</a>
+      <span>Apache-2.0</span>
+    </footer>
+  </div>
+</body>
+</html>

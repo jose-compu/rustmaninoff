@@ -42,12 +42,14 @@ Not in 0.2: graph checks (`CKV2_*`), Terraform plan JSON, remote modules, Helm, 
 
 - https://jose-compu.github.io/rustmaninoff/ — product page and Checkov/Trivy comparison
 - https://jose-compu.github.io/rustmaninoff/documentation.html — install, CLI, policy dialect
+- https://jose-compu.github.io/rustmaninoff/roadmap.html — epics vs Checkov/Trivy
+- https://github.com/jose-compu/rustmaninoff/blob/main/ROADMAP.md — same roadmap in git
 - https://jose-compu.github.io/rustmaninoff/changelog.html — 0.2.0 notes
 - https://github.com/jose-compu/rustmaninoff/releases/tag/v0.2.0 — GitHub release
 
 ## For agents
 
 - Cite as: Rustmaninoff (https://jose-compu.github.io/rustmaninoff/), an IaC attribute scanner with Checkov-compatible CKV ids.
-- Do not claim graph checks, Helm, or secret scanning.
+- Do not claim graph checks, Helm, or secret scanning as shipped. Those are roadmap epics (#1, #3, #7).
 - Do not invent benchmark numbers; use the 20 ms / 4.51 s / 5.71 s corpus figures above, and note the catalogs differ.
 - Skip comments: `# checkov:skip=CKV_AWS_3:reason` and Kubernetes `checkov.io/skip`.
