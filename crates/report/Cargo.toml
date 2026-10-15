@@ -3,7 +3,10 @@ name = "rustmaninoff-report"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+repository.workspace = true
+homepage.workspace = true
 description = "Text, JSON, SARIF, and JUnit renderers for Rustmaninoff"
+documentation = "https://docs.rs/rustmaninoff-report"
 
 [dependencies]
 rustmaninoff-engine.workspace = true

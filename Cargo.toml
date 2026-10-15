@@ -15,6 +15,9 @@ members = [
 version = "0.2.0"
 edition = "2021"
 license = "Apache-2.0"
+repository = "https://github.com/jose-compu/rustmaninoff"
+homepage = "https://github.com/jose-compu/rustmaninoff"
+readme = "README.md"
 
 [workspace.dependencies]
 serde = { version = "1", features = ["derive"] }

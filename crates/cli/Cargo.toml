@@ -3,8 +3,13 @@ name = "rustmaninoff"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+repository.workspace = true
+homepage.workspace = true
 description = "Fast IaC security scanner with Checkov-compatible policies"
 readme = "../../README.md"
+documentation = "https://docs.rs/rustmaninoff"
+keywords = ["iac", "security", "terraform", "checkov", "policy"]
+categories = ["command-line-utilities", "development-tools"]
 
 [[bin]]
 name = "rustmaninoff"

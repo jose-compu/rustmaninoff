@@ -3,7 +3,10 @@ name = "rustmaninoff-engine"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+repository.workspace = true
+homepage.workspace = true
 description = "Checkov-compatible attribute policy engine"
+documentation = "https://docs.rs/rustmaninoff-engine"
 
 [dependencies]
 rayon = "1"

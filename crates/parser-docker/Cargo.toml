@@ -3,7 +3,10 @@ name = "rustmaninoff-parser-docker"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+repository.workspace = true
+homepage.workspace = true
 description = "Dockerfile parser for Rustmaninoff"
+documentation = "https://docs.rs/rustmaninoff-parser-docker"
 
 [dependencies]
 rustmaninoff-ir.workspace = true

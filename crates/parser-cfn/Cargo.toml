@@ -3,7 +3,10 @@ name = "rustmaninoff-parser-cfn"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+repository.workspace = true
+homepage.workspace = true
 description = "CloudFormation YAML and JSON parser for Rustmaninoff"
+documentation = "https://docs.rs/rustmaninoff-parser-cfn"
 
 [dependencies]
 rustmaninoff-ir.workspace = true
