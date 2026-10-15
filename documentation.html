@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Documentation — Rustmaninoff</title>
+  <meta name="description" content="Install, scan flags, config, policy dialect, and v0.2 scope for Rustmaninoff.">
+  <script>
+    (function () {
+      var m = location.pathname.match(/^(.*\/rustmaninoff)\/?/);
+      if (m) {
+        var b = document.createElement("base");
+        b.href = m[1] + "/";
+        document.head.appendChild(b);
+      }
+    })();
+  </script>
+  <link rel="icon" href="img/logo.jpg">
+  <link rel="apple-touch-icon" href="img/logo.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="index.html"><img src="img/logo.jpg" alt=""> Rustmaninoff</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a class="active" href="documentation.html">Docs</a>
+        <a href="changelog.html">Changelog</a>
+        <a href="https://crates.io/crates/rustmaninoff">crates.io</a>
+        <a href="https://github.com/jose-compu/rustmaninoff">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <p class="kicker" style="margin-top:1.6rem;">Documentation · v0.2.0</p>
+    <h1 style="margin:0 0 0.4rem;letter-spacing:-0.03em;">Using Rustmaninoff</h1>
+    <p class="lede" style="margin-left:0;">Attribute scanner for Terraform, CloudFormation, Kubernetes, and Dockerfiles. Policies are Checkov-compatible YAML.</p>
+
+    <div class="doc-layout">
+      <aside class="toc">
+        <a href="#install">Install</a>
+        <a href="#scan">Scan</a>
+        <a href="#config">Config</a>
+        <a href="#policies">Policies</a>
+        <a href="#skip">Skips</a>
+        <a href="#scope">v0.2 scope</a>
+        <a href="#ci">CI</a>
+        <a href="#crates">Crates</a>
+        <a href="#limits">Limits</a>
+      </aside>
+
+      <article class="doc">
+        <h2 id="install">Install</h2>
+        <p>Requires Rust 1.95 or newer.</p>
+        <pre><code>cargo install rustmaninoff --locked
+rustmaninoff scan .</code></pre>
+        <p>From a checkout:</p>
+        <pre><code>cargo build --release -p rustmaninoff
+./target/release/rustmaninoff scan .</code></pre>
+        <p>GitHub Release binaries for Linux and macOS (amd64 and arm64) are attached to <a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.2.0">v0.2.0</a>.</p>
+
+        <h2 id="scan">Scan</h2>
+        <pre><code>rustmaninoff scan [PATH] \
+  --framework terraform,cloudformation,kubernetes,docker \
+  --check CKV_AWS_3 \
+  --skip-check CKV_AWS_8 \
+  --output cli,json,sarif,junit \
+  --fail-on HIGH \
+  --external-checks-dir ./extra</code></pre>
+        <ul>
+          <li><code>PATH</code> defaults to the current directory.</li>
+          <li><code>--output</code> defaults to <code>cli</code>. Also: <code>json</code>, <code>sarif</code>, <code>junit</code>, plus <code>--json-file</code>, <code>--sarif-file</code>, <code>--junit-file</code>.</li>
+          <li><code>--fail-on</code> is <code>LOW</code>, <code>MEDIUM</code>, <code>HIGH</code>, or <code>CRITICAL</code>. Default <code>HIGH</code>.</li>
+          <li><code>--soft-fail</code> always exits 0. <code>--show-unknown</code> prints unknown results. <code>--show-passed</code> prints passed checks. <code>--compact</code> shortens the text report.</li>
+        </ul>
+        <p>Exit codes: <strong>0</strong> when nothing fails the threshold, <strong>1</strong> when a finding is at or above <code>--fail-on</code> or a file fails to parse, <strong>2</strong> on usage errors.</p>
+        <p>Interpolations (<code>${...}</code>, <code>Fn::*</code>, <code>!Ref</code>, <code>!GetAtt</code>) are unknown. Unknown results do not fail the process.</p>
+
+        <h2 id="config">Config</h2>
+        <p>Optional <code>.rustmaninoff.yaml</code> in the scan path, or <code>--config</code>:</p>
+        <pre><code>frameworks: [terraform, cloudformation, kubernetes, docker]
+skip_checks: []
+fail_on: HIGH
+excluded_paths: []
+external_checks_dirs: []
+show_unknown: false
+compact: false</code></pre>
+        <p>Directories named <code>.git</code>, <code>.terraform</code>, <code>.terragrunt-cache</code>, <code>node_modules</code>, <code>vendor</code>, and <code>target</code> are skipped. Symbolic links are not followed.</p>
+
+        <h2 id="policies">Policies</h2>
+        <p>A check definition is the <strong>pass</strong> condition. Built-in policies are rewritten YAML, attributed to <a href="https://github.com/bridgecrewio/checkov">Checkov</a> (Bridgecrew / Palo Alto Networks, Apache-2.0), and reuse published CKV ids.</p>
+        <p>Operators: <code>equals</code>, <code>not_equals</code>, <code>exists</code>, <code>not_exists</code>, <code>contains</code>, <code>not_contains</code>, <code>within</code>, <code>regex_match</code>, <code>starting_with</code>, <code>ending_with</code>, numeric comparisons, <code>is_true</code>, <code>is_false</code>, <code>is_empty</code>, <code>length_greater_than</code>, <code>length_less_than</code>, and their negated forms. Combinators: <code>and</code>, <code>or</code>, <code>not</code>.</p>
+        <p>Extensions: <code>no_element</code>, <code>forbid_resource</code>, <code>equals_any</code>, <code>intersects</code>, <code>image_tag_pinned</code>, and <code>missing: pass|fail|unknown</code>. <code>scope</code> is ignored. Severity defaults to <code>MEDIUM</code> when omitted.</p>
+        <h3>Example</h3>
+        <pre><code>metadata:
+  id: CKV_DOCKER_1
+  name: Ensure the base image uses a non-latest tag
+  category: SUPPLY_CHAIN
+  severity: HIGH
+  framework: docker
+resource_types:
+- dockerfile
+definition:
+  cond_type: attribute
+  attribute: FROM.unpinned
+  operator: is_false</code></pre>
+        <p>Drop extra YAML in <code>--external-checks-dir</code>. Each built-in check ships with pass and fail fixtures.</p>
+
+        <h2 id="skip">Skips</h2>
+        <p>Inline: <code># checkov:skip=CKV_AWS_3:reason</code>.</p>
+        <p>Kubernetes annotation value: <code>checkov.io/skip: CKV_K8S_16=reason</code>.</p>
+
+        <h2 id="scope">v0.2 scope</h2>
+        <ul>
+          <li>Terraform <code>.tf</code> / <code>.tf.json</code> managed <code>resource</code> blocks and <code>data</code> sources (IR kind <code>data</code>, type <code>data.TYPE</code>). No module download and no full HCL evaluation.</li>
+          <li>CloudFormation YAML and JSON <code>Resources</code>. Attribute paths are relative to <code>Properties</code>.</li>
+          <li>Kubernetes multi-document YAML, including <code>List</code>.</li>
+          <li>Dockerfiles: FROM, USER, ADD vs COPY, HEALTHCHECK, and privileged-ish RUN patterns.</li>
+          <li>181 built-in checks: 94 Terraform, 51 CloudFormation, 32 Kubernetes, 4 Docker.</li>
+          <li>Text, JSON, SARIF 2.1.0, and JUnit reports.</li>
+        </ul>
+        <p>S3 encryption, versioning, and logging on current Terraform target <code>aws_s3_bucket_server_side_encryption_configuration</code>, <code>aws_s3_bucket_versioning</code>, and <code>aws_s3_bucket_logging</code>. <code>CKV_AWS_286</code> matches a static action subset, including <code>*</code> and <code>*:*</code>. <code>CKV_K8S_14</code> accepts a digest or a tag other than <code>latest</code>; an image whose last colon is a registry port and which has no tag is treated as pinned.</p>
+        <p><strong>Not in 0.2:</strong> graph checks (<code>CKV2_*</code>), Terraform plan JSON, remote modules, Helm, Kustomize, secrets scanning, full variable evaluation, and cfn-lint resource-spec validation.</p>
+
+        <h2 id="ci">CI</h2>
+        <pre><code>- uses: actions/checkout@v4
+- run: cargo install --path crates/cli --locked
+- run: rustmaninoff scan . --fail-on HIGH --output sarif --sarif-file rustmaninoff.sarif</code></pre>
+        <p>Or install a released crate: <code>cargo install rustmaninoff --locked --version 0.2.0</code>.</p>
+
+        <h2 id="crates">Crates</h2>
+        <p>Workspace 0.2.0 on crates.io:</p>
+        <ul>
+          <li><a href="https://crates.io/crates/rustmaninoff">rustmaninoff</a> (CLI)</li>
+          <li><a href="https://crates.io/crates/rustmaninoff-ir">rustmaninoff-ir</a></li>
+          <li><a href="https://crates.io/crates/rustmaninoff-engine">rustmaninoff-engine</a></li>
+          <li><a href="https://crates.io/crates/rustmaninoff-report">rustmaninoff-report</a></li>
+          <li><a href="https://crates.io/crates/rustmaninoff-parser-terraform">rustmaninoff-parser-terraform</a></li>
+          <li><a href="https://crates.io/crates/rustmaninoff-parser-cfn">rustmaninoff-parser-cfn</a></li>
+          <li><a href="https://crates.io/crates/rustmaninoff-parser-k8s">rustmaninoff-parser-k8s</a></li>
+          <li><a href="https://crates.io/crates/rustmaninoff-parser-docker">rustmaninoff-parser-docker</a></li>
+        </ul>
+        <p>API docs: <a href="https://docs.rs/rustmaninoff">docs.rs/rustmaninoff</a>.</p>
+
+        <h2 id="limits">Limits</h2>
+        <p>Files larger than 10 MB, and files past the nesting or YAML-alias limits, are reported as diagnostics and are not parsed.</p>
+      </article>
+    </div>
+
+    <footer class="footer">
+      <span>v0.2.0</span>
+      <a href="https://github.com/jose-compu/rustmaninoff">jose-compu/rustmaninoff</a>
+      <span>Apache-2.0</span>
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Changelog — Rustmaninoff</title>
+  <script>
+    (function () {
+      var m = location.pathname.match(/^(.*\/rustmaninoff)\/?/);
+      if (m) {
+        var b = document.createElement("base");
+        b.href = m[1] + "/";
+        document.head.appendChild(b);
+      }
+    })();
+  </script>
+  <link rel="icon" href="img/logo.jpg">
+  <link rel="apple-touch-icon" href="img/logo.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="index.html"><img src="img/logo.jpg" alt=""> Rustmaninoff</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="documentation.html">Docs</a>
+        <a class="active" href="changelog.html">Changelog</a>
+        <a href="https://crates.io/crates/rustmaninoff">crates.io</a>
+        <a href="https://github.com/jose-compu/rustmaninoff">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <p class="kicker" style="margin-top:1.6rem;">Release notes</p>
+    <h1 style="margin:0 0 1.2rem;letter-spacing:-0.03em;">Changelog</h1>
+
+    <article class="card">
+      <h2 style="margin-top:0;">0.2.0 — 2026-10-15</h2>
+      <h3>Added</h3>
+      <ul>
+        <li>Terraform <code>data</code> sources in the HCL/JSON parsers. Data sources are IR resources with kind <code>data</code> and type <code>data.TYPE</code>.</li>
+        <li>Dockerfile parser crate <code>rustmaninoff-parser-docker</code> and <code>--framework docker</code>.</li>
+        <li>Docker checks <code>CKV_DOCKER_1</code>–<code>CKV_DOCKER_4</code> (pinned FROM tag, non-root USER, COPY vs ADD, HEALTHCHECK).</li>
+        <li>Additional Terraform, CloudFormation, and Kubernetes attribute checks (181 built-in total).</li>
+      </ul>
+      <h3>Changed</h3>
+      <ul>
+        <li>Workspace crates are <strong>0.2.0</strong> on crates.io.</li>
+        <li>Interpolations remain unknown. Graph checks, plan JSON, Helm, and Kustomize are still out of scope.</li>
+      </ul>
+      <p class="note"><a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.2.0">GitHub release v0.2.0</a> · <a href="https://github.com/jose-compu/rustmaninoff/compare/v0.1.0...v0.2.0">Full changelog</a></p>
+    </article>
+
+    <article class="card" style="margin-top:0.9rem;">
+      <h2 style="margin-top:0;">0.1.0</h2>
+      <p class="note" style="margin:0;">Initial public release: Terraform, CloudFormation, and Kubernetes attribute scanning with Checkov-compatible YAML.</p>
+    </article>
+
+    <footer class="footer">
+      <span>v0.2.0</span>
+      <a href="https://github.com/jose-compu/rustmaninoff">jose-compu/rustmaninoff</a>
+      <span>Apache-2.0</span>
+    </footer>
+  </div>
+</body>
+</html>

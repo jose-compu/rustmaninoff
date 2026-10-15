@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rustmaninoff — IaC security scanner</title>
+  <meta name="description" content="Fast IaC security scanner for Terraform, CloudFormation, Kubernetes, and Dockerfiles. Checkov-compatible policies, written in Rust.">
+  <script>
+    (function () {
+      var m = location.pathname.match(/^(.*\/rustmaninoff)\/?/);
+      if (m) {
+        var b = document.createElement("base");
+        b.href = m[1] + "/";
+        document.head.appendChild(b);
+      }
+    })();
+  </script>
+  <link rel="icon" href="img/logo.jpg">
+  <link rel="apple-touch-icon" href="img/logo.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="index.html"><img src="img/logo.jpg" alt=""> Rustmaninoff</a>
+      <nav class="nav-links">
+        <a class="active" href="index.html">Home</a>
+        <a href="documentation.html">Docs</a>
+        <a href="changelog.html">Changelog</a>
+        <a href="https://crates.io/crates/rustmaninoff">crates.io</a>
+        <a href="https://github.com/jose-compu/rustmaninoff">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <section class="hero">
+      <img class="hero-banner" src="img/banner.jpg" alt="Rustmaninoff, IaC security scanner">
+      <p class="kicker">v0.2.0 · Apache-2.0</p>
+      <h1>Attribute scanning for IaC, without the Python tax.</h1>
+      <p class="lede">Terraform, CloudFormation, Kubernetes, and Dockerfiles. Checkov-compatible YAML policies and CKV ids. A Rust engine, not a port of the Checkov runtime.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="documentation.html">Read the docs</a>
+        <a class="btn btn-ghost" href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.2.0">GitHub release</a>
+        <a class="btn btn-ghost" href="https://crates.io/crates/rustmaninoff">Install from crates.io</a>
+      </div>
+      <div class="stats">
+        <div class="stat"><b>20 ms</b><span>full synthetic corpus</span></div>
+        <div class="stat"><b>181</b><span>built-in checks</span></div>
+        <div class="stat"><b>4</b><span>frameworks</span></div>
+        <div class="stat"><b>~225×</b><span>faster than Checkov on that corpus</span></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Install</h2>
+      <pre><code>cargo install rustmaninoff --locked
+rustmaninoff scan . --framework terraform,cloudformation,kubernetes,docker</code></pre>
+    </section>
+
+    <section class="section">
+      <h2>What it does</h2>
+      <div class="grid">
+        <article class="card">
+          <h3>Terraform</h3>
+          <p><code>.tf</code> and <code>.tf.json</code> managed resources and data sources. Data sources are IR kind <code>data</code>, type <code>data.TYPE</code>.</p>
+        </article>
+        <article class="card">
+          <h3>CloudFormation</h3>
+          <p>YAML and JSON <code>Resources</code>. Attribute paths are relative to <code>Properties</code>.</p>
+        </article>
+        <article class="card">
+          <h3>Kubernetes</h3>
+          <p>Multi-document YAML, including <code>List</code>. Inline skip via <code>checkov.io/skip</code>.</p>
+        </article>
+        <article class="card">
+          <h3>Dockerfiles</h3>
+          <p><code>Dockerfile</code>, <code>Containerfile</code>, <code>*.dockerfile</code>. FROM tag, USER, COPY vs ADD, HEALTHCHECK.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Speed, on one corpus</h2>
+      <p class="note">Wall-clock CLI time, Apple M2, macOS 14.8. Median of three runs after warmup. 40 Terraform files (1,080 resources), 20 CloudFormation files (300 resources), 20 Kubernetes files (160 resources). Catalogs are not the same: Rustmaninoff ran 181 attribute checks.</p>
+      <div class="bars" style="margin: 1.1rem 0 1.2rem;">
+        <div class="bar-row">
+          <div class="bar-label">Rustmaninoff 0.2.0</div>
+          <div class="bar-track"><div class="bar-fill self"></div></div>
+          <div class="bar-val">0.02 s</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Checkov 3.3.21</div>
+          <div class="bar-track"><div class="bar-fill checkov"></div></div>
+          <div class="bar-val">4.51 s</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Trivy 0.74.0</div>
+          <div class="bar-track"><div class="bar-fill trivy"></div></div>
+          <div class="bar-val">5.71 s</div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Scanner</th><th class="num">Full</th><th class="num">Terraform</th><th class="num">CloudFormation</th><th class="num">Kubernetes</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Rustmaninoff 0.2.0</td><td class="num">20 ms</td><td class="num">11 ms</td><td class="num">9 ms</td><td class="num">11 ms</td></tr>
+            <tr><td>Checkov 3.3.21</td><td class="num">4.51 s</td><td class="num">3.72 s</td><td class="num">2.71 s</td><td class="num">2.92 s</td></tr>
+            <tr><td>Trivy 0.74.0</td><td class="num">5.71 s</td><td class="num">2.67 s</td><td class="num">1.29 s</td><td class="num">2.59 s</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Policy dialect</h2>
+      <p class="note">A check definition is the pass condition. Built-in YAML is rewritten from Checkov (Bridgecrew / Palo Alto Networks, Apache-2.0) and keeps published CKV ids.</p>
+      <pre><code>metadata:
+  id: CKV_AWS_3
+  name: Ensure all data stored in the EBS is securely encrypted
+  severity: HIGH
+  framework: terraform
+resource_types:
+- aws_ebs_volume
+definition:
+  cond_type: attribute
+  attribute: encrypted
+  operator: equals
+  value: true</code></pre>
+    </section>
+
+    <section class="section">
+      <h2>v0.2.0</h2>
+      <div class="grid">
+        <article class="card">
+          <h3>Added</h3>
+          <p>Terraform data sources, Dockerfile parser, Docker checks CKV_DOCKER_1–4, more TF/CFN/K8s attribute checks. Catalog is 181 (94 Terraform, 51 CloudFormation, 32 Kubernetes, 4 Docker).</p>
+        </article>
+        <article class="card">
+          <h3>Still out of scope</h3>
+          <p>Graph checks (<code>CKV2_*</code>), Terraform plan JSON, remote modules, Helm, Kustomize, secrets scanning, full variable evaluation. Interpolations remain unknown.</p>
+        </article>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span>v0.2.0</span>
+      <a href="https://github.com/jose-compu/rustmaninoff">jose-compu/rustmaninoff</a>
+      <a href="https://docs.rs/rustmaninoff">docs.rs</a>
+      <span>Apache-2.0</span>
+    </footer>
+  </div>
+</body>
+</html>
