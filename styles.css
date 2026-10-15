@@ -203,6 +203,10 @@ a:hover { text-decoration: underline; }
   gap: 0.9rem;
 }
 
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+.compare td:nth-child(2) { color: var(--copper-bright); }
+
 .card {
   background: var(--bg-elev);
   border: 1px solid var(--border);
@@ -326,7 +330,7 @@ td.num { text-align: right; font-variant-numeric: tabular-nums; font-family: var
 }
 
 @media (max-width: 800px) {
-  .stats, .grid, .doc-layout { grid-template-columns: 1fr; }
+  .stats, .grid, .grid-3, .doc-layout { grid-template-columns: 1fr; }
   .toc { position: static; flex-direction: row; flex-wrap: wrap; gap: 0.6rem 1rem; }
   .bar-row { grid-template-columns: 1fr; }
 }

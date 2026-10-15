@@ -43,6 +43,7 @@
 
     <div class="doc-layout">
       <aside class="toc">
+        <a href="#why">Vs Checkov / Trivy</a>
         <a href="#install">Install</a>
         <a href="#scan">Scan</a>
         <a href="#config">Config</a>
@@ -55,6 +56,16 @@
       </aside>
 
       <article class="doc">
+        <h2 id="why">Why Rustmaninoff over Checkov and Trivy</h2>
+        <p>Checkov and Trivy are broader platforms. Rustmaninoff is a small attribute scanner for CI when you already know the CKV ids to enforce.</p>
+        <ul>
+          <li><strong>Speed.</strong> 20 ms on 1,540 resources vs 4.51 s Checkov (~225×) and 5.71 s Trivy (~285×). No Python interpreter, no policy-db refresh on the scan path.</li>
+          <li><strong>One static binary.</strong> Checkov needs a Python environment. Trivy also covers vulns, secrets, and SBOMs that an IaC-only job may not want.</li>
+          <li><strong>Checkov-shaped policies, Rust engine.</strong> Published CKV ids, YAML pass-conditions, and <code># checkov:skip=</code> / <code>checkov.io/skip</code>. Not a Python port of Checkov.</li>
+          <li><strong>Predictable CI.</strong> Interpolations are unknown, never fail. SARIF 2.1.0, JUnit, JSON, <code>--fail-on</code>.</li>
+          <li><strong>Focused catalog.</strong> 181 attribute checks, each with pass and fail fixtures. No graph checks, Helm, Kustomize, plan JSON, or secrets/vuln scanning—use Checkov or Trivy for that surface.</li>
+        </ul>
+
         <h2 id="install">Install</h2>
         <p>Requires Rust 1.95 or newer.</p>
         <pre><code>cargo install rustmaninoff --locked
