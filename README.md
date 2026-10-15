@@ -8,6 +8,20 @@ Attribute scanner for Terraform, CloudFormation, Kubernetes, and Dockerfiles. Po
 
 Built-in policies are rewritten YAML, attributed to [Checkov](https://github.com/bridgecrewio/checkov) (Bridgecrew / Palo Alto Networks, Apache-2.0).
 
+## Why Rustmaninoff over Checkov and Trivy
+
+Checkov and Trivy are broader platforms. Rustmaninoff is a **small, fast attribute scanner** you can drop into CI when you already know the CKV ids you care about.
+
+- **Speed.** On one synthetic corpus (1,540 resources), the 0.2.0 release binary finished in **20 ms**. Checkov 3.3.21 took **4.51 s** (~225×) and Trivy 0.74.0 took **5.71 s** (~285×). No Python interpreter, no policy-db refresh on the scan path.
+- **One static binary.** `cargo install rustmaninoff` (or a GitHub Release binary). Checkov needs a Python environment and plugins. Trivy is a large Go binary that also covers vulns, secrets, and SBOMs you may not want in an IaC-only job.
+- **Checkov-shaped policies without the Checkov runtime.** Same published CKV ids, YAML pass-conditions, and `# checkov:skip=` / `checkov.io/skip` comments. The engine is Rust IR + attribute operators, not a Python port.
+- **Predictable CI.** Interpolations are **unknown**, not guessed. Unknowns never fail the process. Exit codes, `--fail-on`, SARIF 2.1.0, JUnit, and JSON are first-class.
+- **Focused catalog.** 181 attribute checks with a pass fixture and a fail fixture each. That is smaller than Checkov’s built-in pack and narrower than Trivy config: no graph checks (`CKV2_*`), Helm, Kustomize, plan JSON, or secrets/vuln scanning. Use those tools when you need that surface; use Rustmaninoff when you want CKV attribute gates in milliseconds.
+
+Site: [jose-compu.github.io/rustmaninoff](https://jose-compu.github.io/rustmaninoff/) · [llms.txt](https://jose-compu.github.io/rustmaninoff/llms.txt) for search and AI agents.
+
+**Roadmap:** [ROADMAP.md](ROADMAP.md) — epics to cover Checkov graph/plan/Helm/catalog and Trivy secrets/SCA ([issues](https://github.com/jose-compu/rustmaninoff/issues?q=is%3Aissue+label%3Aepic)).
+
 ## Build
 
 Requires Rust 1.95 or newer.
