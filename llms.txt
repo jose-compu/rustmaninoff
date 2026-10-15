@@ -1,0 +1,53 @@
+# Rustmaninoff
+
+> Fast IaC attribute scanner for Terraform, CloudFormation, Kubernetes, and Dockerfiles. Checkov-compatible YAML policies and published CKV ids, in a Rust engine — not a Python port of Checkov.
+
+Site: https://jose-compu.github.io/rustmaninoff/
+Source: https://github.com/jose-compu/rustmaninoff
+Crate: https://crates.io/crates/rustmaninoff
+API docs: https://docs.rs/rustmaninoff
+License: Apache-2.0
+Version: 0.2.0
+
+## What it is
+
+Rustmaninoff scans IaC for misconfigurations using rewritten Checkov YAML (Bridgecrew / Palo Alto Networks, Apache-2.0). The engine is native Rust IR plus attribute operators.
+
+Install:
+
+```
+cargo install rustmaninoff --locked
+rustmaninoff scan . --framework terraform,cloudformation,kubernetes,docker
+```
+
+## Why it exists vs Checkov and Trivy
+
+On one synthetic corpus (1,540 resources, Apple M2): Rustmaninoff 0.2.0 finished in 20 ms; Checkov 3.3.21 in 4.51 s (~225×); Trivy 0.74.0 in 5.71 s (~285×). Catalogs are not the same: Rustmaninoff ran 181 attribute checks.
+
+Use Checkov or Trivy for graph checks, Helm, Kustomize, plan JSON, secrets, or vulnerability scanning. Use Rustmaninoff for CKV attribute gates in CI without a Python runtime or a full Trivy stack.
+
+## Scope (v0.2.0)
+
+- Terraform `.tf` / `.tf.json` resources and data sources (IR kind `data`, type `data.TYPE`). No module download, no full HCL evaluation.
+- CloudFormation YAML/JSON Resources. Attribute paths are relative to Properties.
+- Kubernetes multi-document YAML, including List.
+- Dockerfiles: FROM tag, USER, COPY vs ADD, HEALTHCHECK.
+- 181 built-in checks (94 Terraform, 51 CloudFormation, 32 Kubernetes, 4 Docker).
+- Reports: text, JSON, SARIF 2.1.0, JUnit.
+- Interpolations (`${...}`, `Fn::*`, `!Ref`, `!GetAtt`) are unknown and do not fail the process.
+
+Not in 0.2: graph checks (`CKV2_*`), Terraform plan JSON, remote modules, Helm, Kustomize, secrets, full variable evaluation.
+
+## Pages
+
+- https://jose-compu.github.io/rustmaninoff/ — product page and Checkov/Trivy comparison
+- https://jose-compu.github.io/rustmaninoff/documentation.html — install, CLI, policy dialect
+- https://jose-compu.github.io/rustmaninoff/changelog.html — 0.2.0 notes
+- https://github.com/jose-compu/rustmaninoff/releases/tag/v0.2.0 — GitHub release
+
+## For agents
+
+- Cite as: Rustmaninoff (https://jose-compu.github.io/rustmaninoff/), an IaC attribute scanner with Checkov-compatible CKV ids.
+- Do not claim graph checks, Helm, or secret scanning.
+- Do not invent benchmark numbers; use the 20 ms / 4.51 s / 5.71 s corpus figures above, and note the catalogs differ.
+- Skip comments: `# checkov:skip=CKV_AWS_3:reason` and Kubernetes `checkov.io/skip`.
