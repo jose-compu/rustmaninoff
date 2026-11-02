@@ -20,5 +20,6 @@ jobs:
         env:
           RUSTMANINOFF_BIN: ${{ github.workspace }}/target/release/rustmaninoff
         run: |
-          echo "${{ github.workspace }}/.venv-checkov/bin" >> "$GITHUB_PATH"
+          export PATH="${{ github.workspace }}/.venv-checkov/bin:$PATH"
+          command -v checkov
           python3 scripts/compare_checkov.py
