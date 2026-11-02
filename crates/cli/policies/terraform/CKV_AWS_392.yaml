@@ -1,0 +1,43 @@
+metadata:
+  id: CKV_AWS_392
+  name: Ensure AWS S3 access point block public access setting is enabled
+  category: NETWORKING
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_392. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_s3_access_point
+definition:
+  or:
+  - cond_type: attribute
+    attribute: public_access_block_configuration
+    operator: not_exists
+  - or:
+    - cond_type: attribute
+      attribute: public_access_block_configuration.block_public_acls
+      operator: is_true
+    - cond_type: attribute
+      attribute: public_access_block_configuration.block_public_policy
+      operator: is_true
+    - cond_type: attribute
+      attribute: public_access_block_configuration.restrict_public_buckets
+      operator: is_true
+fixtures:
+  fail: |
+    resource "aws_s3_access_point" "bad" {
+      public_access_block_configuration {
+        block_public_acls       = false
+        block_public_policy     = false
+        ignore_public_acls      = false
+        restrict_public_buckets = false
+      }
+    }
+  pass: |
+    resource "aws_s3_access_point" "good" {
+      public_access_block_configuration {
+        block_public_acls       = true
+        block_public_policy     = true
+        ignore_public_acls      = true
+        restrict_public_buckets = true
+      }
+    }

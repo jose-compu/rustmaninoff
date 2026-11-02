@@ -1,0 +1,32 @@
+metadata:
+  id: CKV_AWS_78
+  name: Ensure that CodeBuild Project encryption is not disabled
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_78. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_codebuild_project
+definition:
+  or:
+  - cond_type: attribute
+    attribute: artifacts.encryption_disabled
+    operator: not_exists
+  - cond_type: attribute
+    attribute: artifacts.encryption_disabled
+    operator: is_false
+fixtures:
+  fail: |
+    resource "aws_codebuild_project" "bad" {
+      artifacts {
+        type                = "S3"
+        encryption_disabled = true
+      }
+    }
+  pass: |
+    resource "aws_codebuild_project" "good" {
+      artifacts {
+        type                = "S3"
+        encryption_disabled = false
+      }
+    }

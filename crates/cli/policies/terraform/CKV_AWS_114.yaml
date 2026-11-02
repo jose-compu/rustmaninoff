@@ -1,0 +1,31 @@
+metadata:
+  id: CKV_AWS_114
+  name: Ensure that EMR clusters with Kerberos have Kerberos Realm set
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_114. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_emr_cluster
+definition:
+  or:
+  - cond_type: attribute
+    attribute: kerberos_attributes
+    operator: not_exists
+  - cond_type: attribute
+    attribute: kerberos_attributes.realm
+    operator: exists
+fixtures:
+  fail: |
+    resource "aws_emr_cluster" "bad" {
+      kerberos_attributes {
+        kdc_admin_password = "x"
+      }
+    }
+  pass: |
+    resource "aws_emr_cluster" "good" {
+      kerberos_attributes {
+        realm              = "EC2.INTERNAL"
+        kdc_admin_password = "x"
+      }
+    }

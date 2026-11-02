@@ -1,0 +1,29 @@
+metadata:
+  id: CKV_AWS_153
+  name: Autoscaling groups should supply tags to launch configurations
+  category: GENERAL_SECURITY
+  severity: LOW
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_153. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_autoscaling_group
+definition:
+  or:
+  - cond_type: attribute
+    attribute: tag
+    operator: exists
+  - cond_type: attribute
+    attribute: tags
+    operator: exists
+fixtures:
+  fail: |
+    resource "aws_autoscaling_group" "bad" {
+      max_size = 1
+      min_size = 1
+    }
+  pass: |
+    resource "aws_autoscaling_group" "good" {
+      max_size = 1
+      min_size = 1
+      tags = { Name = "asg" }
+    }

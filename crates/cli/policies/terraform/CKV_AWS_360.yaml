@@ -1,0 +1,23 @@
+metadata:
+  id: CKV_AWS_360
+  name: Ensure DocumentDB has an adequate backup retention period
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_360. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_docdb_cluster
+definition:
+  cond_type: attribute
+  attribute: backup_retention_period
+  operator: greater_than_or_equal
+  value: 7
+fixtures:
+  fail: |
+    resource "aws_docdb_cluster" "bad" {
+      backup_retention_period = 1
+    }
+  pass: |
+    resource "aws_docdb_cluster" "good" {
+      backup_retention_period = 7
+    }

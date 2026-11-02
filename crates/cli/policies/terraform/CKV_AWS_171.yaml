@@ -1,0 +1,23 @@
+metadata:
+  id: CKV_AWS_171
+  name: Ensure EMR Cluster security configuration encryption is using SSE-KMS
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_171. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_emr_security_configuration
+definition:
+  cond_type: attribute
+  attribute: configuration
+  operator: contains
+  value: SSE-KMS
+fixtures:
+  fail: |
+    resource "aws_emr_security_configuration" "bad" {
+      configuration = "mode=SSE-S3"
+    }
+  pass: |
+    resource "aws_emr_security_configuration" "good" {
+      configuration = "mode=SSE-KMS"
+    }

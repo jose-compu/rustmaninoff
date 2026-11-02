@@ -1,0 +1,23 @@
+metadata:
+  id: CKV_AWS_338
+  name: Ensure CloudWatch log groups retain logs for at least 1 year
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_338. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_cloudwatch_log_group
+definition:
+  cond_type: attribute
+  attribute: retention_in_days
+  operator: greater_than_or_equal
+  value: 365
+fixtures:
+  fail: |
+    resource "aws_cloudwatch_log_group" "bad" {
+      retention_in_days = 30
+    }
+  pass: |
+    resource "aws_cloudwatch_log_group" "good" {
+      retention_in_days = 365
+    }
