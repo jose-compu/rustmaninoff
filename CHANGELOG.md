@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.4.1 — 2026-11-02
+
+### Security
+
+- GitHub Action (`action.yml`): pass all inputs via environment variables (no `${{ inputs.* }}` interpolation into the shell script body), validate `version` / `path` / `fail-on` / `output` / `sarif-file` / `args`, and verify the downloaded archive against the published `.sha256` before install.
+
+### Changed
+
+- Workspace crates are **0.4.1**.
+- Action default `version` pin is `0.4.1`.
+
 ## 0.4.0 — 2026-11-02
 
 ### Added

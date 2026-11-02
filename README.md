@@ -193,11 +193,11 @@ repos:
 
 ### GitHub Action
 
-Composite action at the repo root (`action.yml`). Downloads a release binary and scans:
+Composite action at the repo root (`action.yml`). Downloads a release binary, verifies its SHA-256 checksum, and scans. Inputs are passed via environment variables and validated before use.
 
 ```yaml
 - uses: actions/checkout@v4
-- uses: jose-compu/rustmaninoff@v0.4.0
+- uses: jose-compu/rustmaninoff@v0.4.1
   with:
     path: .
     fail-on: HIGH
@@ -221,11 +221,11 @@ Tags: `latest` (main), semver (`0.4.0`, `0.4`), and `sha-*`. Built by `.github/w
 
 ## Release
 
-Pushing the tag `v0.4.0` runs `.github/workflows/release.yml`. It publishes Linux and macOS binaries for amd64 and arm64, each with a SHA-256 checksum. Crates.io publish is manual (dependency order: `ir` → parsers/engine/report → `rustmaninoff`).
+Pushing the tag `v0.4.1` runs `.github/workflows/release.yml`. It publishes Linux and macOS binaries for amd64 and arm64, each with a SHA-256 checksum. Crates.io publish is manual (dependency order: `ir` → parsers/engine/report → `rustmaninoff`).
 
 ```sh
-git tag v0.4.0
-git push origin v0.4.0
+git tag v0.4.1
+git push origin v0.4.1
 ```
 
 ## License

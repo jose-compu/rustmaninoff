@@ -1,5 +1,5 @@
 name: Rustmaninoff
-description: Scan IaC with rustmaninoff (Checkov-compatible CKV policies, single Rust binary)
+description: Fast Checkov-compatible IaC scanner (Terraform, Kubernetes, Docker, CloudFormation) with SARIF output
 author: jose-compu
 branding:
   icon: shield
@@ -13,7 +13,7 @@ inputs:
   version:
     description: rustmaninoff release version (without leading v), or "latest"
     required: false
-    default: "0.4.0"
+    default: "0.4.1"
   fail-on:
     description: Minimum severity that fails the job (LOW, MEDIUM, HIGH, CRITICAL)
     required: false
@@ -27,7 +27,7 @@ inputs:
     required: false
     default: "rustmaninoff.sarif"
   args:
-    description: Extra CLI arguments appended to `rustmaninoff scan`
+    description: Extra CLI arguments appended to `rustmaninoff scan` (trusted input; restricted character set)
     required: false
     default: ""
   github-token:
@@ -46,10 +46,21 @@ runs:
     - name: Install rustmaninoff
       shell: bash
       env:
-        VERSION: ${{ inputs.version }}
+        # Pass inputs via env to avoid ${{ }} interpolation into the script body (command injection).
+        INPUT_VERSION: ${{ inputs.version }}
         GH_TOKEN: ${{ inputs.github-token }}
       run: |
         set -euo pipefail
+
+        version="${INPUT_VERSION}"
+        if [ "$version" != "latest" ]; then
+          version="${version#v}"
+          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][A-Za-z0-9.-]+)?$ ]]; then
+            echo "invalid version input (expected semver or 'latest'): ${INPUT_VERSION}" >&2
+            exit 1
+          fi
+        fi
+
         os="$(uname -s)"
         arch="$(uname -m)"
         case "$arch" in
@@ -63,29 +74,108 @@ runs:
           *) echo "unsupported OS: $os" >&2; exit 1 ;;
         esac
 
-        if [ "$VERSION" = "latest" ]; then
-          api="https://api.github.com/repos/jose-compu/rustmaninoff/releases/latest"
-          tag="$(curl -fsSL -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" "$api" | sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p' | head -1)"
-        else
-          tag="v${VERSION#v}"
+        curl_auth=()
+        if [ -n "${GH_TOKEN:-}" ]; then
+          curl_auth=(-H "Authorization: Bearer ${GH_TOKEN}")
         fi
+
+        if [ "$version" = "latest" ]; then
+          api="https://api.github.com/repos/jose-compu/rustmaninoff/releases/latest"
+          tag="$(curl -fsSL "${curl_auth[@]}" -H "Accept: application/vnd.github+json" "$api" \
+            | python3 -c 'import json,sys; print(json.load(sys.stdin)["tag_name"])')"
+          if [ -z "$tag" ] || ! [[ "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([.-][A-Za-z0-9.-]+)?$ ]]; then
+            echo "failed to resolve a valid latest release tag" >&2
+            exit 1
+          fi
+        else
+          tag="v${version}"
+        fi
+
         asset="rustmaninoff-${target}.tar.gz"
-        url="https://github.com/jose-compu/rustmaninoff/releases/download/${tag}/${asset}"
+        base="https://github.com/jose-compu/rustmaninoff/releases/download/${tag}"
+        url="${base}/${asset}"
+        sum_url="${base}/${asset}.sha256"
         echo "Downloading ${url}"
         tmp="$(mktemp -d)"
-        curl -fsSL -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/octet-stream" -o "$tmp/$asset" "$url"
+        trap 'rm -rf "$tmp"' EXIT
+        curl -fsSL "${curl_auth[@]}" -o "$tmp/$asset" "$url"
+        curl -fsSL "${curl_auth[@]}" -o "$tmp/$asset.sha256" "$sum_url"
+
+        (
+          cd "$tmp"
+          if command -v sha256sum >/dev/null 2>&1; then
+            sha256sum -c "$asset.sha256"
+          else
+            expected="$(awk '{print $1}' "$asset.sha256")"
+            actual="$(shasum -a 256 "$asset" | awk '{print $1}')"
+            if [ "$expected" != "$actual" ]; then
+              echo "checksum mismatch for ${asset}" >&2
+              echo "expected ${expected}" >&2
+              echo "actual   ${actual}" >&2
+              exit 1
+            fi
+            echo "${asset}: OK"
+          fi
+        )
+
         tar -xzf "$tmp/$asset" -C "$tmp"
+        if [ ! -f "$tmp/rustmaninoff" ]; then
+          echo "release archive missing rustmaninoff binary" >&2
+          exit 1
+        fi
         install -m 0755 "$tmp/rustmaninoff" "$RUNNER_TEMP/rustmaninoff"
         echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
         "$RUNNER_TEMP/rustmaninoff" --version
 
     - name: Scan
       shell: bash
+      env:
+        INPUT_PATH: ${{ inputs.path }}
+        INPUT_FAIL_ON: ${{ inputs.fail-on }}
+        INPUT_OUTPUT: ${{ inputs.output }}
+        INPUT_SARIF_FILE: ${{ inputs.sarif-file }}
+        INPUT_ARGS: ${{ inputs.args }}
       run: |
         set -euo pipefail
-        cmd=(rustmaninoff scan "${{ inputs.path }}" --fail-on "${{ inputs.fail-on }}" --output "${{ inputs.output }}")
-        case ",${{ inputs.output }}," in
-          *,sarif,*) cmd+=(--sarif-file "${{ inputs.sarif-file }}") ;;
+
+        path="${INPUT_PATH}"
+        fail_on="${INPUT_FAIL_ON}"
+        output="${INPUT_OUTPUT}"
+        sarif_file="${INPUT_SARIF_FILE}"
+        args="${INPUT_ARGS}"
+
+        # Reject metacharacters that would enable shell injection if ever mis-expanded.
+        safe_path='^[A-Za-z0-9._/=@+-][A-Za-z0-9._/=@+ -]*$'
+        if [ -z "$path" ] || ! [[ "$path" =~ $safe_path ]]; then
+          echo "invalid path input" >&2
+          exit 1
+        fi
+        if ! [[ "$fail_on" =~ ^(LOW|MEDIUM|HIGH|CRITICAL)$ ]]; then
+          echo "invalid fail-on input (expected LOW|MEDIUM|HIGH|CRITICAL)" >&2
+          exit 1
+        fi
+        if ! [[ "$output" =~ ^(cli|json|sarif|junit)(,(cli|json|sarif|junit))*$ ]]; then
+          echo "invalid output input (expected comma-separated cli,json,sarif,junit)" >&2
+          exit 1
+        fi
+        if ! [[ "$sarif_file" =~ ^[A-Za-z0-9._/=@+-][A-Za-z0-9._/=@+ -]*$ ]]; then
+          echo "invalid sarif-file input" >&2
+          exit 1
+        fi
+        # Extra args are optional; allow a conservative CLI character set only.
+        if [ -n "$args" ] && ! [[ "$args" =~ ^[A-Za-z0-9_./=,:@+ -]+$ ]]; then
+          echo "invalid args input (forbidden characters)" >&2
+          exit 1
+        fi
+
+        cmd=(rustmaninoff scan "$path" --fail-on "$fail_on" --output "$output")
+        case ",${output}," in
+          *,sarif,*) cmd+=(--sarif-file "$sarif_file") ;;
         esac
-        # shellcheck disable=SC2086
-        "${cmd[@]}" ${{ inputs.args }}
+        if [ -n "$args" ]; then
+          # Word-split only after character allowlist validation above.
+          # shellcheck disable=SC2206
+          extra=( $args )
+          cmd+=("${extra[@]}")
+        fi
+        "${cmd[@]}"

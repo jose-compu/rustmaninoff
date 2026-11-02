@@ -1,6 +1,6 @@
 # Rustmaninoff roadmap
 
-**Now:** v0.4.0 — coverage credibility (536 checks; Docker 100% / K8s 93.8% fidelity), benches + Checkov compare CI. Next: v0.5 pipeline inputs (Helm + plan JSON).
+**Now:** v0.4.1 — Action hardening (injection + checksum) ahead of Marketplace. Next: v0.5 pipeline inputs (Helm + plan JSON).
 
 **Position:** complementary — *run it next to Trivy, in place of Checkov*. Teams already use Trivy for CVEs. Rustmaninoff’s claim is narrow and provable: **Checkov-compatible CKV policies, single Rust binary, fast**. Broad “scanner platform” scope dilutes that. Do not take on CVE / image layer / vuln-DB work.
 
@@ -110,7 +110,7 @@ Checkov and Trivy both template Helm and scan plan/rendered surfaces. This relea
 | Pre-commit hook | [#30](https://github.com/jose-compu/rustmaninoff/issues/30) | **shipped** |
 | Homebrew tap | [#31](https://github.com/jose-compu/rustmaninoff/issues/31) | **shipped** (`jose-compu/homebrew-tap`) |
 | Official Docker image | [#32](https://github.com/jose-compu/rustmaninoff/issues/32) | **shipped** (`ghcr.io/jose-compu/rustmaninoff`) |
-| GitHub Marketplace listing | [#33](https://github.com/jose-compu/rustmaninoff/issues/33) | metadata ready; publish from v0.4.0 release edit |
+| GitHub Marketplace listing | [#33](https://github.com/jose-compu/rustmaninoff/issues/33) | action hardened in 0.4.1; publish from v0.4.1 release edit |
 | Baseline files (adopt without drowning in legacy findings) | [#58](https://github.com/jose-compu/rustmaninoff/issues/58) | open |
 
 ## Later — adjacent, same engine only
