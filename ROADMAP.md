@@ -2,11 +2,16 @@
 
 **Now:** v0.3.0 — attribute + graph scanner (185 checks), Terraform vars/locals/`--var-file`, OpenTofu `.tofu`.
 
-**Aim:** cover the same *job* as Checkov (IaC misconfig, including graph and packaging) and the misconfig/secrets slice of Trivy, without becoming a Python Checkov port or downloading a CVE database on the default scan path.
+**Position:** complementary — *run it next to Trivy, in place of Checkov*. Teams already use Trivy for CVEs. Rustmaninoff’s claim is narrow and provable: **Checkov-compatible CKV policies, single Rust binary, fast**. Broad “scanner platform” scope dilutes that. Do not take on CVE / image layer / vuln-DB work.
 
-Speed stays the constraint. Attribute scans should remain milliseconds. Graph, Helm, and plan JSON are extra passes. Image/FS vulnerability scanning is optional and off by default ([#8](https://github.com/jose-compu/rustmaninoff/issues/8)).
+**Order of work** (stay on IaC):
 
-Site: [jose-compu.github.io/rustmaninoff](https://jose-compu.github.io/rustmaninoff/). Issues: tracking [#11](https://github.com/jose-compu/rustmaninoff/issues/11) · [epics](https://github.com/jose-compu/rustmaninoff/issues?q=is%3Aissue+label%3Aepic) · labels `epic`, `checkov-parity`, `trivy-parity`.
+1. Raise Checkov check **coverage and fidelity** for Terraform, Kubernetes, and Dockerfile (the common CI surface). Publish a coverage table with percentages.
+2. Add **Helm rendering** and **Terraform plan JSON** — what real pipelines scan.
+3. Finish **adoption**: SARIF (done), GitHub Action, pre-commit, baseline/ignore so existing repos can onboard without a flood of findings.
+4. Only then: adjacent features that reuse the same engine (e.g. simple secret **patterns in IaC files**). Never CVE scanning.
+
+Site: [jose-compu.github.io/rustmaninoff](https://jose-compu.github.io/rustmaninoff/). Tracking: [#11](https://github.com/jose-compu/rustmaninoff/issues/11) · [epics](https://github.com/jose-compu/rustmaninoff/issues?q=is%3Aissue+label%3Aepic) · labels `epic`, `checkov-parity`.
 
 ## Now — fix the basics ([#47](https://github.com/jose-compu/rustmaninoff/issues/47))
 
@@ -16,8 +21,8 @@ Launch hygiene (hours, not weeks). README **and** the project site should match.
 | --- | ---: | --- |
 | Cut / keep v0.3.0 GitHub Release with downloadable binaries | [#48](https://github.com/jose-compu/rustmaninoff/issues/48) | release assets live; spot-check |
 | Confirm `cargo install rustmaninoff` via crates.io | [#49](https://github.com/jose-compu/rustmaninoff/issues/49) | 0.3.0 on crates.io; spot-check |
-| Badges (crates.io, CI, license) + ~20s terminal demo GIF | [#50](https://github.com/jose-compu/rustmaninoff/issues/50) | README + SVG demo (this PR); GIF optional follow-up |
-| One-line pitch + one comparison (CKV hook) on README + site | [#52](https://github.com/jose-compu/rustmaninoff/issues/52) | README pitch (this PR); site mirror on `docs` |
+| Badges (crates.io, CI, license) + ~20s terminal demo GIF | [#50](https://github.com/jose-compu/rustmaninoff/issues/50) | README + SVG demo; GIF optional |
+| One-line pitch + one comparison (CKV hook) on README + site | [#52](https://github.com/jose-compu/rustmaninoff/issues/52) | README pitch; site mirror on `docs` |
 | Label open issues `good first issue` / `help wanted` | [#51](https://github.com/jose-compu/rustmaninoff/issues/51) | seed labels applied |
 
 ## v0.2 (shipped)
@@ -29,119 +34,120 @@ Launch hygiene (hours, not weeks). README **and** the project site should match.
 - 181 attribute checks with pass/fail fixtures
 - CLI / JSON / SARIF / JUnit
 
-Not in 0.2: `CKV2_*`, plan JSON, modules, Helm, Kustomize, secrets, vulns, Azure/GCP catalog depth.
-
 ## v0.3 (shipped core; follow-ups open)
 
 | Epic | Issue | Status |
 | --- | ---: | --- |
 | Resource graph and `CKV2_*` composite checks | [#1](https://github.com/jose-compu/rustmaninoff/issues/1) | **shipped** in 0.3.0 (first-wave AWS) |
 | Terraform variables, locals, OpenTofu | [#16](https://github.com/jose-compu/rustmaninoff/issues/16) | **shipped** in 0.3.0 |
-| Local modules / count / for_each | [#17](https://github.com/jose-compu/rustmaninoff/issues/17) | open (0.3.x) |
-| `terraform_plan` JSON | [#18](https://github.com/jose-compu/rustmaninoff/issues/18) | open (0.3.x) |
-| Graph bridge from resolved interpolations | [#19](https://github.com/jose-compu/rustmaninoff/issues/19) | open (0.3.x) |
+| Local modules / count / for_each | [#17](https://github.com/jose-compu/rustmaninoff/issues/17) | open (feeds plan fidelity) |
+| Graph bridge from resolved interpolations | [#19](https://github.com/jose-compu/rustmaninoff/issues/19) | open |
 
-Parent epic [#2](https://github.com/jose-compu/rustmaninoff/issues/2) remains open until modules + plan JSON land.
+Parent epic [#2](https://github.com/jose-compu/rustmaninoff/issues/2): vars shipped; modules remain; **plan JSON moves to v0.5** with Helm (pipeline scan path).
 
-## v0.4 — packaging, more IaC, and CI adoption
+## v0.4 — coverage credibility (TF / K8s / Dockerfile first)
 
-| Epic | Issue |
+Coverage is credibility. Each accurate CKV ID makes a Checkov swap easier. Publish the percentage.
+
+| Epic / work | Issue |
 | --- | ---: |
-| Helm charts and Kustomize overlays | [#3](https://github.com/jose-compu/rustmaninoff/issues/3) |
-| ARM, Bicep, Ansible, Serverless, OpenAPI, SAM | [#6](https://github.com/jose-compu/rustmaninoff/issues/6) |
-| CI adoption — Action, pre-commit, Homebrew, Docker, Marketplace | [#28](https://github.com/jose-compu/rustmaninoff/issues/28) |
+| Checkov catalog depth — prioritize Terraform, Kubernetes, Dockerfile fidelity | [#4](https://github.com/jose-compu/rustmaninoff/issues/4) |
+| Credibility — reproducible benches, Checkov fidelity table, CI comparison | [#40](https://github.com/jose-compu/rustmaninoff/issues/40) |
 | Launch distribution — Show HN, Reddit, TWiR, blog, awesome lists | [#34](https://github.com/jose-compu/rustmaninoff/issues/34) |
-| Credibility — reproducible benches, Checkov fidelity, CI comparison | [#40](https://github.com/jose-compu/rustmaninoff/issues/40) |
 | Small-repo tactics — friendly CI offers + disclosed Checkov threads | [#44](https://github.com/jose-compu/rustmaninoff/issues/44) |
 
-Checkov/Trivy gap: they template Helm and walk Kustomize; Checkov also scans ARM/Bicep/Ansible/Serverless/OpenAPI.
+### Catalog depth (#4) — v0.4 focus
 
-### CI adoption (#28)
+- Remaining high-severity **Terraform** AWS attribute + graph checks teams hit in CI
+- Grow **Kubernetes** (`CKV_K8S_*`) and **Dockerfile** (`CKV_DOCKER_*`) packs
+- CloudFormation continues where it shares AWS CKV ids; Azure/GCP packs only after TF/K8s/Docker coverage is visibly strong
+- Every new check: pass + fail fixture
+- Published coverage table (% of Checkov CKV ids for claimed frameworks) — see [#42](https://github.com/jose-compu/rustmaninoff/issues/42)
 
-Make Rustmaninoff easy to adopt before teams invent install scripts. Distinct from [#5](https://github.com/jose-compu/rustmaninoff/issues/5) (scanning CI-as-code).
+### Credibility (#40)
 
-| Deliverable | Issue |
-| --- | ---: |
-| Reusable composite Action (`jose-compu/rustmaninoff-action`): download release binary, scan, upload SARIF | [#29](https://github.com/jose-compu/rustmaninoff/issues/29) |
-| Pre-commit hook | [#30](https://github.com/jose-compu/rustmaninoff/issues/30) |
-| Homebrew tap | [#31](https://github.com/jose-compu/rustmaninoff/issues/31) |
-| Official Docker image | [#32](https://github.com/jose-compu/rustmaninoff/issues/32) |
-| List the Action on GitHub Marketplace | [#33](https://github.com/jose-compu/rustmaninoff/issues/33) |
+| Deliverable | Issue | Status |
+| --- | ---: | --- |
+| Reproducible benchmarks: corpus + script; real-world repo | [#41](https://github.com/jose-compu/rustmaninoff/issues/41) | open |
+| Fidelity / coverage table: CKV share and intentional gaps | [#42](https://github.com/jose-compu/rustmaninoff/issues/42) | inventory + `docs/coverage.md` started |
+| CI badge + suite comparing output to Checkov on shared fixtures | [#43](https://github.com/jose-compu/rustmaninoff/issues/43) | open |
 
-Each path is another install surface and another place to be found. Marketplace is itself a discovery channel.
+### Launch (#34) and small-repo tactics (#44)
 
-### Launch distribution (#34)
-
-Outreach that brings users. Distinct from [#28](https://github.com/jose-compu/rustmaninoff/issues/28) (install binaries). Lead with the problem and numbers; stay honest that benchmarks are self-reported and from one corpus.
+Lead with: *next to Trivy, in place of Checkov* — speed + CKV compatibility. Honest about catalog % from [#42](https://github.com/jose-compu/rustmaninoff/issues/42).
 
 | Deliverable | Issue |
 | --- | ---: |
 | Show HN with benchmark story + caveats | [#35](https://github.com/jose-compu/rustmaninoff/issues/35) |
 | Reddit: r/rust, r/devops, r/netsec, r/kubernetes | [#36](https://github.com/jose-compu/rustmaninoff/issues/36) |
-| This Week in Rust (PR) + Rust Users Forum | [#37](https://github.com/jose-compu/rustmaninoff/issues/37) |
-| Technical blog: why rewrite policies in Rust (own site + dev.to, cross-link) | [#38](https://github.com/jose-compu/rustmaninoff/issues/38) |
-| Awesome lists: awesome-rust, awesome-static-analysis, awesome-devsecops, awesome-terraform | [#39](https://github.com/jose-compu/rustmaninoff/issues/39) |
+| This Week in Rust + Rust Users Forum | [#37](https://github.com/jose-compu/rustmaninoff/issues/37) |
+| Technical blog: why rewrite policies in Rust | [#38](https://github.com/jose-compu/rustmaninoff/issues/38) |
+| Awesome lists | [#39](https://github.com/jose-compu/rustmaninoff/issues/39) |
+| Friendly projects: optional CI step | [#45](https://github.com/jose-compu/rustmaninoff/issues/45) |
+| Disclosed answers on “Checkov is slow” threads | [#46](https://github.com/jose-compu/rustmaninoff/issues/46) |
 
-### Credibility (#40)
+## v0.5 — real pipeline inputs (Helm + plan JSON)
 
-Trust for security adopters: numbers others can rerun, an honest Checkov fidelity table, and CI that catches parity drift. Complements [#34](https://github.com/jose-compu/rustmaninoff/issues/34) (telling the story) with evidence.
-
-| Deliverable | Issue |
+| Epic / work | Issue |
 | --- | ---: |
-| Reproducible benchmarks: publish corpus + script; include a real-world repo | [#41](https://github.com/jose-compu/rustmaninoff/issues/41) |
-| Fidelity table: Checkov CKV coverage share and where results differ | [#42](https://github.com/jose-compu/rustmaninoff/issues/42) |
-| CI badge + test suite comparing output to Checkov on shared fixtures | [#43](https://github.com/jose-compu/rustmaninoff/issues/43) |
+| Helm chart rendering → Kubernetes IR | [#3](https://github.com/jose-compu/rustmaninoff/issues/3) (Helm first; Kustomize secondary) |
+| `terraform_plan` JSON | [#18](https://github.com/jose-compu/rustmaninoff/issues/18) |
+| Local modules / count / for_each (needed for faithful plan/module scans) | [#17](https://github.com/jose-compu/rustmaninoff/issues/17) |
 
-### Small-repo tactics (#44)
+Checkov and Trivy both template Helm and scan plan/rendered surfaces. This release makes Rustmaninoff usable on those CI artifacts without widening into other product lines.
 
-Outbound, opt-in growth for a small project. Distinct from [#28](https://github.com/jose-compu/rustmaninoff/issues/28) (build install paths) and [#34](https://github.com/jose-compu/rustmaninoff/issues/34) (launch posts). Quality over volume; **no abuse**.
+## v0.6 — adoption polish (swap Checkov in CI without a findings flood)
 
-| Deliverable | Issue |
+| Epic / work | Issue |
 | --- | ---: |
-| Open issues/PRs in friendly projects offering the scanner as an optional CI step | [#45](https://github.com/jose-compu/rustmaninoff/issues/45) |
-| Answer “Checkov is slow” / “alternatives to Checkov” threads (Reddit, Stack Overflow, GitHub) with author disclosure | [#46](https://github.com/jose-compu/rustmaninoff/issues/46) |
+| CI adoption — Action, pre-commit, Homebrew, Docker, Marketplace | [#28](https://github.com/jose-compu/rustmaninoff/issues/28) |
+| Baseline / suppressions for brownfield repos | [#58](https://github.com/jose-compu/rustmaninoff/issues/58) |
 
-## v0.5 — catalog, pipelines, secrets
+### CI adoption (#28)
 
-| Epic | Issue |
-| --- | ---: |
-| Checkov catalog depth (AWS, Azure, GCP) | [#4](https://github.com/jose-compu/rustmaninoff/issues/4) |
-| CI/CD as code (Actions, GitLab, Azure Pipelines, Argo, …) | [#5](https://github.com/jose-compu/rustmaninoff/issues/5) |
-| Secrets scanning | [#7](https://github.com/jose-compu/rustmaninoff/issues/7) |
+| Deliverable | Issue | Status |
+| --- | ---: | --- |
+| Reusable Action + SARIF upload | [#29](https://github.com/jose-compu/rustmaninoff/issues/29) | **shipped** |
+| Pre-commit hook | [#30](https://github.com/jose-compu/rustmaninoff/issues/30) | **shipped** |
+| Homebrew tap | [#31](https://github.com/jose-compu/rustmaninoff/issues/31) | **shipped** (`jose-compu/homebrew-tap`) |
+| Official Docker image | [#32](https://github.com/jose-compu/rustmaninoff/issues/32) | **shipped** (`ghcr.io/jose-compu/rustmaninoff`) |
+| GitHub Marketplace listing | [#33](https://github.com/jose-compu/rustmaninoff/issues/33) | open |
+| Baseline files (adopt without drowning in legacy findings) | [#58](https://github.com/jose-compu/rustmaninoff/issues/58) | open |
 
-181 checks is not Checkov’s 1000+. Pipelines and secrets are both Checkov frameworks and Trivy scanners.
+## Later — adjacent, same engine only
 
-## v1.0 — compliance and optional Trivy-class SCA
+Only after coverage, pipeline inputs, and adoption are solid.
 
-| Epic | Issue |
-| --- | ---: |
-| Compliance packs (CIS/NSA) and Rego/custom graph YAML | [#10](https://github.com/jose-compu/rustmaninoff/issues/10) |
-| Live Kubernetes cluster scanning | [#9](https://github.com/jose-compu/rustmaninoff/issues/9) |
-| Optional image/filesystem vulns, licenses, SBOM | [#8](https://github.com/jose-compu/rustmaninoff/issues/8) |
+| Work | Issue | Notes |
+| --- | ---: | --- |
+| Simple secret **patterns in IaC files** (not a Trivy secrets product) | [#7](https://github.com/jose-compu/rustmaninoff/issues/7) | Narrowed: known patterns on TF/K8s/Docker/CFN content; no entropy product race |
+| Compliance pack filters (CIS map over existing CKV ids) | [#10](https://github.com/jose-compu/rustmaninoff/issues/10) | Filter/docs; optional Rego only if demanded |
+| Extra IaC formats (ARM, Bicep, Ansible, …) | [#6](https://github.com/jose-compu/rustmaninoff/issues/6) | **Deferred** — dilutes TF/K8s/Docker focus |
+| CI/CD-as-code frameworks (Actions/GitLab YAML checks) | [#5](https://github.com/jose-compu/rustmaninoff/issues/5) | **Deferred** — not the Checkov-swap path |
+| Live Kubernetes cluster scan | [#9](https://github.com/jose-compu/rustmaninoff/issues/9) | **Deferred** — Trivy/`kubectl` territory |
 
-Default `rustmaninoff scan` remains IaC misconfig. `--scanners vuln` is how Trivy-like coverage is opted in, so CI does not pay for a vulnerability DB unless it asked.
+## Out of scope — do not build
+
+| Work | Issue | Why |
+| --- | ---: | --- |
+| Image/FS CVE scanning, vuln DB, SBOM-as-product | [#8](https://github.com/jose-compu/rustmaninoff/issues/8) | **Won’t**: Trivy’s business (funded CVE DBs, layer analysis). Stay complementary. |
 
 ## Mapping
 
 | Capability | Checkov | Trivy | Rustmaninoff |
 | --- | --- | --- | --- |
-| TF / CFN / K8s / Dockerfile attributes | yes | misconfig | **v0.2** |
-| Graph / `CKV2_*` | yes | some | [#1](https://github.com/jose-compu/rustmaninoff/issues/1) |
-| Terraform plan / modules / vars | yes | misconfig | [#2](https://github.com/jose-compu/rustmaninoff/issues/2) |
-| Helm / Kustomize | yes | yes | [#3](https://github.com/jose-compu/rustmaninoff/issues/3) |
-| ARM / Bicep / Ansible / Serverless / OpenAPI | yes | some | [#6](https://github.com/jose-compu/rustmaninoff/issues/6) |
-| GHA / GitLab CI / Azure Pipelines / Argo (scan those files) | yes | some | [#5](https://github.com/jose-compu/rustmaninoff/issues/5) |
-| Action / brew / Docker / pre-commit (run this scanner) | yes | yes | [#28](https://github.com/jose-compu/rustmaninoff/issues/28) |
-| Launch posts / TWiR / awesome lists (discovery) | — | — | [#34](https://github.com/jose-compu/rustmaninoff/issues/34) |
-| Reproducible benches / fidelity table / Checkov CI compare | — | — | [#40](https://github.com/jose-compu/rustmaninoff/issues/40) |
-| Friendly CI offers + disclosed Checkov-thread answers | — | — | [#44](https://github.com/jose-compu/rustmaninoff/issues/44) |
-| Fix the basics (release, crates, README/site pitch) | — | — | [#47](https://github.com/jose-compu/rustmaninoff/issues/47) |
-| Azure / GCP catalog | yes | misconfig | [#4](https://github.com/jose-compu/rustmaninoff/issues/4) |
-| Secrets | yes | yes | [#7](https://github.com/jose-compu/rustmaninoff/issues/7) |
-| Image/FS CVEs, SBOM, licenses | SCA | **core** | [#8](https://github.com/jose-compu/rustmaninoff/issues/8) (opt-in) |
-| Live cluster | limited | `k8s` | [#9](https://github.com/jose-compu/rustmaninoff/issues/9) |
-| CIS packs / Rego | Prisma / YAML | Rego | [#10](https://github.com/jose-compu/rustmaninoff/issues/10) |
+| TF / CFN / K8s / Dockerfile attributes | yes | misconfig | **v0.2+**; deepen in **v0.4** |
+| Graph / `CKV2_*` | yes | some | **v0.3** ([#1](https://github.com/jose-compu/rustmaninoff/issues/1)) |
+| Coverage % / fidelity table | — | — | **v0.4** ([#42](https://github.com/jose-compu/rustmaninoff/issues/42)) |
+| Terraform plan / modules | yes | misconfig | modules [#17](https://github.com/jose-compu/rustmaninoff/issues/17); plan **v0.5** [#18](https://github.com/jose-compu/rustmaninoff/issues/18) |
+| Helm (then Kustomize) | yes | yes | **v0.5** [#3](https://github.com/jose-compu/rustmaninoff/issues/3) |
+| Action / pre-commit / brew / Docker / baseline | yes | yes | **v0.6** [#28](https://github.com/jose-compu/rustmaninoff/issues/28), [#58](https://github.com/jose-compu/rustmaninoff/issues/58) |
+| Secrets in IaC (narrow patterns) | yes | yes | **Later** [#7](https://github.com/jose-compu/rustmaninoff/issues/7) |
+| ARM / Bicep / Ansible / Serverless / OpenAPI | yes | some | Deferred [#6](https://github.com/jose-compu/rustmaninoff/issues/6) |
+| GHA / GitLab CI as scanned frameworks | yes | some | Deferred [#5](https://github.com/jose-compu/rustmaninoff/issues/5) |
+| Live cluster | limited | `k8s` | Deferred [#9](https://github.com/jose-compu/rustmaninoff/issues/9) |
+| Image/FS CVEs, SBOM product | SCA | **core** | **Out of scope** [#8](https://github.com/jose-compu/rustmaninoff/issues/8) |
 
 ## Constraint
 
-Do not regress the 0.2 attribute path. New frameworks are `--framework` flags. Network (module registry, Helm repos, vuln DB) is never implicit in CI.
+Do not regress the attribute path. New frameworks are `--framework` flags. Network (module registry, Helm repos) is never implicit in CI. **No vulnerability database on any default or optional path** — point users at Trivy for that.

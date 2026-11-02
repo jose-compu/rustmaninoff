@@ -36,7 +36,7 @@ Checkov and Trivy are broader platforms. Rustmaninoff is a **small, fast attribu
 
 Site: [jose-compu.github.io/rustmaninoff](https://jose-compu.github.io/rustmaninoff/) · [llms.txt](https://jose-compu.github.io/rustmaninoff/llms.txt) for search and AI agents.
 
-**Roadmap:** [ROADMAP.md](ROADMAP.md) — epics to cover Checkov graph/plan/Helm/catalog and Trivy secrets/SCA ([issues](https://github.com/jose-compu/rustmaninoff/issues?q=is%3Aissue+label%3Aepic)).
+**Roadmap:** [ROADMAP.md](ROADMAP.md) · built-in inventory: [docs/coverage.md](docs/coverage.md) — epics to cover Checkov graph/plan/Helm/catalog and Trivy secrets/SCA ([issues](https://github.com/jose-compu/rustmaninoff/issues?q=is%3Aissue+label%3Aepic)).
 
 ## Build
 
@@ -183,6 +183,13 @@ rustmaninoff scan .
 ```
 
 GitHub Release binaries: https://github.com/jose-compu/rustmaninoff/releases/tag/v0.3.0
+
+### Homebrew
+
+```sh
+brew install jose-compu/tap/rustmaninoff
+rustmaninoff scan .
+```
 
 ### Pre-commit
 
