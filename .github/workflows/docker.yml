@@ -61,17 +61,17 @@ jobs:
           VERSION: ${{ steps.ver.outputs.version }}
         run: |
           set -euo pipefail
-          repo="${{ github.repository }}"
+          # Prefer the Releases API (auth OK). Do not HEAD github.com/.../download with
+          # Authorization — redirects to object storage then fail/loop forever.
           for asset in \
             rustmaninoff-x86_64-unknown-linux-gnu.tar.gz \
             rustmaninoff-aarch64-unknown-linux-gnu.tar.gz
           do
-            url="https://github.com/${repo}/releases/download/v${VERSION}/${asset}"
-            echo "Waiting for ${url}"
+            echo "Waiting for release asset ${asset} on v${VERSION}"
             ok=0
             for _ in $(seq 1 60); do
-              code="$(curl -fsSIL -o /dev/null -w '%{http_code}' -H "Authorization: Bearer ${GH_TOKEN}" "$url" || true)"
-              if [ "$code" = "200" ]; then
+              if gh release view "v${VERSION}" --repo "${{ github.repository }}" --json assets \
+                --jq ".assets[].name" | grep -Fxq "$asset"; then
                 ok=1
                 break
               fi
@@ -83,7 +83,6 @@ jobs:
             fi
           done
           echo "Release assets ready for v${VERSION}"
-
       # QEMU only executes the thin download stage for arm64 (seconds), not a full cargo build.
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
