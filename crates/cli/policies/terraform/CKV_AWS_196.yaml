@@ -1,0 +1,20 @@
+metadata:
+  id: CKV_AWS_196
+  name: Ensure no aws_elasticache_security_group resources exist
+  category: NETWORKING
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_196. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_elasticache_security_group
+definition:
+  cond_type: forbid_resource
+fixtures:
+  fail: |
+    resource "aws_elasticache_security_group" "bad" {
+      name = "legacy"
+    }
+  pass: |
+    resource "aws_vpc" "good" {
+      cidr_block = "10.0.0.0/16"
+    }

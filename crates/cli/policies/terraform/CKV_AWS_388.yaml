@@ -1,0 +1,30 @@
+metadata:
+  id: CKV_AWS_388
+  name: Ensure AWS Aurora PostgreSQL is not exposed to local file read vulnerability
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_388. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_db_instance
+definition:
+  or:
+  - cond_type: attribute
+    attribute: engine
+    operator: not_contains
+    value: aurora-postgresql
+  - cond_type: attribute
+    attribute: engine_version
+    operator: not_within
+    value: ["10.11", "10.12", "10.13", "11.6", "11.7", "11.8"]
+fixtures:
+  fail: |
+    resource "aws_db_instance" "bad" {
+      engine         = "aurora-postgresql"
+      engine_version = "11.8"
+    }
+  pass: |
+    resource "aws_db_instance" "good" {
+      engine         = "aurora-postgresql"
+      engine_version = "15.4"
+    }

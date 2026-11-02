@@ -1,0 +1,22 @@
+metadata:
+  id: CKV_AWS_101
+  name: Ensure Neptune logging is enabled
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_101. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_neptune_cluster
+definition:
+  cond_type: attribute
+  attribute: enable_cloudwatch_logs_exports
+  operator: contains
+  value: audit
+fixtures:
+  fail: |
+    resource "aws_neptune_cluster" "bad" {
+    }
+  pass: |
+    resource "aws_neptune_cluster" "good" {
+      enable_cloudwatch_logs_exports = ["audit"]
+    }

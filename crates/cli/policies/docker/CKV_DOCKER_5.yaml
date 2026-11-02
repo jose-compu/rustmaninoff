@@ -1,0 +1,39 @@
+metadata:
+  id: CKV_DOCKER_5
+  name: Ensure update instructions are not used alone in the Dockerfile
+  category: APPLICATION_SECURITY
+  severity: MEDIUM
+  framework: docker
+  guidelines: Adapted from Checkov CKV_DOCKER_5 (approximate per-RUN). https://github.com/bridgecrewio/checkov
+resource_types:
+- dockerfile
+definition:
+  or:
+  - cond_type: attribute
+    attribute: RUN
+    operator: not_exists
+  - or:
+    - cond_type: attribute
+      attribute: RUN.command
+      operator: not_contains
+      value: update
+    - or:
+      - cond_type: attribute
+        attribute: RUN.command
+        operator: contains
+        value: install
+      - cond_type: attribute
+        attribute: RUN.command
+        operator: contains
+        value: upgrade
+      - cond_type: attribute
+        attribute: RUN.command
+        operator: contains
+        value: add
+fixtures:
+  fail: |
+    FROM alpine:3.20
+    RUN apk update
+  pass: |
+    FROM alpine:3.20
+    RUN apk update && apk add curl

@@ -1,0 +1,23 @@
+metadata:
+  id: CKV_AWS_143
+  name: Ensure that S3 bucket has Object Lock enabled
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_143. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_s3_bucket
+definition:
+  cond_type: attribute
+  attribute: object_lock_enabled
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_s3_bucket" "bad" {
+      bucket = "data"
+    }
+  pass: |
+    resource "aws_s3_bucket" "good" {
+      bucket              = "data"
+      object_lock_enabled = true
+    }

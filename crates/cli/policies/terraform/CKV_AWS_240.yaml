@@ -1,0 +1,25 @@
+metadata:
+  id: CKV_AWS_240
+  name: Ensure Kinesis Firehose delivery stream is encrypted
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_240. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_kinesis_firehose_delivery_stream
+definition:
+  cond_type: attribute
+  attribute: server_side_encryption.enabled
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_kinesis_firehose_delivery_stream" "bad" {
+      name = "stream"
+    }
+  pass: |
+    resource "aws_kinesis_firehose_delivery_stream" "good" {
+      name = "stream"
+      server_side_encryption {
+        enabled = true
+      }
+    }

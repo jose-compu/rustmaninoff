@@ -1,0 +1,28 @@
+metadata:
+  id: CKV_AWS_315
+  name: Ensure EC2 Auto Scaling groups use EC2 launch templates
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_315. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_autoscaling_group
+definition:
+  or:
+  - cond_type: attribute
+    attribute: launch_template
+    operator: exists
+  - cond_type: attribute
+    attribute: mixed_instances_policy.launch_template
+    operator: exists
+fixtures:
+  fail: |
+    resource "aws_autoscaling_group" "bad" {
+      launch_configuration = "old"
+    }
+  pass: |
+    resource "aws_autoscaling_group" "good" {
+      launch_template {
+        id = "lt-1"
+      }
+    }

@@ -1,0 +1,20 @@
+metadata:
+  id: CKV_AWS_273
+  name: Ensure access is controlled through SSO and not AWS IAM defined users
+  category: IAM
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_273. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_iam_user
+definition:
+  cond_type: forbid_resource
+fixtures:
+  fail: |
+    resource "aws_iam_user" "bad" {
+      name = "human"
+    }
+  pass: |
+    resource "aws_vpc" "good" {
+      cidr_block = "10.0.0.0/16"
+    }
