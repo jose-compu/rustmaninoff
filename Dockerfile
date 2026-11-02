@@ -17,7 +17,7 @@ ARG VERSION=0.3.0
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ca-certificates curl \
     && rm -rf /var/lib/apt/lists/*
-RUN set -euo pipefail; \
+RUN set -eu; \
     case "$TARGETARCH" in \
       amd64) target=x86_64-unknown-linux-gnu ;; \
       arm64) target=aarch64-unknown-linux-gnu ;; \
