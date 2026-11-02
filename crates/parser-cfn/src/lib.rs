@@ -4,7 +4,8 @@ use std::collections::BTreeMap;
 use std::path::Path;
 
 use rustmaninoff_ir::{
-    extract_skip_comments, skips_between, Framework, ParseOutput, Resource, Value,
+    extract_skip_comments, skips_between, Edge, EdgeKind, Framework, ParseOutput, Resource,
+    ResourceRef, Value,
 };
 
 pub fn parse_file(path: &Path, source: &str) -> ParseOutput {
@@ -19,7 +20,6 @@ pub fn parse_file(path: &Path, source: &str) -> ParseOutput {
             Err(err) => return fail(path, err.to_string()),
         }
     };
-    let document = mark_intrinsics(document);
     let skips = extract_skip_comments(source);
     let Some(resources) = document.get("Resources").and_then(as_object) else {
         return ParseOutput::default();
@@ -32,10 +32,14 @@ pub fn parse_file(path: &Path, source: &str) -> ParseOutput {
         let Some(type_name) = resource.get("Type").and_then(Value::as_str) else {
             continue;
         };
-        let attributes = resource
+        let from = ResourceRef::new(type_name, name.clone()).with_file(path.to_path_buf());
+        collect_depends_on(&mut output, &from, resource.get("DependsOn"));
+        let raw_attributes = resource
             .get("Properties")
             .cloned()
             .unwrap_or_else(|| Value::Object(BTreeMap::new()));
+        collect_intrinsic_edges(&mut output, &from, None, &raw_attributes);
+        let attributes = mark_intrinsics(raw_attributes);
         let start_line = find_logical_id_line(source, name);
         output.resources.push(Resource {
             framework: Framework::CloudFormation,
@@ -50,6 +54,96 @@ pub fn parse_file(path: &Path, source: &str) -> ParseOutput {
         });
     }
     output
+}
+
+fn collect_depends_on(output: &mut ParseOutput, from: &ResourceRef, value: Option<&Value>) {
+    let Some(value) = value else {
+        return;
+    };
+    match value {
+        Value::String(name) => {
+            output.push_edge(Edge::new(
+                from.clone(),
+                ResourceRef::new(String::new(), name.clone()),
+                EdgeKind::DependsOn,
+            ));
+        }
+        Value::Array(items) => {
+            for item in items {
+                if let Some(name) = item.as_str() {
+                    output.push_edge(Edge::new(
+                        from.clone(),
+                        ResourceRef::new(String::new(), name.to_string()),
+                        EdgeKind::DependsOn,
+                    ));
+                }
+            }
+        }
+        _ => {}
+    }
+}
+
+fn collect_intrinsic_edges(
+    output: &mut ParseOutput,
+    from: &ResourceRef,
+    via: Option<&str>,
+    value: &Value,
+) {
+    match value {
+        Value::Array(items) => {
+            for item in items {
+                collect_intrinsic_edges(output, from, via, item);
+            }
+        }
+        Value::Object(map) => {
+            if let Some(target) = ref_target(map) {
+                let mut edge = Edge::new(from.clone(), target, EdgeKind::Ref);
+                if let Some(path) = via {
+                    edge = edge.via(path);
+                }
+                output.push_edge(edge);
+                return;
+            }
+            if let Some(target) = get_att_target(map) {
+                let mut edge = Edge::new(from.clone(), target, EdgeKind::GetAtt);
+                if let Some(path) = via {
+                    edge = edge.via(path);
+                }
+                output.push_edge(edge);
+                return;
+            }
+            for (key, child) in map {
+                collect_intrinsic_edges(output, from, Some(key.as_str()), child);
+            }
+        }
+        _ => {}
+    }
+}
+
+fn ref_target(map: &BTreeMap<String, Value>) -> Option<ResourceRef> {
+    if map.len() != 1 {
+        return None;
+    }
+    let name = map.get("Ref")?.as_str()?;
+    Some(ResourceRef::new(String::new(), name.to_string()))
+}
+
+fn get_att_target(map: &BTreeMap<String, Value>) -> Option<ResourceRef> {
+    if map.len() != 1 {
+        return None;
+    }
+    let value = map.get("Fn::GetAtt")?;
+    match value {
+        Value::String(text) => {
+            let logical = text.split('.').next().unwrap_or(text);
+            Some(ResourceRef::new(String::new(), logical.to_string()))
+        }
+        Value::Array(items) => {
+            let logical = items.first()?.as_str()?;
+            Some(ResourceRef::new(String::new(), logical.to_string()))
+        }
+        _ => None,
+    }
 }
 
 fn as_object(value: &Value) -> Option<&BTreeMap<String, Value>> {
@@ -124,23 +218,46 @@ mod tests {
         let source = r#"
 AWSTemplateFormatVersion: "2010-09-09"
 Resources:
-  Logs:
+  Name:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Ref Name
+      BucketName: logs
+  App:
+    Type: AWS::S3::Bucket
+    DependsOn:
+      - Name
+    Properties:
+      BucketName:
+        Ref: Name
+      LoggingConfiguration:
+        DestinationBucketName:
+          Fn::GetAtt:
+            - Name
+            - Arn
       VersioningConfiguration:
         Status: Enabled
 "#;
         let output = parse_file(Path::new("cfn.yaml"), source);
         assert!(output.diagnostics.is_empty(), "{:?}", output.diagnostics);
-        assert_eq!(output.resources[0].resource_type, "AWS::S3::Bucket");
-        let status = lookup(
-            &output.resources[0].attributes,
-            "VersioningConfiguration.Status",
-        );
+        let app = output
+            .resources
+            .iter()
+            .find(|item| item.name == "App")
+            .expect("App");
+        assert_eq!(app.resource_type, "AWS::S3::Bucket");
+        let status = lookup(&app.attributes, "VersioningConfiguration.Status");
         assert_eq!(status.values[0].as_str(), Some("Enabled"));
-        let name = lookup(&output.resources[0].attributes, "BucketName");
+        let name = lookup(&app.attributes, "BucketName");
         assert!(name.unknown);
+        assert!(output.edges.iter().any(|edge| {
+            edge.kind == EdgeKind::DependsOn && edge.from.name == "App" && edge.to.name == "Name"
+        }));
+        assert!(output.edges.iter().any(|edge| {
+            edge.kind == EdgeKind::Ref && edge.from.name == "App" && edge.to.name == "Name"
+        }));
+        assert!(output.edges.iter().any(|edge| {
+            edge.kind == EdgeKind::GetAtt && edge.from.name == "App" && edge.to.name == "Name"
+        }));
     }
 }
 

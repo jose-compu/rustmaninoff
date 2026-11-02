@@ -3,8 +3,8 @@
 use std::path::Path;
 
 use rustmaninoff_ir::{
-    extract_skip_comments, lookup, skips_between, skips_from_annotations, Framework, ParseOutput,
-    Resource, Value,
+    extract_skip_comments, lookup, skips_between, skips_from_annotations, Edge, EdgeKind,
+    Framework, ParseOutput, Resource, ResourceRef, Value,
 };
 
 pub fn parse_file(path: &Path, source: &str) -> ParseOutput {
@@ -54,10 +54,49 @@ fn push_value(
         }
         Value::Object(_) => {
             if let Some(resource) = resource_from_object(path, source, skips, start_line, value) {
+                collect_k8s_edges(output, &resource);
                 output.resources.push(resource);
             }
         }
         _ => {}
+    }
+}
+
+fn collect_k8s_edges(output: &mut ParseOutput, resource: &Resource) {
+    let from = ResourceRef::from_resource(resource);
+    if let Some(Value::Array(items)) = resource
+        .attributes
+        .pointer("metadata.ownerReferences")
+        .cloned()
+    {
+        for item in items {
+            let Some(kind) = item.get("kind").and_then(Value::as_str) else {
+                continue;
+            };
+            let Some(name) = item.get("name").and_then(Value::as_str) else {
+                continue;
+            };
+            output.push_edge(
+                Edge::new(from.clone(), ResourceRef::new(kind, name), EdgeKind::Owner)
+                    .via("metadata.ownerReferences"),
+            );
+        }
+    }
+    let volumes = lookup(&resource.attributes, "_pod_spec.volumes");
+    for volume in volumes.values {
+        if let Some(claim) = volume
+            .pointer("persistentVolumeClaim.claimName")
+            .and_then(Value::as_str)
+        {
+            output.push_edge(
+                Edge::new(
+                    from.clone(),
+                    ResourceRef::new("PersistentVolumeClaim", claim),
+                    EdgeKind::Mount,
+                )
+                .via("spec.volumes"),
+            );
+        }
     }
 }
 
@@ -171,9 +210,16 @@ kind: Deployment
 metadata:
   name: web
   namespace: prod
+  ownerReferences:
+    - kind: ReplicaSet
+      name: web-rs
 spec:
   template:
     spec:
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: web-data
       containers:
         - name: web
           image: nginx:1.25
@@ -187,6 +233,16 @@ spec:
             "_containers.securityContext.privileged",
         );
         assert_eq!(privileged.values[0], &Value::Bool(true));
+        assert!(output.edges.iter().any(|edge| {
+            edge.kind == EdgeKind::Owner
+                && edge.to.resource_type == "ReplicaSet"
+                && edge.to.name == "web-rs"
+        }));
+        assert!(output.edges.iter().any(|edge| {
+            edge.kind == EdgeKind::Mount
+                && edge.to.resource_type == "PersistentVolumeClaim"
+                && edge.to.name == "web-data"
+        }));
     }
 
     #[test]

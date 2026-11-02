@@ -3,10 +3,11 @@
 use std::collections::{BTreeMap, HashMap};
 use std::path::Path;
 
-use hcl::expr::{Expression, FuncCall, ObjectKey, TemplateExpr};
+use hcl::expr::{Expression, FuncCall, ObjectKey, TemplateExpr, Traversal, TraversalOperator};
 use hcl::structure::Body;
 use rustmaninoff_ir::{
-    extract_skip_comments, skips_between, Framework, ParseOutput, Resource, ResourceKind, Value,
+    extract_skip_comments, skips_between, Edge, EdgeKind, Framework, ParseOutput, Resource,
+    ResourceKind, ResourceRef, Value,
 };
 
 pub fn parse_file(path: &Path, source: &str) -> ParseOutput {
@@ -70,10 +71,14 @@ fn parse_body(path: &Path, source: &str, body: &Body) -> ParseOutput {
                 insert_type(&mut attributes, "egress");
             }
         }
+        let resource_type = resource_type_name(kind, &labels[0]);
+        let from = ResourceRef::new(resource_type.clone(), labels[1].clone())
+            .with_file(path.to_path_buf());
+        collect_body_edges(&mut output, &from, block.body());
         output.resources.push(Resource {
             framework: Framework::Terraform,
             kind,
-            resource_type: resource_type_name(kind, &labels[0]),
+            resource_type,
             name: labels[1].clone(),
             attributes,
             file: path.to_path_buf(),
@@ -83,6 +88,173 @@ fn parse_body(path: &Path, source: &str, body: &Body) -> ParseOutput {
         });
     }
     output
+}
+
+fn collect_body_edges(output: &mut ParseOutput, from: &ResourceRef, body: &Body) {
+    for attribute in body.attributes() {
+        let key = attribute.key();
+        if key == "depends_on" {
+            collect_depends_on(output, from, attribute.expr());
+        } else {
+            collect_expr_edges(output, from, Some(key), attribute.expr());
+        }
+    }
+    for block in body.blocks() {
+        if block.identifier() == "dynamic" {
+            continue;
+        }
+        collect_body_edges(output, from, block.body());
+    }
+}
+
+fn collect_depends_on(output: &mut ParseOutput, from: &ResourceRef, expr: &Expression) {
+    match expr {
+        Expression::Array(items) => {
+            for item in items {
+                if let Some(target) = resource_ref_from_expr(item) {
+                    output.push_edge(Edge::new(from.clone(), target, EdgeKind::DependsOn));
+                }
+            }
+        }
+        other => {
+            if let Some(target) = resource_ref_from_expr(other) {
+                output.push_edge(Edge::new(from.clone(), target, EdgeKind::DependsOn));
+            }
+        }
+    }
+}
+
+fn collect_expr_edges(
+    output: &mut ParseOutput,
+    from: &ResourceRef,
+    via: Option<&str>,
+    expr: &Expression,
+) {
+    match expr {
+        Expression::Array(items) => {
+            for item in items {
+                collect_expr_edges(output, from, via, item);
+            }
+        }
+        Expression::Object(object) => {
+            for (key, value) in object.iter() {
+                let child_via = object_key(key);
+                collect_expr_edges(output, from, child_via.as_deref().or(via), value);
+            }
+        }
+        Expression::Parenthesis(inner) => collect_expr_edges(output, from, via, inner),
+        Expression::Conditional(conditional) => {
+            collect_expr_edges(output, from, via, &conditional.cond_expr);
+            collect_expr_edges(output, from, via, &conditional.true_expr);
+            collect_expr_edges(output, from, via, &conditional.false_expr);
+        }
+        Expression::FuncCall(call) => {
+            for arg in &call.args {
+                collect_expr_edges(output, from, via, arg);
+            }
+        }
+        Expression::Traversal(traversal) => {
+            if let Some(target) = resource_ref_from_traversal(traversal) {
+                let mut edge = Edge::new(from.clone(), target, EdgeKind::References);
+                if let Some(path) = via {
+                    edge = edge.via(path);
+                }
+                output.push_edge(edge);
+            }
+            collect_expr_edges(output, from, via, &traversal.expr);
+        }
+        Expression::Variable(_) => {
+            if let Some(target) = resource_ref_from_expr(expr) {
+                let mut edge = Edge::new(from.clone(), target, EdgeKind::References);
+                if let Some(path) = via {
+                    edge = edge.via(path);
+                }
+                output.push_edge(edge);
+            }
+        }
+        Expression::TemplateExpr(template) => {
+            for target in resource_refs_from_template(template) {
+                let mut edge = Edge::new(from.clone(), target, EdgeKind::References);
+                if let Some(path) = via {
+                    edge = edge.via(path);
+                }
+                output.push_edge(edge);
+            }
+        }
+        _ => {}
+    }
+}
+
+fn resource_ref_from_expr(expr: &Expression) -> Option<ResourceRef> {
+    match expr {
+        Expression::Traversal(traversal) => resource_ref_from_traversal(traversal),
+        Expression::String(text) => resource_ref_from_dotted(text),
+        _ => None,
+    }
+}
+
+fn resource_ref_from_traversal(traversal: &Traversal) -> Option<ResourceRef> {
+    let Expression::Variable(variable) = &traversal.expr else {
+        return None;
+    };
+    let root = variable.as_str();
+    let attrs: Vec<&str> = traversal
+        .operators
+        .iter()
+        .map_while(|op| match op {
+            TraversalOperator::GetAttr(ident) => Some(ident.as_str()),
+            _ => None,
+        })
+        .collect();
+    if root == "data" {
+        if attrs.len() >= 2 {
+            return Some(ResourceRef::new(format!("data.{}", attrs[0]), attrs[1]));
+        }
+        return None;
+    }
+    if root == "var" || root == "local" || root == "module" || root == "path" || root == "terraform"
+    {
+        return None;
+    }
+    if attrs.is_empty() {
+        return None;
+    }
+    Some(ResourceRef::new(root, attrs[0]))
+}
+
+fn resource_ref_from_dotted(text: &str) -> Option<ResourceRef> {
+    let parts: Vec<&str> = text.split('.').collect();
+    if parts.len() >= 3 && parts[0] == "data" {
+        return Some(ResourceRef::new(format!("data.{}", parts[1]), parts[2]));
+    }
+    if parts.len() >= 2
+        && parts[0] != "var"
+        && parts[0] != "local"
+        && parts[0] != "module"
+        && parts[0] != "path"
+        && parts[0] != "terraform"
+    {
+        return Some(ResourceRef::new(parts[0], parts[1]));
+    }
+    None
+}
+
+fn resource_refs_from_template(template: &TemplateExpr) -> Vec<ResourceRef> {
+    let raw = match template {
+        TemplateExpr::QuotedString(value) => value.as_str(),
+        TemplateExpr::Heredoc(heredoc) => heredoc.template.as_str(),
+    };
+    let mut refs = Vec::new();
+    for chunk in raw.split("${") {
+        let Some(end) = chunk.find('}') else {
+            continue;
+        };
+        let expr = chunk[..end].trim();
+        if let Some(target) = resource_ref_from_dotted(expr) {
+            refs.push(target);
+        }
+    }
+    refs
 }
 
 fn resource_type_name(kind: ResourceKind, type_name: &str) -> String {
@@ -319,6 +491,9 @@ fn emit_json_section(
         };
         for (name, attributes) in named {
             let mut attributes = json_value(attributes);
+            let from = ResourceRef::new(resource_type_name(kind, resource_type), name.clone())
+                .with_file(path.to_path_buf());
+            collect_value_edges(output, &from, None, &attributes);
             if let Value::String(text) = &attributes {
                 if text.contains("${") {
                     attributes = Value::Unknown {
@@ -341,6 +516,67 @@ fn emit_json_section(
             });
         }
     }
+}
+
+fn collect_value_edges(
+    output: &mut ParseOutput,
+    from: &ResourceRef,
+    via: Option<&str>,
+    value: &Value,
+) {
+    match value {
+        Value::Array(items) => {
+            if via == Some("depends_on") {
+                for item in items {
+                    if let Some(text) = item.as_str() {
+                        if let Some(target) = resource_ref_from_dotted(text) {
+                            output.push_edge(Edge::new(from.clone(), target, EdgeKind::DependsOn));
+                        }
+                    }
+                }
+                return;
+            }
+            for item in items {
+                collect_value_edges(output, from, via, item);
+            }
+        }
+        Value::Object(map) => {
+            for (key, child) in map {
+                collect_value_edges(output, from, Some(key.as_str()), child);
+            }
+        }
+        Value::String(text) => {
+            let kind = if via == Some("depends_on") {
+                EdgeKind::DependsOn
+            } else {
+                EdgeKind::References
+            };
+            for target in resource_refs_from_string(text) {
+                let mut edge = Edge::new(from.clone(), target, kind);
+                if let Some(path) = via {
+                    edge = edge.via(path);
+                }
+                output.push_edge(edge);
+            }
+        }
+        _ => {}
+    }
+}
+
+fn resource_refs_from_string(text: &str) -> Vec<ResourceRef> {
+    if text.contains("${") {
+        let mut refs = Vec::new();
+        for chunk in text.split("${") {
+            let Some(end) = chunk.find('}') else {
+                continue;
+            };
+            if let Some(target) = resource_ref_from_dotted(chunk[..end].trim()) {
+                refs.push(target);
+            }
+        }
+        return refs;
+    }
+    resource_ref_from_dotted(text).into_iter().collect()
 }
 
 fn json_value(value: &serde_json::Value) -> Value {
@@ -587,6 +823,10 @@ data "aws_ami" "ubuntu" {
 }
 resource "aws_instance" "web" {
   ami = data.aws_ami.ubuntu.id
+  depends_on = [aws_s3_bucket.logs]
+}
+resource "aws_s3_bucket" "logs" {
+  bucket = "logs"
 }
 "#;
         let output = parse_file(Path::new("main.tf"), source);
@@ -609,6 +849,18 @@ resource "aws_instance" "web" {
                 .any(|item| item.kind == ResourceKind::Managed
                     && item.resource_type == "aws_instance")
         );
+        assert!(output.edges.iter().any(|edge| {
+            edge.kind == EdgeKind::References
+                && edge.from.resource_type == "aws_instance"
+                && edge.to.resource_type == "data.aws_ami"
+                && edge.to.name == "ubuntu"
+        }));
+        assert!(output.edges.iter().any(|edge| {
+            edge.kind == EdgeKind::DependsOn
+                && edge.from.name == "web"
+                && edge.to.resource_type == "aws_s3_bucket"
+                && edge.to.name == "logs"
+        }));
         let json = parse_file(
             Path::new("main.tf.json"),
             r#"{"data":{"aws_iam_policy_document":{"allow":{"statement":[{"actions":["s3:*"]}]}}},"resource":{"aws_s3_bucket":{"logs":{"bucket":"logs"}}}}"#,
