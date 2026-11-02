@@ -1,6 +1,6 @@
 # Rustmaninoff roadmap
 
-**Now:** v0.3.0 — attribute + graph scanner (185 checks), Terraform vars/locals/`--var-file`, OpenTofu `.tofu`.
+**Now:** v0.3.0 — attribute + graph scanner (188 checks), Terraform vars/locals/`--var-file`, OpenTofu `.tofu`.
 
 **Position:** complementary — *run it next to Trivy, in place of Checkov*. Teams already use Trivy for CVEs. Rustmaninoff’s claim is narrow and provable: **Checkov-compatible CKV policies, single Rust binary, fast**. Broad “scanner platform” scope dilutes that. Do not take on CVE / image layer / vuln-DB work.
 
@@ -69,7 +69,7 @@ Coverage is credibility. Each accurate CKV ID makes a Checkov swap easier. Publi
 | Deliverable | Issue | Status |
 | --- | ---: | --- |
 | Reproducible benchmarks: corpus + script; real-world repo | [#41](https://github.com/jose-compu/rustmaninoff/issues/41) | open |
-| Fidelity / coverage table: CKV share and intentional gaps | [#42](https://github.com/jose-compu/rustmaninoff/issues/42) | inventory + `docs/coverage.md` started |
+| Fidelity / coverage table: CKV share and intentional gaps | [#42](https://github.com/jose-compu/rustmaninoff/issues/42) | `docs/fidelity.md` + pinned Checkov IDs |
 | CI badge + suite comparing output to Checkov on shared fixtures | [#43](https://github.com/jose-compu/rustmaninoff/issues/43) | open |
 
 ### Launch (#34) and small-repo tactics (#44)

@@ -135,6 +135,9 @@ fn attributes_from_instructions(instructions: &[Instruction]) -> Value {
     let mut copy = Vec::new();
     let mut healthcheck = None;
     let mut run = Vec::new();
+    let mut workdir = Vec::new();
+    let mut expose = Vec::new();
+    let mut maintainer = false;
     let mut privileged = false;
     for instruction in instructions {
         match instruction.name.as_str() {
@@ -145,6 +148,9 @@ fn attributes_from_instructions(instructions: &[Instruction]) -> Value {
             "HEALTHCHECK" if !instruction.args.trim().eq_ignore_ascii_case("NONE") => {
                 healthcheck = Some(maybe_string(instruction.args.trim()));
             }
+            "WORKDIR" => workdir.push(maybe_string(instruction.args.trim())),
+            "EXPOSE" => expose.push(maybe_string(instruction.args.trim())),
+            "MAINTAINER" => maintainer = true,
             "RUN" => {
                 let is_privileged = run_is_privileged(&instruction.args);
                 privileged |= is_privileged;
@@ -171,6 +177,15 @@ fn attributes_from_instructions(instructions: &[Instruction]) -> Value {
     }
     if let Some(healthcheck) = healthcheck {
         map.insert("HEALTHCHECK".into(), healthcheck);
+    }
+    if !workdir.is_empty() {
+        map.insert("WORKDIR".into(), Value::Array(workdir));
+    }
+    if !expose.is_empty() {
+        map.insert("EXPOSE".into(), Value::Array(expose));
+    }
+    if maintainer {
+        map.insert("MAINTAINER".into(), Value::Bool(true));
     }
     if !run.is_empty() {
         map.insert("RUN".into(), Value::Array(run));

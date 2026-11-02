@@ -1,0 +1,27 @@
+metadata:
+  id: CKV_DOCKER_9
+  name: Ensure that APT isn't used
+  category: NETWORKING
+  severity: MEDIUM
+  framework: docker
+  guidelines: Adapted from Checkov CKV_DOCKER_9. Prefer apt-get over apt. https://github.com/bridgecrewio/checkov
+resource_types:
+- dockerfile
+definition:
+  or:
+  - cond_type: attribute
+    attribute: RUN
+    operator: not_exists
+  - cond_type: attribute
+    attribute: RUN.command
+    operator: not_contains
+    value: " apt "
+fixtures:
+  fail: |
+    FROM nginx:1.27
+    RUN apt update && apt install -y curl
+    USER app
+  pass: |
+    FROM nginx:1.27
+    RUN apt-get update && apt-get install -y curl
+    USER app

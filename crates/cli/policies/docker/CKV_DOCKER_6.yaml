@@ -1,0 +1,22 @@
+metadata:
+  id: CKV_DOCKER_6
+  name: Ensure that LABEL maintainer is used instead of MAINTAINER (deprecated)
+  category: CONVENTION
+  severity: LOW
+  framework: docker
+  guidelines: Adapted from Checkov CKV_DOCKER_6. https://github.com/bridgecrewio/checkov
+resource_types:
+- dockerfile
+definition:
+  cond_type: attribute
+  attribute: MAINTAINER
+  operator: not_exists
+fixtures:
+  fail: |
+    FROM nginx:1.27
+    MAINTAINER deprecated@example.com
+    USER app
+  pass: |
+    FROM nginx:1.27
+    LABEL maintainer="app@example.com"
+    USER app

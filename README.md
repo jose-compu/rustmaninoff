@@ -32,11 +32,11 @@ Checkov and Trivy are broader platforms. Rustmaninoff is a **small, fast attribu
 - **One static binary.** `cargo install rustmaninoff` (or a GitHub Release binary). Checkov needs a Python environment and plugins. Trivy is a large Go binary that also covers vulns, secrets, and SBOMs you may not want in an IaC-only job.
 - **Checkov-shaped policies without the Checkov runtime.** Same published CKV ids, YAML pass-conditions, and `# checkov:skip=` / `checkov.io/skip` comments. The engine is Rust IR + attribute operators, not a Python port.
 - **Predictable CI.** Interpolations are **unknown**, not guessed. Unknowns never fail the process. Exit codes, `--fail-on`, SARIF 2.1.0, JUnit, and JSON are first-class.
-- **Focused catalog.** 185 checks (attribute + first-wave `CKV2_*` graph) with pass/fail fixtures. Still smaller than Checkov’s full pack: no Helm, Kustomize, plan JSON, or secrets/vuln scanning. Use those tools when you need that surface; use Rustmaninoff when you want fast CKV gates.
+- **Focused catalog.** 188 checks (attribute + first-wave `CKV2_*` graph) with pass/fail fixtures. Still smaller than Checkov’s full pack: no Helm, Kustomize, plan JSON, or secrets/vuln scanning. Use those tools when you need that surface; use Rustmaninoff when you want fast CKV gates.
 
 Site: [jose-compu.github.io/rustmaninoff](https://jose-compu.github.io/rustmaninoff/) · [llms.txt](https://jose-compu.github.io/rustmaninoff/llms.txt) for search and AI agents.
 
-**Roadmap:** [ROADMAP.md](ROADMAP.md) · built-in inventory: [docs/coverage.md](docs/coverage.md) — epics to cover Checkov graph/plan/Helm/catalog and Trivy secrets/SCA ([issues](https://github.com/jose-compu/rustmaninoff/issues?q=is%3Aissue+label%3Aepic)).
+**Roadmap:** [ROADMAP.md](ROADMAP.md) · fidelity: [docs/fidelity.md](docs/fidelity.md) — epics to cover Checkov graph/plan/Helm/catalog and Trivy secrets/SCA ([issues](https://github.com/jose-compu/rustmaninoff/issues?q=is%3Aissue+label%3Aepic)).
 
 ## Build
 
@@ -85,7 +85,8 @@ Directories named `.git`, `.terraform`, `.terragrunt-cache`, `node_modules`, `ve
 - CloudFormation YAML and JSON `Resources`. Attribute paths are relative to `Properties`.
 - Kubernetes multi-document YAML, including `List`.
 - Dockerfiles (`Dockerfile`, `Containerfile`, `*.dockerfile`): FROM, USER, ADD vs COPY, HEALTHCHECK, and privileged-ish RUN patterns.
-- 185 built-in checks including first-wave Terraform `CKV2_AWS_*` graph policies. Attribute path unchanged; graph is a second pass.
+- 188 built-in checks including first-wave Terraform `CKV2_AWS_*` graph policies. Attribute path unchanged; graph is a second pass.
+- Coverage vs Checkov: [docs/fidelity.md](docs/fidelity.md) (regenerable).
 - Text, JSON, SARIF 2.1.0, and JUnit reports.
 
 S3 encryption, versioning, and logging on current Terraform target `aws_s3_bucket_server_side_encryption_configuration`, `aws_s3_bucket_versioning`, and `aws_s3_bucket_logging`. `CKV_AWS_286` matches a static action subset, including `*` and `*:*`. `CKV_K8S_14` accepts a digest or a tag other than `latest`; an image whose last colon is a registry port and which has no tag is treated as pinned.
