@@ -1,0 +1,29 @@
+metadata:
+  id: CKV2_AWS_IAM_POLICY_ATTACHMENT
+  name: Ensure IAM role has an attached managed policy resource
+  category: IAM
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Graph check that an IAM role is connected to a policy attachment. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_iam_role
+definition:
+  cond_type: connection
+  connected_resource_types:
+  - aws_iam_role_policy_attachment
+  operator: exists
+fixtures:
+  fail: |
+    resource "aws_iam_role" "app" {
+      name = "app"
+      assume_role_policy = "{}"
+    }
+  pass: |
+    resource "aws_iam_role" "app" {
+      name = "app"
+      assume_role_policy = "{}"
+    }
+    resource "aws_iam_role_policy_attachment" "app" {
+      role       = aws_iam_role.app.name
+      policy_arn = "arn:aws:iam::aws:policy/ReadOnlyAccess"
+    }

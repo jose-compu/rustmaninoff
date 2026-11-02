@@ -1,0 +1,27 @@
+metadata:
+  id: CKV2_AWS_S3_BUCKET_LOGGING
+  name: Ensure S3 bucket has access logging configured via companion resource
+  category: LOGGING
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Graph check. Companion to attribute CKV_AWS_18. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_s3_bucket
+definition:
+  cond_type: connection
+  connected_resource_types:
+  - aws_s3_bucket_logging
+  operator: exists
+fixtures:
+  fail: |
+    resource "aws_s3_bucket" "data" {
+      bucket = "data"
+    }
+  pass: |
+    resource "aws_s3_bucket" "data" {
+      bucket = "data"
+    }
+    resource "aws_s3_bucket_logging" "data" {
+      bucket = aws_s3_bucket.data.id
+      target_bucket = "logs"
+    }
