@@ -1,0 +1,31 @@
+metadata:
+  id: CKV_AWS_175
+  name: Ensure WAF has associated rules
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_175. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_waf_web_acl
+- aws_wafregional_web_acl
+- aws_wafv2_web_acl
+definition:
+  or:
+  - cond_type: attribute
+    attribute: rules
+    operator: exists
+  - cond_type: attribute
+    attribute: rule
+    operator: exists
+fixtures:
+  fail: |
+    resource "aws_wafv2_web_acl" "bad" {
+      name = "acl"
+    }
+  pass: |
+    resource "aws_wafv2_web_acl" "good" {
+      name = "acl"
+      rule {
+        name = "allow"
+      }
+    }

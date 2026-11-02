@@ -1,0 +1,20 @@
+metadata:
+  id: CKV_AWS_148
+  name: Ensure no default VPC is planned to be provisioned
+  category: NETWORKING
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_148. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_default_vpc
+definition:
+  cond_type: forbid_resource
+fixtures:
+  fail: |
+    resource "aws_default_vpc" "bad" {
+      tags = { Name = "default" }
+    }
+  pass: |
+    resource "aws_vpc" "good" {
+      cidr_block = "10.0.0.0/16"
+    }

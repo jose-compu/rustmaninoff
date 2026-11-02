@@ -1,0 +1,29 @@
+metadata:
+  id: CKV_AWS_357
+  name: Ensure Transfer Server allows only secure protocols
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_357. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_transfer_server
+definition:
+  or:
+  - cond_type: attribute
+    attribute: protocols
+    operator: not_exists
+  - cond_type: attribute
+    attribute: protocols
+    operator: within
+    value:
+    - SFTP
+    - FTPS
+fixtures:
+  fail: |
+    resource "aws_transfer_server" "bad" {
+      protocols = ["FTP"]
+    }
+  pass: |
+    resource "aws_transfer_server" "good" {
+      protocols = ["SFTP"]
+    }

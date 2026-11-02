@@ -1,0 +1,37 @@
+metadata:
+  id: CKV_AWS_59
+  name: Ensure there is no open access to back-end resources through API
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_59. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_api_gateway_method
+definition:
+  or:
+  - cond_type: attribute
+    attribute: http_method
+    operator: equals
+    value: OPTIONS
+  - and:
+    - cond_type: attribute
+      attribute: authorization
+      operator: exists
+    - cond_type: attribute
+      attribute: authorization
+      operator: not_equals
+      value: NONE
+  - cond_type: attribute
+    attribute: api_key_required
+    operator: is_true
+fixtures:
+  fail: |
+    resource "aws_api_gateway_method" "bad" {
+      http_method   = "GET"
+      authorization = "NONE"
+    }
+  pass: |
+    resource "aws_api_gateway_method" "good" {
+      http_method   = "GET"
+      authorization = "AWS_IAM"
+    }
