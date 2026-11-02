@@ -4,6 +4,22 @@
   <img src="docs/rustmaninoff-banner.jpg" alt="Rustmaninoff, IaC security scanner" width="720">
 </p>
 
+<p align="center">
+  <strong>Checkov-compatible CKV policies, single Rust binary, no Python — about 225× faster than Checkov on a published synthetic corpus.</strong><br>
+  <em>Compared to Checkov:</em> same published CKV ids and skip comments, without the Python runtime or plugin install.
+</p>
+
+<p align="center">
+  <a href="https://crates.io/crates/rustmaninoff"><img src="https://img.shields.io/crates/v/rustmaninoff.svg" alt="crates.io"></a>
+  <a href="https://github.com/jose-compu/rustmaninoff/actions/workflows/ci.yml"><img src="https://github.com/jose-compu/rustmaninoff/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="License Apache-2.0"></a>
+  <a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.3.0"><img src="https://img.shields.io/github/v/release/jose-compu/rustmaninoff" alt="GitHub release"></a>
+</p>
+
+<p align="center">
+  <img src="docs/demo.svg" alt="Terminal demo: rustmaninoff fails CKV_AWS_3 on an unencrypted EBS volume" width="720">
+</p>
+
 Attribute scanner for Terraform, CloudFormation, Kubernetes, and Dockerfiles. Policies are Checkov-compatible YAML and reuse published CKV ids. The engine is not a port of the Checkov Python runtime.
 
 Built-in policies are rewritten YAML, attributed to [Checkov](https://github.com/bridgecrewio/checkov) (Bridgecrew / Palo Alto Networks, Apache-2.0).
@@ -165,6 +181,8 @@ Builtin YAML is parsed once per process (about 6 ms) and reused. Repeat the stag
 cargo install rustmaninoff --locked
 rustmaninoff scan .
 ```
+
+GitHub Release binaries: https://github.com/jose-compu/rustmaninoff/releases/tag/v0.3.0
 
 ## Release
 
