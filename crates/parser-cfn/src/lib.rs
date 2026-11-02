@@ -71,6 +71,7 @@ fn fail(path: &Path, message: String) -> ParseOutput {
             line: 1,
             message,
         }],
+        edges: Vec::new(),
     }
 }
 

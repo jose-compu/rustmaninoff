@@ -30,6 +30,7 @@ pub fn parse_file(path: &Path, source: &str) -> ParseOutput {
             skips: skips_between(&skips, 1, end_line),
         }],
         diagnostics: Vec::new(),
+        edges: Vec::new(),
     }
 }
 
