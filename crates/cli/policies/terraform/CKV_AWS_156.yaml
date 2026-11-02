@@ -1,0 +1,27 @@
+metadata:
+  id: CKV_AWS_156
+  name: Ensure that Workspace root volumes are encrypted
+  category: ENCRYPTION
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_156. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_workspaces_workspace
+definition:
+  cond_type: attribute
+  attribute: root_volume_encryption_enabled
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_workspaces_workspace" "bad" {
+      directory_id = "d-123"
+      bundle_id = "wsb-1"
+      user_name = "user"
+    }
+  pass: |
+    resource "aws_workspaces_workspace" "good" {
+      directory_id = "d-123"
+      bundle_id = "wsb-1"
+      user_name = "user"
+      root_volume_encryption_enabled = true
+    }

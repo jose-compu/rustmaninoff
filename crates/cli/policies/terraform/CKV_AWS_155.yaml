@@ -1,0 +1,27 @@
+metadata:
+  id: CKV_AWS_155
+  name: Ensure that Workspace user volumes are encrypted
+  category: ENCRYPTION
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_155. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_workspaces_workspace
+definition:
+  cond_type: attribute
+  attribute: user_volume_encryption_enabled
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_workspaces_workspace" "bad" {
+      directory_id = "d-123"
+      bundle_id = "wsb-1"
+      user_name = "user"
+    }
+  pass: |
+    resource "aws_workspaces_workspace" "good" {
+      directory_id = "d-123"
+      bundle_id = "wsb-1"
+      user_name = "user"
+      user_volume_encryption_enabled = true
+    }

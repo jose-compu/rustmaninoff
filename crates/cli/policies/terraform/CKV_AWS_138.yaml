@@ -1,0 +1,42 @@
+metadata:
+  id: CKV_AWS_138
+  name: Ensure that ELB is cross-zone-load-balancing enabled
+  category: NETWORKING
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_138. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_elb
+definition:
+  or:
+  - cond_type: attribute
+    attribute: cross_zone_load_balancing
+    operator: not_exists
+  - cond_type: attribute
+    attribute: cross_zone_load_balancing
+    operator: is_true
+fixtures:
+  fail: |
+    resource "aws_elb" "bad" {
+      name = "elb"
+      availability_zones = ["us-east-1a"]
+      cross_zone_load_balancing = false
+      listener {
+        instance_port = 80
+        instance_protocol = "http"
+        lb_port = 80
+        lb_protocol = "http"
+      }
+    }
+  pass: |
+    resource "aws_elb" "good" {
+      name = "elb"
+      availability_zones = ["us-east-1a"]
+      cross_zone_load_balancing = true
+      listener {
+        instance_port = 80
+        instance_protocol = "http"
+        lb_port = 80
+        lb_protocol = "http"
+      }
+    }
