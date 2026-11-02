@@ -19,5 +19,6 @@ jobs:
       - name: Compare failed CKV ids
         env:
           RUSTMANINOFF_BIN: ${{ github.workspace }}/target/release/rustmaninoff
-          PATH: ${{ github.workspace }}/.venv-checkov/bin:${{ env.PATH }}
-        run: python3 scripts/compare_checkov.py
+        run: |
+          echo "${{ github.workspace }}/.venv-checkov/bin" >> "$GITHUB_PATH"
+          python3 scripts/compare_checkov.py
