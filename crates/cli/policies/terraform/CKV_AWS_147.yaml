@@ -1,0 +1,27 @@
+metadata:
+  id: CKV_AWS_147
+  name: Ensure that CodeBuild projects are encrypted using CMK
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_147. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_codebuild_project
+definition:
+  cond_type: attribute
+  attribute: encryption_key
+  operator: exists
+fixtures:
+  fail: |
+    resource "aws_codebuild_project" "bad" {
+      artifacts {
+        type = "S3"
+      }
+    }
+  pass: |
+    resource "aws_codebuild_project" "good" {
+      encryption_key = "arn:aws:kms:us-east-1:123456789012:key/abcd"
+      artifacts {
+        type = "S3"
+      }
+    }

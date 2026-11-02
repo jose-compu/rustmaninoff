@@ -1,0 +1,27 @@
+metadata:
+  id: CKV_AWS_249
+  name: Ensure that AWS ECS task definitions have a non-empty execution/task role ARN
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_249. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_ecs_task_definition
+definition:
+  or:
+  - cond_type: attribute
+    attribute: execution_role_arn
+    operator: exists
+  - cond_type: attribute
+    attribute: task_role_arn
+    operator: exists
+fixtures:
+  fail: |
+    resource "aws_ecs_task_definition" "bad" {
+      family = "app"
+    }
+  pass: |
+    resource "aws_ecs_task_definition" "good" {
+      family             = "app"
+      execution_role_arn = "arn:aws:iam::123456789012:role/ecs"
+    }

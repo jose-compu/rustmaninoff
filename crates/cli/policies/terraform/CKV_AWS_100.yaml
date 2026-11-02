@@ -1,0 +1,34 @@
+metadata:
+  id: CKV_AWS_100
+  name: Ensure AWS EKS node group does not have implicit SSH access from 0.0.0.0/0
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_100. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_eks_node_group
+definition:
+  or:
+  - cond_type: attribute
+    attribute: remote_access
+    operator: not_exists
+  - cond_type: attribute
+    attribute: remote_access.ec2_ssh_key
+    operator: not_exists
+  - cond_type: attribute
+    attribute: remote_access.source_security_group_ids
+    operator: exists
+fixtures:
+  fail: |
+    resource "aws_eks_node_group" "bad" {
+      remote_access {
+        ec2_ssh_key = "key"
+      }
+    }
+  pass: |
+    resource "aws_eks_node_group" "good" {
+      remote_access {
+        ec2_ssh_key               = "key"
+        source_security_group_ids = ["sg-1"]
+      }
+    }

@@ -1,0 +1,32 @@
+metadata:
+  id: CKV_AWS_204
+  name: Ensure AMIs are encrypted using KMS CMKs
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_204. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_ami
+definition:
+  or:
+  - cond_type: attribute
+    attribute: ebs_block_device
+    operator: not_exists
+  - cond_type: attribute
+    attribute: ebs_block_device.encrypted
+    operator: is_true
+fixtures:
+  fail: |
+    resource "aws_ami" "bad" {
+      ebs_block_device {
+        device_name = "/dev/xvda"
+        encrypted   = false
+      }
+    }
+  pass: |
+    resource "aws_ami" "good" {
+      ebs_block_device {
+        device_name = "/dev/xvda"
+        encrypted   = true
+      }
+    }

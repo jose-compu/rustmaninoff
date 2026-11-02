@@ -1,0 +1,38 @@
+metadata:
+  id: CKV_AWS_97
+  name: Ensure Encryption in transit is enabled for EFS volumes in ECS Task definitions
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_97. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_ecs_task_definition
+definition:
+  or:
+  - cond_type: attribute
+    attribute: volume.efs_volume_configuration
+    operator: not_exists
+  - cond_type: attribute
+    attribute: volume.efs_volume_configuration.transit_encryption
+    operator: equals
+    value: ENABLED
+fixtures:
+  fail: |
+    resource "aws_ecs_task_definition" "bad" {
+      volume {
+        name = "efs"
+        efs_volume_configuration {
+          file_system_id = "fs-1"
+        }
+      }
+    }
+  pass: |
+    resource "aws_ecs_task_definition" "good" {
+      volume {
+        name = "efs"
+        efs_volume_configuration {
+          file_system_id     = "fs-1"
+          transit_encryption = "ENABLED"
+        }
+      }
+    }
