@@ -1,0 +1,30 @@
+metadata:
+  id: CKV_AWS_211
+  name: Ensure RDS uses a modern CaCert
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_211. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_db_instance
+definition:
+  or:
+  - cond_type: attribute
+    attribute: ca_cert_identifier
+    operator: not_exists
+  - cond_type: attribute
+    attribute: ca_cert_identifier
+    operator: within
+    value:
+    - rds-ca-rsa2048-g1
+    - rds-ca-rsa4096-g1
+    - rds-ca-ecc384-g1
+fixtures:
+  fail: |
+    resource "aws_db_instance" "bad" {
+      ca_cert_identifier = "rds-ca-2019"
+    }
+  pass: |
+    resource "aws_db_instance" "good" {
+      ca_cert_identifier = "rds-ca-rsa2048-g1"
+    }

@@ -1,0 +1,27 @@
+metadata:
+  id: CKV_AWS_218
+  name: Ensure that CloudSearch is using latest TLS
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_218. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_cloudsearch_domain
+definition:
+  cond_type: attribute
+  attribute: endpoint_options.tls_security_policy
+  operator: equals
+  value: "Policy-Min-TLS-1-2-2019-07"
+fixtures:
+  fail: |
+    resource "aws_cloudsearch_domain" "bad" {
+      endpoint_options {
+        tls_security_policy = "NONE"
+      }
+    }
+  pass: |
+    resource "aws_cloudsearch_domain" "good" {
+      endpoint_options {
+        tls_security_policy = "Policy-Min-TLS-1-2-2019-07"
+      }
+    }

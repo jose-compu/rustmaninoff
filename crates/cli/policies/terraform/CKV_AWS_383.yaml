@@ -1,0 +1,23 @@
+metadata:
+  id: CKV_AWS_383
+  name: Ensure AWS Bedrock agent is associated with Bedrock guardrails
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_383. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_bedrockagent_agent
+definition:
+  cond_type: attribute
+  attribute: guardrail_configuration.guardrail_identifier
+  operator: exists
+fixtures:
+  fail: |
+    resource "aws_bedrockagent_agent" "bad" {
+    }
+  pass: |
+    resource "aws_bedrockagent_agent" "good" {
+      guardrail_configuration {
+        guardrail_identifier = "enabled-value"
+      }
+    }

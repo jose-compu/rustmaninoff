@@ -1,0 +1,23 @@
+metadata:
+  id: CKV_AWS_170
+  name: Ensure QLDB ledger permissions mode is set to STANDARD
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_170. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_qldb_ledger
+definition:
+  cond_type: attribute
+  attribute: permissions_mode
+  operator: equals
+  value: "STANDARD"
+fixtures:
+  fail: |
+    resource "aws_qldb_ledger" "bad" {
+      permissions_mode = "NONE"
+    }
+  pass: |
+    resource "aws_qldb_ledger" "good" {
+      permissions_mode = "STANDARD"
+    }

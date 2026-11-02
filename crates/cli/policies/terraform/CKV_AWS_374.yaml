@@ -1,0 +1,35 @@
+metadata:
+  id: CKV_AWS_374
+  name: Ensure AWS CloudFront web distribution has geo restriction enabled
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_374. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_cloudfront_distribution
+definition:
+  or:
+  - cond_type: attribute
+    attribute: restrictions.geo_restriction.restriction_type
+    operator: not_exists
+  - cond_type: attribute
+    attribute: restrictions.geo_restriction.restriction_type
+    operator: not_equals
+    value: "none"
+fixtures:
+  fail: |
+    resource "aws_cloudfront_distribution" "bad" {
+      restrictions {
+        geo_restriction {
+          restriction_type = "none"
+        }
+      }
+    }
+  pass: |
+    resource "aws_cloudfront_distribution" "good" {
+      restrictions {
+        geo_restriction {
+          restriction_type = "GOOD"
+        }
+      }
+    }

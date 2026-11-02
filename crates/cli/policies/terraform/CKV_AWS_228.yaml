@@ -1,0 +1,28 @@
+metadata:
+  id: CKV_AWS_228
+  name: Verify Elasticsearch domain is using an up to date TLS policy
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_228. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_elasticsearch_domain
+- aws_opensearch_domain
+definition:
+  cond_type: attribute
+  attribute: domain_endpoint_options.tls_security_policy
+  operator: equals
+  value: "Policy-Min-TLS-1-2-PFS-2023-10"
+fixtures:
+  fail: |
+    resource "aws_elasticsearch_domain" "bad" {
+      domain_endpoint_options {
+        tls_security_policy = "NONE"
+      }
+    }
+  pass: |
+    resource "aws_elasticsearch_domain" "good" {
+      domain_endpoint_options {
+        tls_security_policy = "Policy-Min-TLS-1-2-PFS-2023-10"
+      }
+    }

@@ -1,0 +1,24 @@
+metadata:
+  id: CKV_AWS_247
+  name: Ensure all data stored in the Elasticsearch is encrypted with a CMK
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_247. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_elasticsearch_domain
+- aws_opensearch_domain
+definition:
+  cond_type: attribute
+  attribute: encrypt_at_rest.kms_key_id
+  operator: exists
+fixtures:
+  fail: |
+    resource "aws_elasticsearch_domain" "bad" {
+    }
+  pass: |
+    resource "aws_elasticsearch_domain" "good" {
+      encrypt_at_rest {
+        kms_key_id = "arn:aws:kms:us-east-1:123456789012:key/abcd"
+      }
+    }

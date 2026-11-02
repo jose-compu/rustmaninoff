@@ -1,0 +1,21 @@
+metadata:
+  id: CKV_AWS_295
+  name: Ensure DataSync Location Object Storage doesn't expose secrets
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_295. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_datasync_location_object_storage
+definition:
+  cond_type: attribute
+  attribute: secret_key
+  operator: not_exists
+fixtures:
+  fail: |
+    resource "aws_datasync_location_object_storage" "bad" {
+      secret_key = "supersecret"
+    }
+  pass: |
+    resource "aws_datasync_location_object_storage" "good" {
+    }

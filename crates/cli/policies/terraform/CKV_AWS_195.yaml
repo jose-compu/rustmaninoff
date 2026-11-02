@@ -1,0 +1,23 @@
+metadata:
+  id: CKV_AWS_195
+  name: Ensure Glue component has a security configuration associated
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_195. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_glue_crawler
+- aws_glue_dev_endpoint
+- aws_glue_job
+definition:
+  cond_type: attribute
+  attribute: security_configuration
+  operator: exists
+fixtures:
+  fail: |
+    resource "aws_glue_crawler" "bad" {
+    }
+  pass: |
+    resource "aws_glue_crawler" "good" {
+      security_configuration = "enabled-value"
+    }

@@ -1,0 +1,23 @@
+metadata:
+  id: CKV_AWS_226
+  name: Ensure DB instance gets all minor upgrades automatically
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_226. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_db_instance
+- aws_rds_cluster_instance
+definition:
+  cond_type: attribute
+  attribute: auto_minor_version_upgrade
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_db_instance" "bad" {
+      auto_minor_version_upgrade = false
+    }
+  pass: |
+    resource "aws_db_instance" "good" {
+      auto_minor_version_upgrade = true
+    }

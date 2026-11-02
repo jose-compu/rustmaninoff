@@ -1,0 +1,31 @@
+metadata:
+  id: CKV_AWS_343
+  name: Ensure Amazon Redshift clusters should have automatic snapshots enabled
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_343. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_redshift_cluster
+definition:
+  or:
+  - cond_type: attribute
+    attribute: automated_snapshot_retention_period
+    operator: not_exists
+  - and:
+    - cond_type: attribute
+      attribute: automated_snapshot_retention_period
+      operator: exists
+    - cond_type: attribute
+      attribute: automated_snapshot_retention_period
+      operator: not_equals
+      value: 0
+fixtures:
+  fail: |
+    resource "aws_redshift_cluster" "bad" {
+      automated_snapshot_retention_period = 0
+    }
+  pass: |
+    resource "aws_redshift_cluster" "good" {
+      automated_snapshot_retention_period = 7
+    }

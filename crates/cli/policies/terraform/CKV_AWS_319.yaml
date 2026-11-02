@@ -1,0 +1,26 @@
+metadata:
+  id: CKV_AWS_319
+  name: Ensure that CloudWatch alarm actions are enabled
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_319. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_cloudwatch_metric_alarm
+definition:
+  or:
+  - cond_type: attribute
+    attribute: actions_enabled
+    operator: not_exists
+  - cond_type: attribute
+    attribute: actions_enabled
+    operator: is_true
+fixtures:
+  fail: |
+    resource "aws_cloudwatch_metric_alarm" "bad" {
+      actions_enabled = false
+    }
+  pass: |
+    resource "aws_cloudwatch_metric_alarm" "good" {
+      actions_enabled = true
+    }

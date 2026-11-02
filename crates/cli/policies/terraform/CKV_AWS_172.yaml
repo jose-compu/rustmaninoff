@@ -1,0 +1,26 @@
+metadata:
+  id: CKV_AWS_172
+  name: Ensure QLDB ledger has deletion protection enabled
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_172. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_qldb_ledger
+definition:
+  or:
+  - cond_type: attribute
+    attribute: deletion_protection
+    operator: not_exists
+  - cond_type: attribute
+    attribute: deletion_protection
+    operator: is_true
+fixtures:
+  fail: |
+    resource "aws_qldb_ledger" "bad" {
+      deletion_protection = false
+    }
+  pass: |
+    resource "aws_qldb_ledger" "good" {
+      deletion_protection = true
+    }

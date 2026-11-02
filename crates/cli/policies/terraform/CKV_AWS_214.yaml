@@ -1,0 +1,22 @@
+metadata:
+  id: CKV_AWS_214
+  name: Ensure AppSync API Cache is encrypted at rest
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_214. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_appsync_api_cache
+definition:
+  cond_type: attribute
+  attribute: at_rest_encryption_enabled
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_appsync_api_cache" "bad" {
+      at_rest_encryption_enabled = false
+    }
+  pass: |
+    resource "aws_appsync_api_cache" "good" {
+      at_rest_encryption_enabled = true
+    }

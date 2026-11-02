@@ -1,0 +1,27 @@
+metadata:
+  id: CKV_AWS_365
+  name: Ensure SES Configuration Set enforces TLS usage
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_365. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_ses_configuration_set
+definition:
+  cond_type: attribute
+  attribute: delivery_options.tls_policy
+  operator: equals
+  value: "Require"
+fixtures:
+  fail: |
+    resource "aws_ses_configuration_set" "bad" {
+      delivery_options {
+        tls_policy = "NONE"
+      }
+    }
+  pass: |
+    resource "aws_ses_configuration_set" "good" {
+      delivery_options {
+        tls_policy = "Require"
+      }
+    }

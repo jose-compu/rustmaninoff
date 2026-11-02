@@ -1,0 +1,35 @@
+metadata:
+  id: CKV_AWS_223
+  name: Ensure ECS Cluster enables logging of ECS Exec
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_223. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_ecs_cluster
+definition:
+  or:
+  - cond_type: attribute
+    attribute: configuration.execute_command_configuration.logging
+    operator: not_exists
+  - cond_type: attribute
+    attribute: configuration.execute_command_configuration.logging
+    operator: not_equals
+    value: "NONE"
+fixtures:
+  fail: |
+    resource "aws_ecs_cluster" "bad" {
+      configuration {
+        execute_command_configuration {
+          logging = "NONE"
+        }
+      }
+    }
+  pass: |
+    resource "aws_ecs_cluster" "good" {
+      configuration {
+        execute_command_configuration {
+          logging = "GOOD"
+        }
+      }
+    }
