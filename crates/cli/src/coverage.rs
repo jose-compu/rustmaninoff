@@ -48,7 +48,7 @@ fn scan_paths_frameworks_and_outputs() {
     .unwrap();
     fs::write(
         root.join("Dockerfile"),
-        "FROM nginx:latest\nUSER root\nADD src dest\n",
+        "FROM nginx:latest\nUSER root\nADD src dest\nEXPOSE 22\n",
     )
     .unwrap();
     let skipped = root.join("target");
