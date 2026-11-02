@@ -1,0 +1,26 @@
+metadata:
+  id: CKV_AWS_369
+  name: Ensure Amazon Sagemaker Data Quality Job encrypts all communications between instances used for monitoring jobs
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_369. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_sagemaker_data_quality_job_definition
+definition:
+  cond_type: attribute
+  attribute: network_config.enable_inter_container_traffic_encryption
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_sagemaker_data_quality_job_definition" "bad" {
+      network_config {
+        enable_inter_container_traffic_encryption = false
+      }
+    }
+  pass: |
+    resource "aws_sagemaker_data_quality_job_definition" "good" {
+      network_config {
+        enable_inter_container_traffic_encryption = true
+      }
+    }

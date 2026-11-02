@@ -1,0 +1,31 @@
+metadata:
+  id: CKV_AWS_329
+  name: EFS access points should enforce a root directory
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_329. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_efs_access_point
+definition:
+  or:
+  - cond_type: attribute
+    attribute: root_directory.path
+    operator: not_exists
+  - cond_type: attribute
+    attribute: root_directory.path
+    operator: not_equals
+    value: "/"
+fixtures:
+  fail: |
+    resource "aws_efs_access_point" "bad" {
+      root_directory {
+        path = "/"
+      }
+    }
+  pass: |
+    resource "aws_efs_access_point" "good" {
+      root_directory {
+        path = "GOOD"
+      }
+    }

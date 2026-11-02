@@ -1,0 +1,22 @@
+metadata:
+  id: CKV_AWS_73
+  name: Ensure API Gateway has X-Ray Tracing enabled
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_73. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_api_gateway_stage
+definition:
+  cond_type: attribute
+  attribute: xray_tracing_enabled
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_api_gateway_stage" "bad" {
+      xray_tracing_enabled = false
+    }
+  pass: |
+    resource "aws_api_gateway_stage" "good" {
+      xray_tracing_enabled = true
+    }

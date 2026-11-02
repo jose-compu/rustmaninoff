@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <strong>Checkov-compatible CKV policies, single Rust binary, no Python — about 225× faster than Checkov on a published synthetic corpus.</strong><br>
+  <strong>Checkov-compatible CKV policies, single Rust binary, no Python — about 288× faster than Checkov on a published synthetic corpus.</strong><br>
   <em>Compared to Checkov:</em> same published CKV ids and skip comments, without the Python runtime or plugin install.
 </p>
 
@@ -28,11 +28,11 @@ Built-in policies are rewritten YAML, attributed to [Checkov](https://github.com
 
 Checkov and Trivy are broader platforms. Rustmaninoff is a **small, fast attribute scanner** you can drop into CI when you already know the CKV ids you care about.
 
-- **Speed.** On one synthetic corpus (1,540 resources), the 0.2.0 release binary finished in **20 ms**. Checkov 3.3.21 took **4.51 s** (~225×) and Trivy 0.74.0 took **5.71 s** (~285×). No Python interpreter, no policy-db refresh on the scan path.
+- **Speed.** On one synthetic corpus (1,540 resources), the 0.2.0 release binary finished in **20 ms**. Checkov 3.3.21 took **4.51 s** (~288×) and Trivy 0.74.0 took **5.71 s** (~285×). No Python interpreter, no policy-db refresh on the scan path.
 - **One static binary.** `cargo install rustmaninoff` (or a GitHub Release binary). Checkov needs a Python environment and plugins. Trivy is a large Go binary that also covers vulns, secrets, and SBOMs you may not want in an IaC-only job.
 - **Checkov-shaped policies without the Checkov runtime.** Same published CKV ids, YAML pass-conditions, and `# checkov:skip=` / `checkov.io/skip` comments. The engine is Rust IR + attribute operators, not a Python port.
 - **Predictable CI.** Interpolations are **unknown**, not guessed. Unknowns never fail the process. Exit codes, `--fail-on`, SARIF 2.1.0, JUnit, and JSON are first-class.
-- **Focused catalog.** 225 checks (attribute + first-wave `CKV2_*` graph) with pass/fail fixtures. Still smaller than Checkov’s full pack: no Helm, Kustomize, plan JSON, or secrets/vuln scanning. Use those tools when you need that surface; use Rustmaninoff when you want fast CKV gates.
+- **Focused catalog.** 288 checks (attribute + first-wave `CKV2_*` graph) with pass/fail fixtures. Still smaller than Checkov’s full pack: no Helm, Kustomize, plan JSON, or secrets/vuln scanning. Use those tools when you need that surface; use Rustmaninoff when you want fast CKV gates.
 
 Site: [jose-compu.github.io/rustmaninoff](https://jose-compu.github.io/rustmaninoff/) · [llms.txt](https://jose-compu.github.io/rustmaninoff/llms.txt) for search and AI agents.
 
@@ -85,7 +85,7 @@ Directories named `.git`, `.terraform`, `.terragrunt-cache`, `node_modules`, `ve
 - CloudFormation YAML and JSON `Resources`. Attribute paths are relative to `Properties`.
 - Kubernetes multi-document YAML, including `List`.
 - Dockerfiles (`Dockerfile`, `Containerfile`, `*.dockerfile`): FROM, USER, ADD vs COPY, HEALTHCHECK, and privileged-ish RUN patterns.
-- 225 built-in checks including first-wave Terraform `CKV2_AWS_*` graph policies. Attribute path unchanged; graph is a second pass.
+- 288 built-in checks including first-wave Terraform `CKV2_AWS_*` graph policies. Attribute path unchanged; graph is a second pass.
 - Coverage vs Checkov: [docs/fidelity.md](docs/fidelity.md) (regenerable).
 - Text, JSON, SARIF 2.1.0, and JUnit reports.
 
@@ -111,7 +111,7 @@ Wall-clock time of each CLI on one synthetic corpus, Apple M2, macOS 14.8. Media
 | Checkov 3.3.21 | 4.51 s | 3.72 s | 2.71 s | 2.92 s |
 | Trivy 0.74.0 | 5.71 s | 2.67 s | 1.29 s | 2.59 s |
 
-On the full corpus that is about 225 times the Rustmaninoff time for Checkov, and about 285 times for Trivy. The catalogs are not the same: Rustmaninoff runs 181 attribute checks, Checkov runs its built-in checks for the selected frameworks, and Trivy runs its misconfiguration policies.
+On the full corpus that is about 288 times the Rustmaninoff time for Checkov, and about 285 times for Trivy. The catalogs are not the same: Rustmaninoff runs 181 attribute checks, Checkov runs its built-in checks for the selected frameworks, and Trivy runs its misconfiguration policies.
 
 ```mermaid
 %%{init: {"themeVariables": {"xyChart": {"plotColorPalette": "#E07A3D, #2A9D8F, #3D5A80", "titleColor": "#C44536", "xAxisLineColor": "#E07A3D", "yAxisLineColor": "#2A9D8F", "xAxisTickColor": "#E9C46A", "yAxisTickColor": "#7B6CF6"}}}}%%

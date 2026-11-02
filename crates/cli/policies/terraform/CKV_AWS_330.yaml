@@ -1,0 +1,26 @@
+metadata:
+  id: CKV_AWS_330
+  name: EFS access points should enforce a user identity
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_330. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_efs_access_point
+definition:
+  cond_type: attribute
+  attribute: posix_user.gid
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_efs_access_point" "bad" {
+      posix_user {
+        gid = false
+      }
+    }
+  pass: |
+    resource "aws_efs_access_point" "good" {
+      posix_user {
+        gid = true
+      }
+    }

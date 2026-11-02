@@ -1,0 +1,23 @@
+metadata:
+  id: CKV_AWS_307
+  name: Ensure SageMaker Users should not have root access to SageMaker notebook instances
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_307. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_sagemaker_notebook_instance
+definition:
+  cond_type: attribute
+  attribute: root_access
+  operator: equals
+  value: "Disabled"
+fixtures:
+  fail: |
+    resource "aws_sagemaker_notebook_instance" "bad" {
+      root_access = "Enabled"
+    }
+  pass: |
+    resource "aws_sagemaker_notebook_instance" "good" {
+      root_access = "Disabled"
+    }

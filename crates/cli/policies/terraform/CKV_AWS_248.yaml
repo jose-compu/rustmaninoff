@@ -1,0 +1,24 @@
+metadata:
+  id: CKV_AWS_248
+  name: Ensure that Elasticsearch is not using the default Security Group
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_248. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_elasticsearch_domain
+- aws_opensearch_domain
+definition:
+  cond_type: attribute
+  attribute: vpc_options.security_group_ids
+  operator: exists
+fixtures:
+  fail: |
+    resource "aws_elasticsearch_domain" "bad" {
+    }
+  pass: |
+    resource "aws_elasticsearch_domain" "good" {
+      vpc_options {
+        security_group_ids = ["sg-1"]
+      }
+    }

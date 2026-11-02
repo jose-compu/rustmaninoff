@@ -1,0 +1,22 @@
+metadata:
+  id: CKV_AWS_235
+  name: Ensure that copied AMIs are encrypted
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_235. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_ami_copy
+definition:
+  cond_type: attribute
+  attribute: encrypted
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_ami_copy" "bad" {
+      encrypted = false
+    }
+  pass: |
+    resource "aws_ami_copy" "good" {
+      encrypted = true
+    }

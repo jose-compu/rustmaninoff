@@ -1,0 +1,21 @@
+metadata:
+  id: CKV_AWS_190
+  name: Ensure lustre file systems is encrypted by KMS using a customer managed Key (CMK)
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_190. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_fsx_lustre_file_system
+definition:
+  cond_type: attribute
+  attribute: kms_key_id
+  operator: exists
+fixtures:
+  fail: |
+    resource "aws_fsx_lustre_file_system" "bad" {
+    }
+  pass: |
+    resource "aws_fsx_lustre_file_system" "good" {
+      kms_key_id = "arn:aws:kms:us-east-1:123456789012:key/abcd"
+    }

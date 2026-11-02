@@ -1,0 +1,21 @@
+metadata:
+  id: CKV_AWS_306
+  name: Ensure SageMaker notebook instances should be launched into a custom VPC
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_306. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_sagemaker_notebook_instance
+definition:
+  cond_type: attribute
+  attribute: subnet_id
+  operator: exists
+fixtures:
+  fail: |
+    resource "aws_sagemaker_notebook_instance" "bad" {
+    }
+  pass: |
+    resource "aws_sagemaker_notebook_instance" "good" {
+      subnet_id = "enabled-value"
+    }

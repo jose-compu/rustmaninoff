@@ -1,0 +1,26 @@
+metadata:
+  id: CKV_AWS_238
+  name: Ensure that GuardDuty detector is enabled
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_238. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_guardduty_detector
+definition:
+  or:
+  - cond_type: attribute
+    attribute: enable
+    operator: not_exists
+  - cond_type: attribute
+    attribute: enable
+    operator: is_true
+fixtures:
+  fail: |
+    resource "aws_guardduty_detector" "bad" {
+      enable = false
+    }
+  pass: |
+    resource "aws_guardduty_detector" "good" {
+      enable = true
+    }

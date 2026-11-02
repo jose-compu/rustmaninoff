@@ -1,0 +1,26 @@
+metadata:
+  id: CKV_AWS_285
+  name: Ensure State Machine has execution history logging enabled
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_285. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_sfn_state_machine
+definition:
+  cond_type: attribute
+  attribute: logging_configuration.include_execution_data
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_sfn_state_machine" "bad" {
+      logging_configuration {
+        include_execution_data = false
+      }
+    }
+  pass: |
+    resource "aws_sfn_state_machine" "good" {
+      logging_configuration {
+        include_execution_data = true
+      }
+    }

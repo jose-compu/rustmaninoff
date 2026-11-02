@@ -1,0 +1,23 @@
+metadata:
+  id: CKV_AWS_367
+  name: Ensure Amazon Sagemaker Data Quality Job uses KMS to encrypt model artifacts
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_367. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_sagemaker_data_quality_job_definition
+definition:
+  cond_type: attribute
+  attribute: data_quality_job_output_config.kms_key_id
+  operator: exists
+fixtures:
+  fail: |
+    resource "aws_sagemaker_data_quality_job_definition" "bad" {
+    }
+  pass: |
+    resource "aws_sagemaker_data_quality_job_definition" "good" {
+      data_quality_job_output_config {
+        kms_key_id = "arn:aws:kms:us-east-1:123456789012:key/abcd"
+      }
+    }

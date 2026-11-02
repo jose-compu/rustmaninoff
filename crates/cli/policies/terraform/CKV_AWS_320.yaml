@@ -1,0 +1,22 @@
+metadata:
+  id: CKV_AWS_320
+  name: Ensure Redshift clusters do not use the default database name
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_320. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_redshift_cluster
+definition:
+  cond_type: attribute
+  attribute: database_name
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_redshift_cluster" "bad" {
+      database_name = false
+    }
+  pass: |
+    resource "aws_redshift_cluster" "good" {
+      database_name = true
+    }

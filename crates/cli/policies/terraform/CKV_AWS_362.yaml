@@ -1,0 +1,22 @@
+metadata:
+  id: CKV_AWS_362
+  name: CKV_AWS_362
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_362. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_neptune_cluster
+definition:
+  cond_type: attribute
+  attribute: copy_tags_to_snapshot
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_neptune_cluster" "bad" {
+      copy_tags_to_snapshot = false
+    }
+  pass: |
+    resource "aws_neptune_cluster" "good" {
+      copy_tags_to_snapshot = true
+    }

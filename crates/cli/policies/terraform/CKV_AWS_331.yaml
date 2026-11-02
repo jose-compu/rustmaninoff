@@ -1,0 +1,27 @@
+metadata:
+  id: CKV_AWS_331
+  name: Ensure Transit Gateways do not automatically accept VPC attachment requests
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_331. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_ec2_transit_gateway
+definition:
+  or:
+  - cond_type: attribute
+    attribute: auto_accept_shared_attachments
+    operator: not_exists
+  - cond_type: attribute
+    attribute: auto_accept_shared_attachments
+    operator: not_equals
+    value: "enable"
+fixtures:
+  fail: |
+    resource "aws_ec2_transit_gateway" "bad" {
+      auto_accept_shared_attachments = "enable"
+    }
+  pass: |
+    resource "aws_ec2_transit_gateway" "good" {
+      auto_accept_shared_attachments = "GOOD"
+    }

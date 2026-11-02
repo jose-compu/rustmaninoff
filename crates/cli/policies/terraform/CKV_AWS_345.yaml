@@ -1,0 +1,27 @@
+metadata:
+  id: CKV_AWS_345
+  name: Ensure that Network firewall encryption is via a CMK
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_345. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_networkfirewall_firewall
+- aws_networkfirewall_rule_group
+definition:
+  cond_type: attribute
+  attribute: encryption_configuration.key_id
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_networkfirewall_firewall" "bad" {
+      encryption_configuration {
+        key_id = false
+      }
+    }
+  pass: |
+    resource "aws_networkfirewall_firewall" "good" {
+      encryption_configuration {
+        key_id = true
+      }
+    }
