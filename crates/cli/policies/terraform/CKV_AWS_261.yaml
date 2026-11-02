@@ -1,0 +1,33 @@
+metadata:
+  id: CKV_AWS_261
+  name: Ensure HTTP HTTPS Target group defines Healthcheck
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_261. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_lb_target_group
+- aws_alb_target_group
+definition:
+  or:
+  - cond_type: attribute
+    attribute: protocol
+    operator: not_within
+    value:
+    - HTTP
+    - HTTPS
+  - cond_type: attribute
+    attribute: health_check.path
+    operator: exists
+fixtures:
+  fail: |
+    resource "aws_lb_target_group" "bad" {
+      protocol = "HTTP"
+    }
+  pass: |
+    resource "aws_lb_target_group" "good" {
+      protocol = "HTTP"
+      health_check {
+        path = "/health"
+      }
+    }

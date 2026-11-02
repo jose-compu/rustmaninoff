@@ -1,0 +1,21 @@
+metadata:
+  id: CKV_AWS_245
+  name: Ensure replicated backups are encrypted at rest using KMS CMKs
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_245. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_db_instance_automated_backups_replication
+definition:
+  cond_type: attribute
+  attribute: kms_key_id
+  operator: exists
+fixtures:
+  fail: |
+    resource "aws_db_instance_automated_backups_replication" "bad" {
+    }
+  pass: |
+    resource "aws_db_instance_automated_backups_replication" "good" {
+      kms_key_id = "arn:aws:kms:us-east-1:123456789012:key/abcd"
+    }

@@ -1,0 +1,33 @@
+metadata:
+  id: CKV_AWS_105
+  name: Ensure Redshift uses SSL
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_105. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_redshift_parameter_group
+definition:
+  and:
+  - cond_type: attribute
+    attribute: parameter.name
+    operator: equals
+    value: require_ssl
+  - cond_type: attribute
+    attribute: parameter.value
+    operator: is_true
+fixtures:
+  fail: |
+    resource "aws_redshift_parameter_group" "bad" {
+      parameter {
+        name  = "require_ssl"
+        value = false
+      }
+    }
+  pass: |
+    resource "aws_redshift_parameter_group" "good" {
+      parameter {
+        name  = "require_ssl"
+        value = true
+      }
+    }
