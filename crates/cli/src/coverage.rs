@@ -329,7 +329,12 @@ fn write_failure_is_reported() {
             0
         );
         assert!(
-            super::classify_and_parse(&link, &[rustmaninoff_ir::Framework::Terraform]).is_none()
+            super::classify_and_parse(
+                &link,
+                &[rustmaninoff_ir::Framework::Terraform],
+                &rustmaninoff_parser_terraform::EvalContext::default(),
+            )
+            .is_none()
         );
     }
     let _ = fs::remove_dir_all(root);

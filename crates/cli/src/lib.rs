@@ -71,6 +71,9 @@ pub struct ScanArgs {
     /// Directory of extra YAML policies. Repeatable.
     #[arg(long = "external-checks-dir")]
     pub external_checks_dir: Vec<PathBuf>,
+    /// Terraform `.tfvars` / `.tfvars.json` file. Repeatable; later files override earlier ones.
+    #[arg(long = "var-file")]
+    pub var_file: Vec<PathBuf>,
     #[arg(long)]
     pub show_unknown: bool,
     #[arg(long)]
@@ -109,6 +112,7 @@ pub struct ScanRequest {
     pub skip_checks: Vec<String>,
     pub fail_on: Severity,
     pub external_dirs: Vec<PathBuf>,
+    pub var_files: Vec<PathBuf>,
     pub show_unknown: bool,
     pub show_passed: bool,
     pub compact: bool,
@@ -139,9 +143,10 @@ pub fn execute(cli: Cli) -> anyhow::Result<i32> {
 
 pub fn scan(request: &ScanRequest) -> anyhow::Result<ScanResult> {
     let files = discover(&request.path, &request.excluded);
+    let tf_ctx = terraform_eval_context(request)?;
     let parsed: Vec<ParseOutput> = files
         .par_iter()
-        .filter_map(|path| classify_and_parse(path, &request.frameworks))
+        .filter_map(|path| classify_and_parse(path, &request.frameworks, &tf_ctx))
         .collect();
     let mut resources = Vec::new();
     let mut diagnostics = Vec::new();
@@ -226,6 +231,7 @@ fn request_from_args(args: ScanArgs) -> anyhow::Result<ScanRequest> {
         skip_checks,
         fail_on,
         external_dirs,
+        var_files: args.var_file,
         show_unknown: args.show_unknown || config.as_ref().is_some_and(|item| item.show_unknown),
         show_passed: args.show_passed,
         compact: args.compact || config.as_ref().is_some_and(|item| item.compact),
@@ -236,6 +242,20 @@ fn request_from_args(args: ScanArgs) -> anyhow::Result<ScanRequest> {
         junit_file: args.junit_file,
         excluded,
     })
+}
+
+fn terraform_eval_context(
+    request: &ScanRequest,
+) -> anyhow::Result<rustmaninoff_parser_terraform::EvalContext> {
+    let mut ctx = rustmaninoff_parser_terraform::EvalContext::from_env();
+    for path in &request.var_files {
+        let source = fs::read_to_string(path)
+            .map_err(|err| anyhow::anyhow!("failed to read {}: {err}", path.display()))?;
+        let values = rustmaninoff_parser_terraform::parse_tfvars(&source)
+            .map_err(|err| anyhow::anyhow!("invalid tfvars {}: {err}", path.display()))?;
+        ctx.merge_variables(values);
+    }
+    Ok(ctx)
 }
 
 fn load_config(explicit: Option<&Path>, scan_path: &Path) -> anyhow::Result<Option<FileConfig>> {
@@ -324,8 +344,11 @@ fn is_candidate(path: &Path) -> bool {
         return true;
     }
     match path.extension().and_then(|ext| ext.to_str()) {
-        Some("tf" | "json" | "yaml" | "yml") => true,
-        _ => path.to_string_lossy().ends_with(".tf.json"),
+        Some("tf" | "tofu" | "json" | "yaml" | "yml") => true,
+        _ => {
+            let name = path.to_string_lossy();
+            name.ends_with(".tf.json") || name.ends_with(".tofu.json")
+        }
     }
 }
 
@@ -341,7 +364,11 @@ fn is_dockerfile_name(path: &Path) -> bool {
         || lower.ends_with(".dockerfile")
 }
 
-fn classify_and_parse(path: &Path, frameworks: &[Framework]) -> Option<ParseOutput> {
+fn classify_and_parse(
+    path: &Path,
+    frameworks: &[Framework],
+    tf_ctx: &rustmaninoff_parser_terraform::EvalContext,
+) -> Option<ParseOutput> {
     let meta = fs::symlink_metadata(path).ok()?;
     let file_type = meta.file_type();
     if file_type.is_symlink() || !file_type.is_file() {
@@ -362,7 +389,9 @@ fn classify_and_parse(path: &Path, frameworks: &[Framework]) -> Option<ParseOutp
         return None;
     }
     let output = match kind {
-        Framework::Terraform => rustmaninoff_parser_terraform::parse_file(path, &source),
+        Framework::Terraform => {
+            rustmaninoff_parser_terraform::parse_file_with_context(path, &source, tf_ctx)
+        }
         Framework::CloudFormation => rustmaninoff_parser_cfn::parse_file(path, &source),
         Framework::Kubernetes => rustmaninoff_parser_k8s::parse_file(path, &source),
         Framework::Docker => rustmaninoff_parser_docker::parse_file(path, &source),
@@ -387,7 +416,11 @@ fn detect(path: &Path, source: &str) -> Option<Framework> {
         return Some(Framework::Docker);
     }
     let name = path.to_string_lossy();
-    if name.ends_with(".tf") || name.ends_with(".tf.json") {
+    if name.ends_with(".tf")
+        || name.ends_with(".tf.json")
+        || name.ends_with(".tofu")
+        || name.ends_with(".tofu.json")
+    {
         return Some(Framework::Terraform);
     }
     let trimmed = source.trim_start();
