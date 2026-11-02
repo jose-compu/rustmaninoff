@@ -214,6 +214,16 @@ Composite action at the repo root (`action.yml`). Downloads a release binary and
     sarif_file: rustmaninoff.sarif
 ```
 
+### Docker
+
+Multi-arch image on GHCR (`linux/amd64`, `linux/arm64`):
+
+```sh
+docker run --rm -v "$PWD":/src -w /src ghcr.io/jose-compu/rustmaninoff:0.3.0 scan .
+```
+
+Tags: `latest` (main), semver (`0.3.0`, `0.3`), and `sha-*`. Built by `.github/workflows/docker.yml`.
+
 ## Release
 
 Pushing the tag `v0.3.0` runs `.github/workflows/release.yml`. It publishes Linux and macOS binaries for amd64 and arm64, each with a SHA-256 checksum. Crates.io publish is manual (dependency order: `ir` → parsers/engine/report → `rustmaninoff`).
