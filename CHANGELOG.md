@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.4.0 — 2026-11-02
+
+### Added
+
+- Catalog depth: **536** built-in checks. Docker **100%** and Kubernetes **93.8%** of pinned Checkov ids ([docs/fidelity.md](docs/fidelity.md)).
+- `CKV_DOCKER_11` (unique multistage `FROM` aliases) via parser `_from_aliases` + engine `unique` operator.
+- Additional Kubernetes PSP/RBAC/control-plane and Terraform AWS / `CKV2_AWS_*` attribute checks.
+- Reproducible benches: `benchmarks/corpus/`, `scripts/bench.sh`, `benchmarks/history.json` (#41).
+- Checkov comparison CI: `testdata/checkov-compare/`, `scripts/compare_checkov.py`, `.github/workflows/checkov-compare.yml` (#43).
+
+### Changed
+
+- Workspace crates are **0.4.0**.
+- README timing claims refreshed against the published synthetic corpus (medians of three runs).
+
+### Still out of scope / follow-ups
+
+- Helm, Kustomize, Terraform plan JSON, local modules (v0.5).
+- Baseline/suppressions and Marketplace listing (v0.6).
+- Remaining K8s nginx/cipher gaps and TF IAM semantic checks (documented in fidelity).
+
 ## 0.3.0 — 2026-11-02
 
 ### Added

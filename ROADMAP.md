@@ -1,6 +1,6 @@
 # Rustmaninoff roadmap
 
-**Now:** v0.3.0 — attribute + graph scanner (529 checks), Terraform vars/locals/`--var-file`, OpenTofu `.tofu`.
+**Now:** v0.4.0 — coverage credibility (536 checks; Docker 100% / K8s 93.8% fidelity), benches + Checkov compare CI. Next: v0.5 pipeline inputs (Helm + plan JSON).
 
 **Position:** complementary — *run it next to Trivy, in place of Checkov*. Teams already use Trivy for CVEs. Rustmaninoff’s claim is narrow and provable: **Checkov-compatible CKV policies, single Rust binary, fast**. Broad “scanner platform” scope dilutes that. Do not take on CVE / image layer / vuln-DB work.
 
@@ -45,32 +45,31 @@ Launch hygiene (hours, not weeks). README **and** the project site should match.
 
 Parent epic [#2](https://github.com/jose-compu/rustmaninoff/issues/2): vars shipped; modules remain; **plan JSON moves to v0.5** with Helm (pipeline scan path).
 
-## v0.4 — coverage credibility (TF / K8s / Dockerfile first)
+## v0.4 — coverage credibility (shipped in 0.4.0)
 
 Coverage is credibility. Each accurate CKV ID makes a Checkov swap easier. Publish the percentage.
 
-| Epic / work | Issue |
-| --- | ---: |
-| Checkov catalog depth — prioritize Terraform, Kubernetes, Dockerfile fidelity | [#4](https://github.com/jose-compu/rustmaninoff/issues/4) |
-| Credibility — reproducible benches, Checkov fidelity table, CI comparison | [#40](https://github.com/jose-compu/rustmaninoff/issues/40) |
-| Launch distribution — Show HN, Reddit, TWiR, blog, awesome lists | [#34](https://github.com/jose-compu/rustmaninoff/issues/34) |
-| Small-repo tactics — friendly CI offers + disclosed Checkov threads | [#44](https://github.com/jose-compu/rustmaninoff/issues/44) |
+| Epic / work | Issue | Status |
+| --- | ---: | --- |
+| Checkov catalog depth — TF / K8s / Dockerfile fidelity | [#4](https://github.com/jose-compu/rustmaninoff/issues/4) | **shipped** in 0.4.0 (536 checks; Docker 100%, K8s 93.8%) |
+| Credibility — benches, fidelity table, CI comparison | [#40](https://github.com/jose-compu/rustmaninoff/issues/40) | **shipped** in 0.4.0 |
+| Launch distribution — Show HN, Reddit, TWiR, blog, awesome lists | [#34](https://github.com/jose-compu/rustmaninoff/issues/34) | post-tag (open) |
+| Small-repo tactics — friendly CI offers + disclosed Checkov threads | [#44](https://github.com/jose-compu/rustmaninoff/issues/44) | post-tag (open) |
 
-### Catalog depth (#4) — v0.4 focus
+### Catalog depth (#4)
 
-- Remaining high-severity **Terraform** AWS attribute + graph checks teams hit in CI
-- Grow **Kubernetes** (`CKV_K8S_*`) and **Dockerfile** (`CKV_DOCKER_*`) packs
-- CloudFormation continues where it shares AWS CKV ids; Azure/GCP packs only after TF/K8s/Docker coverage is visibly strong
+- Terraform AWS attribute + graph checks deepened; remaining hard gaps documented in [docs/fidelity.md](docs/fidelity.md)
+- Kubernetes (`CKV_K8S_*`) and Dockerfile (`CKV_DOCKER_*`) packs at published fidelity targets
 - Every new check: pass + fail fixture
-- Published coverage table (% of Checkov CKV ids for claimed frameworks) — see [#42](https://github.com/jose-compu/rustmaninoff/issues/42)
+- Coverage table: [#42](https://github.com/jose-compu/rustmaninoff/issues/42) / `docs/fidelity.md`
 
 ### Credibility (#40)
 
 | Deliverable | Issue | Status |
 | --- | ---: | --- |
-| Reproducible benchmarks: corpus + script; real-world repo | [#41](https://github.com/jose-compu/rustmaninoff/issues/41) | open |
-| Fidelity / coverage table: CKV share and intentional gaps | [#42](https://github.com/jose-compu/rustmaninoff/issues/42) | `docs/fidelity.md` + pinned Checkov IDs |
-| CI badge + suite comparing output to Checkov on shared fixtures | [#43](https://github.com/jose-compu/rustmaninoff/issues/43) | open |
+| Reproducible benchmarks: corpus + script; real-world repo | [#41](https://github.com/jose-compu/rustmaninoff/issues/41) | **shipped** (`benchmarks/`, `scripts/bench.sh`) |
+| Fidelity / coverage table: CKV share and intentional gaps | [#42](https://github.com/jose-compu/rustmaninoff/issues/42) | **shipped** |
+| CI badge + suite comparing output to Checkov on shared fixtures | [#43](https://github.com/jose-compu/rustmaninoff/issues/43) | **shipped** (`checkov-compare` workflow) |
 
 ### Launch (#34) and small-repo tactics (#44)
 

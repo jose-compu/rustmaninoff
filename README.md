@@ -5,15 +5,16 @@
 </p>
 
 <p align="center">
-  <strong>Checkov-compatible CKV policies, single Rust binary, no Python — about 288× faster than Checkov on a published synthetic corpus.</strong><br>
+  <strong>Checkov-compatible CKV policies, single Rust binary, no Python — about 65× faster than Checkov on a published synthetic corpus.</strong><br>
   <em>Compared to Checkov:</em> same published CKV ids and skip comments, without the Python runtime or plugin install.
 </p>
 
 <p align="center">
   <a href="https://crates.io/crates/rustmaninoff"><img src="https://img.shields.io/crates/v/rustmaninoff.svg" alt="crates.io"></a>
   <a href="https://github.com/jose-compu/rustmaninoff/actions/workflows/ci.yml"><img src="https://github.com/jose-compu/rustmaninoff/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/jose-compu/rustmaninoff/actions/workflows/checkov-compare.yml"><img src="https://github.com/jose-compu/rustmaninoff/actions/workflows/checkov-compare.yml/badge.svg" alt="Checkov compare"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="License Apache-2.0"></a>
-  <a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.3.0"><img src="https://img.shields.io/github/v/release/jose-compu/rustmaninoff" alt="GitHub release"></a>
+  <a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.4.0"><img src="https://img.shields.io/github/v/release/jose-compu/rustmaninoff" alt="GitHub release"></a>
 </p>
 
 <p align="center">
@@ -28,11 +29,11 @@ Built-in policies are rewritten YAML, attributed to [Checkov](https://github.com
 
 Checkov and Trivy are broader platforms. Rustmaninoff is a **small, fast attribute scanner** you can drop into CI when you already know the CKV ids you care about.
 
-- **Speed.** On one synthetic corpus (1,540 resources), the 0.2.0 release binary finished in **20 ms**. Checkov 3.3.21 took **4.51 s** (~288×) and Trivy 0.74.0 took **5.71 s** (~285×). No Python interpreter, no policy-db refresh on the scan path.
+- **Speed.** On the published synthetic corpus (1,540 resources), a 0.4.0 release binary finished in **54 ms** median. Checkov 3.3.21 took **3.50 s** (~65×) and Trivy 0.74.0 took **6.27 s** (~116×). Rerun with `./scripts/bench.sh`. No Python interpreter, no policy-db refresh on the scan path.
 - **One static binary.** `cargo install rustmaninoff` (or a GitHub Release binary). Checkov needs a Python environment and plugins. Trivy is a large Go binary that also covers vulns, secrets, and SBOMs you may not want in an IaC-only job.
-- **Checkov-shaped policies without the Checkov runtime.** Same published CKV ids, YAML pass-conditions, and `# checkov:skip=` / `checkov.io/skip` comments. The engine is Rust IR + attribute operators, not a Python port.
+- **Checkov-shaped policies without the Checkov runtime.** Same published CKV ids, YAML pass-conditions, and `# checkov:skip=` / `checkov.io/skip` comments. The engine is Rust IR + attribute operators, not a Python port. CI compares shared fixtures to Checkov ([checkov-compare](.github/workflows/checkov-compare.yml)).
 - **Predictable CI.** Interpolations are **unknown**, not guessed. Unknowns never fail the process. Exit codes, `--fail-on`, SARIF 2.1.0, JUnit, and JSON are first-class.
-- **Focused catalog.** 529 checks (attribute + first-wave `CKV2_*` graph) with pass/fail fixtures. Still smaller than Checkov’s full pack: no Helm, Kustomize, plan JSON, or secrets/vuln scanning. Use those tools when you need that surface; use Rustmaninoff when you want fast CKV gates.
+- **Focused catalog.** 536 checks (attribute + `CKV2_*`) with pass/fail fixtures. Fidelity: Docker 100%, Kubernetes 93.8%, Terraform AWS resource ids ~36% — see [docs/fidelity.md](docs/fidelity.md). No Helm, Kustomize, plan JSON, or secrets/vuln scanning (v0.5+ / other tools).
 
 Site: [jose-compu.github.io/rustmaninoff](https://jose-compu.github.io/rustmaninoff/) · [llms.txt](https://jose-compu.github.io/rustmaninoff/llms.txt) for search and AI agents.
 
@@ -79,71 +80,57 @@ compact: false
 
 Directories named `.git`, `.terraform`, `.terragrunt-cache`, `node_modules`, `vendor`, and `target` are skipped. Symbolic links are not followed. Files larger than 10 MB, and files past the nesting or YAML-alias limits, are reported as diagnostics and are not parsed.
 
-## v0.3 scope
+## v0.4 scope
 
 - Terraform `.tf` / `.tf.json` / OpenTofu `.tofu` managed `resource` blocks and `data` sources. Vars/locals via defaults, `TF_VAR_*`, and `--var-file`. No module download yet.
 - CloudFormation YAML and JSON `Resources`. Attribute paths are relative to `Properties`.
 - Kubernetes multi-document YAML, including `List`.
-- Dockerfiles (`Dockerfile`, `Containerfile`, `*.dockerfile`): FROM, USER, ADD vs COPY, HEALTHCHECK, and privileged-ish RUN patterns.
-- 529 built-in checks including first-wave Terraform `CKV2_AWS_*` graph policies. Attribute path unchanged; graph is a second pass.
-- Coverage vs Checkov: [docs/fidelity.md](docs/fidelity.md) (regenerable).
+- Dockerfiles (`Dockerfile`, `Containerfile`, `*.dockerfile`): FROM (incl. unique aliases), USER, ADD vs COPY, HEALTHCHECK, and privileged-ish RUN patterns.
+- **536** built-in checks including Terraform `CKV2_AWS_*` policies. Attribute path unchanged; graph is a second pass.
+- Coverage vs Checkov: [docs/fidelity.md](docs/fidelity.md) (regenerable). Reproducible benches: [benchmarks/](benchmarks/) + `./scripts/bench.sh`.
 - Text, JSON, SARIF 2.1.0, and JUnit reports.
 
 S3 encryption, versioning, and logging on current Terraform target `aws_s3_bucket_server_side_encryption_configuration`, `aws_s3_bucket_versioning`, and `aws_s3_bucket_logging`. `CKV_AWS_286` matches a static action subset, including `*` and `*:*`. `CKV_K8S_14` accepts a digest or a tag other than `latest`; an image whose last colon is a registry port and which has no tag is treated as pinned.
 
-Not in v0.3.0 yet: Terraform plan JSON, module expansion, Helm, Kustomize, secrets scanning, Azure/GCP catalog depth.
+Not in v0.4.0 yet (see v0.5 roadmap): Terraform plan JSON, module expansion, Helm, Kustomize, secrets scanning, Azure/GCP catalog depth.
 
 ## Policy dialect
 
 A check definition is the pass condition. Operators: `equals`, `not_equals`, `exists`, `not_exists`, `contains`, `not_contains`, `within`, `regex_match`, `starting_with`, `ending_with`, numeric comparisons, `is_true`, `is_false`, `is_empty`, `length_greater_than`, `length_less_than`, and their negated forms. Combinators: `and`, `or`, `not`.
 
-Extensions: `no_element`, `forbid_resource`, `equals_any`, `intersects`, `image_tag_pinned`, `connection` (graph neighbors), `filter` (attribute alias), and `missing: pass|fail|unknown`. `scope` is ignored. Severity defaults to `MEDIUM` when omitted.
+Extensions: `no_element`, `forbid_resource`, `equals_any`, `intersects`, `image_tag_pinned`, `unique`, `connection` (graph neighbors), `filter` (attribute alias), and `missing: pass|fail|unknown`. `scope` is ignored. Severity defaults to `MEDIUM` when omitted.
 
 ## Benchmark
 
 ### Against Checkov and Trivy
 
-Wall-clock time of each CLI on one synthetic corpus, Apple M2, macOS 14.8. Median of three runs after a warmup. Stdout was discarded. The corpus is 40 Terraform files (1,080 resources), 20 CloudFormation files (300 resources), and 20 Kubernetes files (160 resources).
+Wall-clock time of each CLI on the published synthetic corpus under [benchmarks/corpus](benchmarks/corpus). Median of three runs after a warmup (`./scripts/bench.sh`). Stdout discarded. Corpus: 40 Terraform files (1,080 resources), 20 CloudFormation files (300 resources), 20 Kubernetes files (160 resources).
 
-| Scanner | Full corpus | Terraform | CloudFormation | Kubernetes |
-| --- | ---: | ---: | ---: | ---: |
-| Rustmaninoff 0.2.0 | 20 ms | 11 ms | 9 ms | 11 ms |
-| Checkov 3.3.21 | 4.51 s | 3.72 s | 2.71 s | 2.92 s |
-| Trivy 0.74.0 | 5.71 s | 2.67 s | 1.29 s | 2.59 s |
+| Scanner | Full corpus | Terraform | Notes |
+| --- | ---: | ---: | --- |
+| Rustmaninoff 0.4.0 | 54 ms | 39 ms | 536 built-in checks |
+| Checkov 3.3.21 | 3.50 s | 2.83 s | full framework packs |
+| Trivy 0.74.0 | 6.27 s | — | misconfig policies |
 
-On the full corpus that is about 288 times the Rustmaninoff time for Checkov, and about 285 times for Trivy. The catalogs are not the same: Rustmaninoff runs 181 attribute checks, Checkov runs its built-in checks for the selected frameworks, and Trivy runs its misconfiguration policies.
+On the full corpus that is about **65×** Checkov and **116×** Trivy versus Rustmaninoff. Catalogs differ. Real-world sample (terraform-aws-modules/terraform-aws-s3-bucket@v4.1.2): Rustmaninoff **45 ms**, Checkov **12.0 s**. See [benchmarks/history.json](benchmarks/history.json).
 
 ```mermaid
 %%{init: {"themeVariables": {"xyChart": {"plotColorPalette": "#E07A3D, #2A9D8F, #3D5A80", "titleColor": "#C44536", "xAxisLineColor": "#E07A3D", "yAxisLineColor": "#2A9D8F", "xAxisTickColor": "#E9C46A", "yAxisTickColor": "#7B6CF6"}}}}%%
 xychart-beta
     title "CLI wall time on the full corpus"
     x-axis [Rustmaninoff, Checkov, Trivy]
-    y-axis "seconds" 0 --> 6
-    bar "Rustmaninoff" [0.02, 0, 0]
-    bar "Checkov" [0, 4.51, 0]
-    bar "Trivy" [0, 0, 5.71]
+    y-axis "seconds" 0 --> 7
+    bar "Rustmaninoff" [0.054, 0, 0]
+    bar "Checkov" [0, 3.50, 0]
+    bar "Trivy" [0, 0, 6.27]
 ```
 
 Copper is Rustmaninoff, teal is Checkov, and steel blue is Trivy.
 
-```mermaid
-%%{init: {"themeVariables": {"xyChart": {"plotColorPalette": "#E07A3D, #2A9D8F, #E9C46A, #3D5A80, #C44536, #7B6CF6", "titleColor": "#C44536", "xAxisLineColor": "#E07A3D", "yAxisLineColor": "#2A9D8F", "xAxisTickColor": "#E9C46A", "yAxisTickColor": "#7B6CF6"}}}}%%
-xychart-beta
-    title "Times slower than Rustmaninoff"
-    x-axis [Terraform, CloudFormation, Kubernetes]
-    y-axis "times slower" 0 --> 360
-    bar "Checkov" [345, 288, 263]
-    bar "Trivy" [247, 137, 234]
-```
-
-Copper is Checkov. Teal is Trivy.
-
-Commands, release binary versus the other CLIs:
-
 ```sh
-rustmaninoff scan CORPUS --soft-fail --compact
-checkov -d CORPUS --framework terraform cloudformation kubernetes --quiet --compact --soft-fail
-trivy config --quiet --skip-check-update CORPUS
+cargo build --release -p rustmaninoff
+./scripts/bench.sh
+# optional: PATH with checkov/trivy for comparison columns
 ```
 
 ### Engine stages
@@ -183,7 +170,7 @@ cargo install rustmaninoff --locked
 rustmaninoff scan .
 ```
 
-GitHub Release binaries: https://github.com/jose-compu/rustmaninoff/releases/tag/v0.3.0
+GitHub Release binaries: https://github.com/jose-compu/rustmaninoff/releases/tag/v0.4.0
 
 ### Homebrew
 
@@ -199,7 +186,7 @@ Requires `rustmaninoff` on `PATH`. Add to `.pre-commit-config.yaml`:
 ```yaml
 repos:
   - repo: https://github.com/jose-compu/rustmaninoff
-    rev: v0.3.0
+    rev: v0.4.0
     hooks:
       - id: rustmaninoff
 ```
@@ -210,7 +197,7 @@ Composite action at the repo root (`action.yml`). Downloads a release binary and
 
 ```yaml
 - uses: actions/checkout@v4
-- uses: jose-compu/rustmaninoff@v0.3.0
+- uses: jose-compu/rustmaninoff@v0.4.0
   with:
     path: .
     fail-on: HIGH
@@ -227,18 +214,18 @@ Composite action at the repo root (`action.yml`). Downloads a release binary and
 Multi-arch image on GHCR (`linux/amd64`, `linux/arm64`):
 
 ```sh
-docker run --rm -v "$PWD":/src -w /src ghcr.io/jose-compu/rustmaninoff:0.3.0 scan .
+docker run --rm -v "$PWD":/src -w /src ghcr.io/jose-compu/rustmaninoff:0.4.0 scan .
 ```
 
-Tags: `latest` (main), semver (`0.3.0`, `0.3`), and `sha-*`. Built by `.github/workflows/docker.yml` from GitHub Release binaries (use `--build-arg BUILD_MODE=source` for a full cargo image build).
+Tags: `latest` (main), semver (`0.4.0`, `0.4`), and `sha-*`. Built by `.github/workflows/docker.yml` from GitHub Release binaries (use `--build-arg BUILD_MODE=source` for a full cargo image build).
 
 ## Release
 
-Pushing the tag `v0.3.0` runs `.github/workflows/release.yml`. It publishes Linux and macOS binaries for amd64 and arm64, each with a SHA-256 checksum. Crates.io publish is manual (dependency order: `ir` → parsers/engine/report → `rustmaninoff`).
+Pushing the tag `v0.4.0` runs `.github/workflows/release.yml`. It publishes Linux and macOS binaries for amd64 and arm64, each with a SHA-256 checksum. Crates.io publish is manual (dependency order: `ir` → parsers/engine/report → `rustmaninoff`).
 
 ```sh
-git tag v0.3.0
-git push origin v0.3.0
+git tag v0.4.0
+git push origin v0.4.0
 ```
 
 ## License

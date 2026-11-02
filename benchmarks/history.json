@@ -1,0 +1,27 @@
+{
+  "machine": "local runner (see scripts/bench.sh)",
+  "date": "2026-11-02",
+  "rustmaninoff": "0.4.0-dev release binary",
+  "catalog_checks": 536,
+  "corpus": {
+    "terraform_files": 40,
+    "terraform_resources": 1080,
+    "cfn_files": 20,
+    "cfn_resources": 300,
+    "k8s_files": 20,
+    "k8s_resources": 160,
+    "total_resources": 1540
+  },
+  "median_ms": {
+    "rustmaninoff_full": 54,
+    "rustmaninoff_terraform": 39,
+    "rustmaninoff_cloudformation": 37,
+    "rustmaninoff_kubernetes": 46,
+    "checkov_3.3.21_full": 3503,
+    "checkov_3.3.21_terraform": 2834,
+    "trivy_0.74.0_full": 6273,
+    "rustmaninoff_real_world_s3_module": 45,
+    "checkov_real_world_s3_module": 11982
+  },
+  "notes": "Medians of 3 runs after warmup. Catalogs differ across tools."
+}

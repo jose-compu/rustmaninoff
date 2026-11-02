@@ -1,0 +1,23 @@
+name: checkov-compare
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Build rustmaninoff
+        run: cargo build --release -p rustmaninoff --locked
+      - name: Install Checkov
+        run: |
+          python3 -m venv .venv-checkov
+          .venv-checkov/bin/pip install --quiet 'checkov==3.3.21'
+      - name: Compare failed CKV ids
+        env:
+          RUSTMANINOFF_BIN: ${{ github.workspace }}/target/release/rustmaninoff
+          PATH: ${{ github.workspace }}/.venv-checkov/bin:${{ env.PATH }}
+        run: python3 scripts/compare_checkov.py

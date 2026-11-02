@@ -45,6 +45,7 @@ pub enum Operator {
     NotIntersects,
     Any,
     ImageTagPinned,
+    Unique,
 }
 
 impl Operator {
@@ -83,6 +84,7 @@ impl Operator {
             "not_intersects" => Self::NotIntersects,
             "any" => Self::Any,
             "image_tag_pinned" => Self::ImageTagPinned,
+            "unique" | "is_unique" => Self::Unique,
             _ => return None,
         })
     }
@@ -97,7 +99,8 @@ impl Operator {
             | Self::NotStartingWith
             | Self::NotEndingWith
             | Self::NotIntersects
-            | Self::IsEmpty => Missing::Pass,
+            | Self::IsEmpty
+            | Self::Unique => Missing::Pass,
             _ => Missing::Fail,
         }
     }
@@ -410,6 +413,9 @@ fn eval_attribute(
             other => other,
         };
     }
+    if operator == Operator::Unique {
+        return eval_unique(&resolved, missing_behavior);
+    }
     if resolved.unknown && resolved.values.is_empty() {
         return Status::Unknown;
     }
@@ -518,7 +524,67 @@ fn leaf_matches(
         Operator::NotIntersects => !intersects(value, expected),
         Operator::Any => !matches!(value, Value::Null | Value::Unknown { .. }),
         Operator::ImageTagPinned => image_tag_pinned(value),
-        Operator::Exists | Operator::NotExists => false,
+        Operator::Unique | Operator::Exists | Operator::NotExists => false,
+    }
+}
+
+fn eval_unique(resolved: &rustmaninoff_ir::Resolved<'_>, missing: Missing) -> Status {
+    if resolved.values.is_empty() {
+        return missing_to_status(missing);
+    }
+    let mut seen = std::collections::BTreeSet::new();
+    let mut saw_value = false;
+    let mut saw_unknown = resolved.unknown;
+    for value in &resolved.values {
+        if collect_unique_items(value, &mut seen, &mut saw_unknown, &mut saw_value) {
+            return Status::Failed;
+        }
+    }
+    if !saw_value {
+        return if saw_unknown {
+            Status::Unknown
+        } else {
+            missing_to_status(missing)
+        };
+    }
+    if saw_unknown {
+        return Status::Unknown;
+    }
+    Status::Passed
+}
+
+fn collect_unique_items(
+    value: &Value,
+    seen: &mut std::collections::BTreeSet<String>,
+    saw_unknown: &mut bool,
+    saw_value: &mut bool,
+) -> bool {
+    match unwrap_single(value) {
+        Value::Unknown { .. } => {
+            *saw_unknown = true;
+            false
+        }
+        Value::Null => false,
+        Value::Array(items) => {
+            for item in items {
+                if collect_unique_items(item, seen, saw_unknown, saw_value) {
+                    return true;
+                }
+            }
+            false
+        }
+        Value::String(text) => {
+            if text.is_empty() {
+                return false;
+            }
+            *saw_value = true;
+            !seen.insert(text.clone())
+        }
+        other => {
+            *saw_value = true;
+            let key = format!("{other:?}");
+            !seen.insert(key)
+        }
     }
 }
 

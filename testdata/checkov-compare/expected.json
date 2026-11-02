@@ -1,0 +1,14 @@
+{
+  "description": "CKV ids that both rustmaninoff and Checkov must report as FAILED on testdata/checkov-compare. Extra findings on either side are ignored.",
+  "must_fail_both": [
+    "CKV_AWS_3",
+    "CKV_K8S_16",
+    "CKV_DOCKER_2"
+  ],
+  "checkov_version": "3.3.21",
+  "notes": [
+    "CKV_DOCKER_2 is unpinned/latest FROM image",
+    "CKV_K8S_16 is privileged container",
+    "CKV_AWS_3 is unencrypted EBS"
+  ]
+}
