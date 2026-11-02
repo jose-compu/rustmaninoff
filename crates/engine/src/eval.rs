@@ -1,6 +1,6 @@
 //! Attribute condition evaluation.
 
-use rustmaninoff_ir::{lookup_path, AttrPath, Value};
+use rustmaninoff_ir::{lookup_path, AttrPath, EdgeKind, Value};
 
 use crate::policy::{yaml_to_value, Severity};
 
@@ -119,10 +119,30 @@ pub enum Cond {
         path: AttrPath,
         where_cond: Box<Cond>,
     },
+    /// Neighbor relationship over IR edges (Checkov-shaped `connection`).
+    Connection {
+        connected_resource_types: Vec<String>,
+        edge_kinds: Vec<EdgeKind>,
+        exists: bool,
+        neighbor_filter: Option<Box<Cond>>,
+    },
     ForbidResource,
 }
 
 impl Cond {
+    /// True when this condition (or a nested child) needs the resource graph.
+    pub fn needs_graph(&self) -> bool {
+        match self {
+            Self::Connection { .. } => true,
+            Self::And(items) | Self::Or(items) => items.iter().any(Self::needs_graph),
+            Self::Not(inner)
+            | Self::NoElement {
+                where_cond: inner, ..
+            } => inner.needs_graph(),
+            Self::Attribute { .. } | Self::ForbidResource => false,
+        }
+    }
+
     pub fn from_yaml(value: &serde_yaml::Value) -> Result<Self, String> {
         let map = value
             .as_mapping()
@@ -140,7 +160,7 @@ impl Cond {
             .and_then(|item| item.as_str())
             .unwrap_or("attribute");
         match kind {
-            "attribute" => {
+            "attribute" | "filter" => {
                 let attribute = required_string(map, "attribute")?;
                 let operator = Operator::parse(&required_string(map, "operator")?)
                     .ok_or_else(|| format!("unknown operator on attribute {attribute}"))?;
@@ -174,10 +194,67 @@ impl Cond {
                     where_cond: Box::new(Self::from_yaml(where_value)?),
                 })
             }
+            "connection" => {
+                let connected = mapping_get(map, "connected_resource_types")
+                    .map(string_list_value)
+                    .unwrap_or_default();
+                if connected.is_empty() {
+                    return Err("connection requires connected_resource_types".into());
+                }
+                let edge_kinds = mapping_get(map, "edge_kinds")
+                    .map(parse_edge_kinds)
+                    .transpose()?
+                    .unwrap_or_default();
+                let operator = mapping_get(map, "operator")
+                    .and_then(|item| item.as_str())
+                    .unwrap_or("exists");
+                let exists = match operator.trim().to_ascii_lowercase().as_str() {
+                    "exists" => true,
+                    "not_exists" | "does_not_exist" => false,
+                    other => {
+                        return Err(format!(
+                            "connection operator must be exists or not_exists, got '{other}'"
+                        ))
+                    }
+                };
+                let neighbor_filter = mapping_get(map, "attribute_filter")
+                    .or_else(|| mapping_get(map, "filter"))
+                    .map(Self::from_yaml)
+                    .transpose()?
+                    .map(Box::new);
+                Ok(Self::Connection {
+                    connected_resource_types: connected,
+                    edge_kinds,
+                    exists,
+                    neighbor_filter,
+                })
+            }
             "forbid_resource" => Ok(Self::ForbidResource),
             other => Err(format!("unsupported cond_type '{other}'")),
         }
     }
+}
+
+fn string_list_value(value: &serde_yaml::Value) -> Vec<String> {
+    if let Some(text) = value.as_str() {
+        return vec![text.to_string()];
+    }
+    value
+        .as_sequence()
+        .map(|items| {
+            items
+                .iter()
+                .filter_map(|item| item.as_str().map(str::to_string))
+                .collect()
+        })
+        .unwrap_or_default()
+}
+
+fn parse_edge_kinds(value: &serde_yaml::Value) -> Result<Vec<EdgeKind>, String> {
+    string_list_value(value)
+        .into_iter()
+        .map(|text| EdgeKind::parse(&text).ok_or_else(|| format!("unknown edge kind '{text}'")))
+        .collect()
 }
 
 fn parse_missing(text: &str) -> Result<Missing, String> {
@@ -267,6 +344,8 @@ pub fn eval_cond(cond: &Cond, root: &Value) -> Status {
             other => other,
         },
         Cond::NoElement { path, where_cond } => eval_no_element(root, path, where_cond),
+        // Graph connections need `eval_graph_cond`; attribute path treats them as unknown.
+        Cond::Connection { .. } => Status::Unknown,
         Cond::ForbidResource => Status::Failed,
     }
 }
@@ -638,6 +717,113 @@ fn image_tag_pinned(value: &Value) -> bool {
         Some((_, tag)) => !tag.is_empty() && !tag.eq_ignore_ascii_case("latest"),
         None => false,
     }
+}
+
+/// Evaluate a condition that may include `connection` nodes against a resource graph.
+pub fn eval_graph_cond(
+    cond: &Cond,
+    resource: &rustmaninoff_ir::Resource,
+    resources: &[rustmaninoff_ir::Resource],
+    edges: &[rustmaninoff_ir::Edge],
+) -> Status {
+    match cond {
+        Cond::And(items) => items
+            .iter()
+            .map(|item| eval_graph_cond(item, resource, resources, edges))
+            .fold(Status::Passed, |acc, status| match (acc, status) {
+                (Status::Failed, _) | (_, Status::Failed) => Status::Failed,
+                (Status::Unknown, _) | (_, Status::Unknown) => Status::Unknown,
+                _ => Status::Passed,
+            }),
+        Cond::Or(items) => items
+            .iter()
+            .map(|item| eval_graph_cond(item, resource, resources, edges))
+            .fold(Status::Failed, |acc, status| match (acc, status) {
+                (Status::Passed, _) | (_, Status::Passed) => Status::Passed,
+                (Status::Unknown, _) | (_, Status::Unknown) => Status::Unknown,
+                _ => Status::Failed,
+            }),
+        Cond::Not(inner) => match eval_graph_cond(inner, resource, resources, edges) {
+            Status::Passed => Status::Failed,
+            Status::Failed => Status::Passed,
+            other => other,
+        },
+        Cond::Connection {
+            connected_resource_types,
+            edge_kinds,
+            exists,
+            neighbor_filter,
+        } => eval_connection(
+            resource,
+            resources,
+            edges,
+            connected_resource_types,
+            edge_kinds,
+            *exists,
+            neighbor_filter.as_deref(),
+        ),
+        other => eval_cond(other, &resource.attributes),
+    }
+}
+
+fn eval_connection(
+    resource: &rustmaninoff_ir::Resource,
+    resources: &[rustmaninoff_ir::Resource],
+    edges: &[rustmaninoff_ir::Edge],
+    connected_types: &[String],
+    edge_kinds: &[EdgeKind],
+    exists: bool,
+    neighbor_filter: Option<&Cond>,
+) -> Status {
+    let from = rustmaninoff_ir::ResourceRef::from_resource(resource);
+    let matched = edges.iter().any(|edge| {
+        if !edge_kinds.is_empty() && !edge_kinds.contains(&edge.kind) {
+            return false;
+        }
+        let neighbor_ref = if edge.from.matches(&from) {
+            &edge.to
+        } else if edge.to.matches(&from) {
+            &edge.from
+        } else {
+            return false;
+        };
+        let Some(neighbor) = find_neighbor(resources, neighbor_ref, connected_types) else {
+            return false;
+        };
+        match neighbor_filter {
+            None => true,
+            Some(filter) => matches!(eval_cond(filter, &neighbor.attributes), Status::Passed),
+        }
+    });
+    match (exists, matched) {
+        (true, true) | (false, false) => Status::Passed,
+        (true, false) | (false, true) => Status::Failed,
+    }
+}
+
+fn find_neighbor<'a>(
+    resources: &'a [rustmaninoff_ir::Resource],
+    neighbor_ref: &rustmaninoff_ir::ResourceRef,
+    connected_types: &[String],
+) -> Option<&'a rustmaninoff_ir::Resource> {
+    let type_ok = |resource_type: &str| {
+        connected_types.iter().any(|allowed| allowed == "*")
+            || connected_types
+                .iter()
+                .any(|allowed| allowed == resource_type)
+    };
+    resources.iter().find(|item| {
+        if !type_ok(&item.resource_type) {
+            return false;
+        }
+        if !neighbor_ref.resource_type.is_empty()
+            && neighbor_ref.resource_type != item.resource_type
+        {
+            return false;
+        }
+        let candidate = rustmaninoff_ir::ResourceRef::from_resource(item);
+        neighbor_ref.matches(&candidate) || neighbor_ref.name == item.name
+    })
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]

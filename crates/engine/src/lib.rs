@@ -3,16 +3,18 @@
 mod eval;
 mod policy;
 
-pub use eval::{eval_cond, Cond, Finding, Status};
+pub use eval::{eval_cond, eval_graph_cond, Cond, Finding, Status};
 pub use policy::{load_policy_dir, parse_policy, Policy, PolicyError, Severity};
 
 use std::collections::{BTreeMap, HashMap};
 use std::sync::Arc;
 
 use rayon::prelude::*;
-use rustmaninoff_ir::{Framework, Resource};
+use rustmaninoff_ir::{Edge, Framework, Resource};
 
-/// Evaluate `policies` against `resources`.
+/// Evaluate attribute policies against `resources`.
+///
+/// Graph (`connection`) policies are skipped here; use [`evaluate_graph`].
 ///
 /// Results that share a check id and resource are collapsed to the worst status,
 /// so a security group and its rule form can share one Checkov id.
@@ -20,7 +22,14 @@ pub fn evaluate(resources: &[Resource], policies: &[Policy]) -> Vec<Finding> {
     if resources.is_empty() || policies.is_empty() {
         return Vec::new();
     }
-    let index = PolicyIndex::build(policies);
+    let attribute_policies: Vec<&Policy> = policies
+        .iter()
+        .filter(|policy| !policy.definition.needs_graph())
+        .collect();
+    if attribute_policies.is_empty() {
+        return Vec::new();
+    }
+    let index = PolicyIndex::build(&attribute_policies);
     let findings = if resources.len() < 32 {
         resources
             .iter()
@@ -35,6 +44,33 @@ pub fn evaluate(resources: &[Resource], policies: &[Policy]) -> Vec<Finding> {
     collapse(findings)
 }
 
+/// Evaluate graph (`connection`) policies using IR edges.
+pub fn evaluate_graph(resources: &[Resource], edges: &[Edge], policies: &[Policy]) -> Vec<Finding> {
+    if resources.is_empty() || policies.is_empty() {
+        return Vec::new();
+    }
+    let graph_policies: Vec<&Policy> = policies
+        .iter()
+        .filter(|policy| policy.definition.needs_graph())
+        .collect();
+    if graph_policies.is_empty() {
+        return Vec::new();
+    }
+    let index = PolicyIndex::build(&graph_policies);
+    let findings = if resources.len() < 32 {
+        resources
+            .iter()
+            .flat_map(|resource| eval_graph_resource(resource, resources, edges, &index))
+            .collect()
+    } else {
+        resources
+            .par_iter()
+            .flat_map(|resource| eval_graph_resource(resource, resources, edges, &index))
+            .collect()
+    };
+    collapse(findings)
+}
+
 struct PolicyIndex<'a> {
     exact: HashMap<Framework, HashMap<String, Vec<&'a Policy>>>,
     wild: HashMap<Framework, Vec<&'a Policy>>,
@@ -43,7 +79,7 @@ struct PolicyIndex<'a> {
 }
 
 impl<'a> PolicyIndex<'a> {
-    fn build(policies: &'a [Policy]) -> Self {
+    fn build(policies: &[&'a Policy]) -> Self {
         let mut index = Self {
             exact: HashMap::new(),
             wild: HashMap::new(),
@@ -95,6 +131,27 @@ impl<'a> PolicyIndex<'a> {
 }
 
 fn eval_resource(resource: &Resource, index: &PolicyIndex<'_>) -> Vec<Finding> {
+    visit_policies(resource, index, |policy| {
+        eval_cond(&policy.definition, &resource.attributes)
+    })
+}
+
+fn eval_graph_resource(
+    resource: &Resource,
+    resources: &[Resource],
+    edges: &[Edge],
+    index: &PolicyIndex<'_>,
+) -> Vec<Finding> {
+    visit_policies(resource, index, |policy| {
+        eval_graph_cond(&policy.definition, resource, resources, edges)
+    })
+}
+
+fn visit_policies(
+    resource: &Resource,
+    index: &PolicyIndex<'_>,
+    mut eval: impl FnMut(&Policy) -> Status,
+) -> Vec<Finding> {
     let shared = SharedIds {
         address: Arc::from(format!("{}.{}", resource.resource_type, resource.name)),
         file: Arc::from(resource.file.display().to_string()),
@@ -118,7 +175,7 @@ fn eval_resource(resource: &Resource, index: &PolicyIndex<'_>) -> Vec<Finding> {
             ));
             return;
         }
-        let status = eval_cond(&policy.definition, &resource.attributes);
+        let status = eval(policy);
         findings.push(make_finding(policy, status, &shared, resource, None));
     };
     if let Some(by_type) = index.exact.get(&resource.framework) {
@@ -370,5 +427,52 @@ definition:
                 assert_eq!(status, Status::Failed, "{length}");
             }
         }
+    }
+
+    #[test]
+    fn connection_requires_logging_neighbor() {
+        use rustmaninoff_ir::{Edge, EdgeKind, ResourceRef};
+
+        let policy = policy(
+            r#"
+metadata:
+  id: CKV2_AWS_S3_LOGGING
+  name: bucket has logging
+  severity: MEDIUM
+  framework: terraform
+resource_types:
+  - aws_s3_bucket
+definition:
+  cond_type: connection
+  connected_resource_types:
+    - aws_s3_bucket_logging
+  operator: exists
+"#,
+        );
+        let bucket = resource("aws_s3_bucket", "data", Value::Object(Default::default()));
+        let logging = resource(
+            "aws_s3_bucket_logging",
+            "data",
+            Value::Object(Default::default()),
+        );
+        let edge = Edge::new(
+            ResourceRef::from_resource(&bucket),
+            ResourceRef::from_resource(&logging),
+            EdgeKind::References,
+        )
+        .via("bucket");
+        assert!(evaluate(
+            &[bucket.clone(), logging.clone()],
+            std::slice::from_ref(&policy)
+        )
+        .is_empty());
+        let failed = evaluate_graph(
+            std::slice::from_ref(&bucket),
+            &[],
+            std::slice::from_ref(&policy),
+        );
+        assert_eq!(failed[0].status, Status::Failed);
+        let passed = evaluate_graph(&[bucket, logging], &[edge], std::slice::from_ref(&policy));
+        assert_eq!(passed[0].status, Status::Passed);
     }
 }
