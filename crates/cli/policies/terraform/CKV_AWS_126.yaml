@@ -1,0 +1,25 @@
+metadata:
+  id: CKV_AWS_126
+  name: Ensure that detailed monitoring is enabled for EC2 instances
+  category: LOGGING
+  severity: LOW
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_126. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_instance
+definition:
+  cond_type: attribute
+  attribute: monitoring
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_instance" "bad" {
+      ami           = "ami-123"
+      instance_type = "t3.micro"
+    }
+  pass: |
+    resource "aws_instance" "good" {
+      ami           = "ami-123"
+      instance_type = "t3.micro"
+      monitoring    = true
+    }

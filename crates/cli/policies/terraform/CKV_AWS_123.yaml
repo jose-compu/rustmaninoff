@@ -1,0 +1,28 @@
+metadata:
+  id: CKV_AWS_123
+  name: Ensure that VPC Endpoint Service is configured for Manual Acceptance
+  category: NETWORKING
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_123. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_vpc_endpoint_service
+definition:
+  cond_type: attribute
+  attribute: acceptance_required
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_vpc_endpoint_service" "bad" {
+      acceptance_required = false
+      network_load_balancer_arns = [
+        "arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/net/lb/50dc6c495c0c9188"
+      ]
+    }
+  pass: |
+    resource "aws_vpc_endpoint_service" "good" {
+      acceptance_required = true
+      network_load_balancer_arns = [
+        "arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/net/lb/50dc6c495c0c9188"
+      ]
+    }

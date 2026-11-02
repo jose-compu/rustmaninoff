@@ -1,0 +1,27 @@
+metadata:
+  id: CKV_AWS_120
+  name: Ensure API Gateway caching is enabled
+  category: BACKUP_AND_RECOVERY
+  severity: LOW
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_120. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_api_gateway_stage
+definition:
+  cond_type: attribute
+  attribute: cache_cluster_enabled
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_api_gateway_stage" "bad" {
+      stage_name    = "prod"
+      rest_api_id   = "api"
+      deployment_id = "dep"
+    }
+  pass: |
+    resource "aws_api_gateway_stage" "good" {
+      stage_name           = "prod"
+      rest_api_id          = "api"
+      deployment_id        = "dep"
+      cache_cluster_enabled = true
+    }
