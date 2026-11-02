@@ -1,0 +1,26 @@
+metadata:
+  id: CKV_AWS_366
+  name: Ensure AWS Cognito identity pool does not allow unauthenticated guest access
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_366. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_cognito_identity_pool
+definition:
+  or:
+  - cond_type: attribute
+    attribute: allow_unauthenticated_identities
+    operator: not_exists
+  - cond_type: attribute
+    attribute: allow_unauthenticated_identities
+    operator: is_false
+fixtures:
+  fail: |
+    resource "aws_cognito_identity_pool" "bad" {
+      allow_unauthenticated_identities = true
+    }
+  pass: |
+    resource "aws_cognito_identity_pool" "good" {
+      allow_unauthenticated_identities = false
+    }

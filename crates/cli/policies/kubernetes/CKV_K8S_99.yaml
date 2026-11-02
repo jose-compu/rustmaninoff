@@ -1,0 +1,57 @@
+metadata:
+  id: CKV_K8S_99
+  name: Ensure that the --etcd-certfile and --etcd-keyfile arguments are set as appropriate
+  category: KUBERNETES
+  severity: HIGH
+  framework: kubernetes
+  guidelines: Adapted from Checkov CKV_K8S_99. https://github.com/bridgecrewio/checkov
+resource_types:
+- Pod
+- Deployment
+- StatefulSet
+- DaemonSet
+- Job
+- CronJob
+- ReplicaSet
+definition:
+  or:
+  - cond_type: attribute
+    attribute: _containers.command
+    operator: not_contains
+    value: "kube-apiserver"
+  - and:
+    - cond_type: attribute
+      attribute: _containers.command
+      operator: contains
+      value: "--etcd-certfile=/x"
+    - cond_type: attribute
+      attribute: _containers.command
+      operator: contains
+      value: "--etcd-keyfile=/x"
+fixtures:
+  fail: |
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: app
+      namespace: kube-system
+    spec:
+      containers:
+        - name: app
+          image: k8s.gcr.io/kube-apiserver:v1.28.0
+          command:
+            - "kube-apiserver"
+  pass: |
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: app
+      namespace: kube-system
+    spec:
+      containers:
+        - name: app
+          image: k8s.gcr.io/kube-apiserver:v1.28.0
+          command:
+            - "kube-apiserver"
+            - "--etcd-certfile=/x"
+            - "--etcd-keyfile=/x"

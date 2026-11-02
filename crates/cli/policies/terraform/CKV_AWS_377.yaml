@@ -1,0 +1,26 @@
+metadata:
+  id: CKV_AWS_377
+  name: Ensure Route 53 domains have transfer lock protection
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_377. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_route53domains_registered_domain
+definition:
+  or:
+  - cond_type: attribute
+    attribute: transfer_lock
+    operator: not_exists
+  - cond_type: attribute
+    attribute: transfer_lock
+    operator: is_true
+fixtures:
+  fail: |
+    resource "aws_route53domains_registered_domain" "bad" {
+      transfer_lock = false
+    }
+  pass: |
+    resource "aws_route53domains_registered_domain" "good" {
+      transfer_lock = true
+    }

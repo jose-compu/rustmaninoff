@@ -1,0 +1,23 @@
+metadata:
+  id: CKV_AWS_346
+  name: Ensure Network Firewall Policy defines an encryption configuration that uses a 
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_346. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_networkfirewall_firewall_policy
+definition:
+  cond_type: attribute
+  attribute: encryption_configuration.key_id
+  operator: exists
+fixtures:
+  fail: |
+    resource "aws_networkfirewall_firewall_policy" "bad" {
+    }
+  pass: |
+    resource "aws_networkfirewall_firewall_policy" "good" {
+      encryption_configuration {
+        key_id = "arn:aws:kms:us-east-1:123456789012:key/abcd"
+      }
+    }

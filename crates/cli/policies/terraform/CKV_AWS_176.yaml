@@ -1,0 +1,24 @@
+metadata:
+  id: CKV_AWS_176
+  name: Ensure Logging is enabled for WAF Web Access Control Lists
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_176. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_waf_web_acl
+- aws_wafregional_web_acl
+definition:
+  cond_type: attribute
+  attribute: logging_configuration.log_destination
+  operator: exists
+fixtures:
+  fail: |
+    resource "aws_waf_web_acl" "bad" {
+    }
+  pass: |
+    resource "aws_waf_web_acl" "good" {
+      logging_configuration {
+        log_destination = "arn:aws:logs:us-east-1:123456789012:destination:x"
+      }
+    }

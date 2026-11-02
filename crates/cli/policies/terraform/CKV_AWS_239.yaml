@@ -1,0 +1,23 @@
+metadata:
+  id: CKV_AWS_239
+  name: Ensure DAX cluster endpoint is using TLS
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_239. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_dax_cluster
+definition:
+  cond_type: attribute
+  attribute: cluster_endpoint_encryption_type
+  operator: equals
+  value: "TLS"
+fixtures:
+  fail: |
+    resource "aws_dax_cluster" "bad" {
+      cluster_endpoint_encryption_type = "NONE"
+    }
+  pass: |
+    resource "aws_dax_cluster" "good" {
+      cluster_endpoint_encryption_type = "TLS"
+    }

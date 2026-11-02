@@ -1,0 +1,30 @@
+metadata:
+  id: CKV_AWS_242
+  name: Ensure MWAA environment has scheduler logs enabled
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_242. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_mwaa_environment
+definition:
+  cond_type: attribute
+  attribute: logging_configuration.scheduler_logs.enabled
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_mwaa_environment" "bad" {
+      logging_configuration {
+        scheduler_logs {
+          enabled = false
+        }
+      }
+    }
+  pass: |
+    resource "aws_mwaa_environment" "good" {
+      logging_configuration {
+        scheduler_logs {
+          enabled = true
+        }
+      }
+    }

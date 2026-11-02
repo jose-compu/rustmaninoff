@@ -1,0 +1,31 @@
+metadata:
+  id: CKV_AWS_303
+  name: Ensure SSM documents are not Public
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_303. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_ssm_document
+definition:
+  or:
+  - cond_type: attribute
+    attribute: permissions.account_ids
+    operator: not_exists
+  - cond_type: attribute
+    attribute: permissions.account_ids
+    operator: not_equals
+    value: "All"
+fixtures:
+  fail: |
+    resource "aws_ssm_document" "bad" {
+      permissions {
+        account_ids = "All"
+      }
+    }
+  pass: |
+    resource "aws_ssm_document" "good" {
+      permissions {
+        account_ids = "GOOD"
+      }
+    }

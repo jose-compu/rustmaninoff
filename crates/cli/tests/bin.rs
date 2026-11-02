@@ -22,7 +22,7 @@ fn binary_exits_clean_failed_and_usage() {
     let clean = dir("clean");
     fs::write(
         clean.join("main.tf"),
-        "resource \"aws_ebs_volume\" \"disk\" {\n  encrypted = true\n}\n",
+        "resource \"aws_ebs_volume\" \"disk\" {\n  encrypted  = true\n  kms_key_id = \"arn:aws:kms:us-east-1:123456789012:key/abcd\"\n}\n",
     )
     .unwrap();
     let ok = binary().arg("scan").arg(&clean).output().expect("run");

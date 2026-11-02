@@ -1,0 +1,22 @@
+metadata:
+  id: CKV_AWS_222
+  name: Ensure DMS replication instance gets all minor upgrade automatically
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_222. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_dms_replication_instance
+definition:
+  cond_type: attribute
+  attribute: auto_minor_version_upgrade
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_dms_replication_instance" "bad" {
+      auto_minor_version_upgrade = false
+    }
+  pass: |
+    resource "aws_dms_replication_instance" "good" {
+      auto_minor_version_upgrade = true
+    }

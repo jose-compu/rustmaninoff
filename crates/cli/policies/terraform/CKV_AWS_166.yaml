@@ -1,0 +1,21 @@
+metadata:
+  id: CKV_AWS_166
+  name: Ensure Backup Vault is encrypted at rest using KMS CMK
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_166. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_backup_vault
+definition:
+  cond_type: attribute
+  attribute: kms_key_arn
+  operator: exists
+fixtures:
+  fail: |
+    resource "aws_backup_vault" "bad" {
+    }
+  pass: |
+    resource "aws_backup_vault" "good" {
+      kms_key_arn = "arn:aws:kms:us-east-1:123456789012:key/abcd"
+    }

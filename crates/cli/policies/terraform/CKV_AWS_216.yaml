@@ -1,0 +1,22 @@
+metadata:
+  id: CKV_AWS_216
+  name: Ensure CloudFront distribution is enabled
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_216. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_cloudfront_distribution
+definition:
+  cond_type: attribute
+  attribute: enabled
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_cloudfront_distribution" "bad" {
+      enabled = false
+    }
+  pass: |
+    resource "aws_cloudfront_distribution" "good" {
+      enabled = true
+    }

@@ -1,0 +1,30 @@
+metadata:
+  id: CKV_AWS_333
+  name: Ensure ECS services do not have public IP addresses assigned to them automatically
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_333. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_ecs_service
+definition:
+  or:
+  - cond_type: attribute
+    attribute: network_configuration.assign_public_ip
+    operator: not_exists
+  - cond_type: attribute
+    attribute: network_configuration.assign_public_ip
+    operator: is_false
+fixtures:
+  fail: |
+    resource "aws_ecs_service" "bad" {
+      network_configuration {
+        assign_public_ip = true
+      }
+    }
+  pass: |
+    resource "aws_ecs_service" "good" {
+      network_configuration {
+        assign_public_ip = false
+      }
+    }

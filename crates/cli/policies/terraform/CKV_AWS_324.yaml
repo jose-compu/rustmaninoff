@@ -1,0 +1,21 @@
+metadata:
+  id: CKV_AWS_324
+  name: Ensure that RDS Cluster log capture is enabled
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_324. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_rds_cluster
+definition:
+  cond_type: attribute
+  attribute: enabled_cloudwatch_logs_exports
+  operator: exists
+fixtures:
+  fail: |
+    resource "aws_rds_cluster" "bad" {
+    }
+  pass: |
+    resource "aws_rds_cluster" "good" {
+      enabled_cloudwatch_logs_exports = "arn:aws:logs:us-east-1:123456789012:destination:x"
+    }

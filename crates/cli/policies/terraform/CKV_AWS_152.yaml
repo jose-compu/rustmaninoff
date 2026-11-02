@@ -1,0 +1,23 @@
+metadata:
+  id: CKV_AWS_152
+  name: Ensure that Load Balancer (Network/Gateway) has cross-zone load balancing enabled
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_152. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_lb
+- aws_alb
+definition:
+  cond_type: attribute
+  attribute: enable_cross_zone_load_balancing
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_lb" "bad" {
+      enable_cross_zone_load_balancing = false
+    }
+  pass: |
+    resource "aws_lb" "good" {
+      enable_cross_zone_load_balancing = true
+    }

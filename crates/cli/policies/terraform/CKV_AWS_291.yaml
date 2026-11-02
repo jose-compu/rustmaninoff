@@ -1,0 +1,39 @@
+metadata:
+  id: CKV_AWS_291
+  name: Ensure MSK nodes are private
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_291. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_msk_cluster
+definition:
+  or:
+  - cond_type: attribute
+    attribute: broker_node_group_info.connectivity_info.public_access.type
+    operator: not_exists
+  - cond_type: attribute
+    attribute: broker_node_group_info.connectivity_info.public_access.type
+    operator: not_equals
+    value: "SERVICE_PROVIDED_EIPS"
+fixtures:
+  fail: |
+    resource "aws_msk_cluster" "bad" {
+      broker_node_group_info {
+        connectivity_info {
+          public_access {
+            type = "SERVICE_PROVIDED_EIPS"
+          }
+        }
+      }
+    }
+  pass: |
+    resource "aws_msk_cluster" "good" {
+      broker_node_group_info {
+        connectivity_info {
+          public_access {
+            type = "GOOD"
+          }
+        }
+      }
+    }

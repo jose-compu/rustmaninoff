@@ -1,0 +1,23 @@
+metadata:
+  id: CKV_AWS_353
+  name: Ensure that RDS instances have performance insights enabled
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_353. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_rds_cluster_instance
+- aws_db_instance
+definition:
+  cond_type: attribute
+  attribute: performance_insights_enabled
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_rds_cluster_instance" "bad" {
+      performance_insights_enabled = false
+    }
+  pass: |
+    resource "aws_rds_cluster_instance" "good" {
+      performance_insights_enabled = true
+    }

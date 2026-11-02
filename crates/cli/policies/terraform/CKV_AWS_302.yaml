@@ -1,0 +1,27 @@
+metadata:
+  id: CKV_AWS_302
+  name: Ensure DB Snapshots are not Public
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_302. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_db_snapshot
+definition:
+  or:
+  - cond_type: attribute
+    attribute: shared_accounts
+    operator: not_exists
+  - cond_type: attribute
+    attribute: shared_accounts
+    operator: not_equals
+    value: "all"
+fixtures:
+  fail: |
+    resource "aws_db_snapshot" "bad" {
+      shared_accounts = "all"
+    }
+  pass: |
+    resource "aws_db_snapshot" "good" {
+      shared_accounts = "GOOD"
+    }

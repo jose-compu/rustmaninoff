@@ -1,0 +1,26 @@
+metadata:
+  id: CKV_AWS_220
+  name: Ensure that CloudSearch is using https
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_220. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_cloudsearch_domain
+definition:
+  cond_type: attribute
+  attribute: endpoint_options.enforce_https
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_cloudsearch_domain" "bad" {
+      endpoint_options {
+        enforce_https = false
+      }
+    }
+  pass: |
+    resource "aws_cloudsearch_domain" "good" {
+      endpoint_options {
+        enforce_https = true
+      }
+    }

@@ -1,0 +1,21 @@
+metadata:
+  id: CKV_AWS_268
+  name: CKV_AWS_268
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_268. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_comprehend_entity_recognizer
+definition:
+  cond_type: attribute
+  attribute: volume_kms_key_id
+  operator: exists
+fixtures:
+  fail: |
+    resource "aws_comprehend_entity_recognizer" "bad" {
+    }
+  pass: |
+    resource "aws_comprehend_entity_recognizer" "good" {
+      volume_kms_key_id = "arn:aws:kms:us-east-1:123456789012:key/abcd"
+    }

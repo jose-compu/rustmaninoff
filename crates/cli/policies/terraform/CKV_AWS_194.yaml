@@ -1,0 +1,29 @@
+metadata:
+  id: CKV_AWS_194
+  name: Ensure AppSync has Field-Level logs enabled
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_194. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_appsync_graphql_api
+definition:
+  cond_type: attribute
+  attribute: log_config.field_log_level
+  operator: within
+  value:
+  - ALL
+  - ERROR
+fixtures:
+  fail: |
+    resource "aws_appsync_graphql_api" "bad" {
+      log_config {
+        field_log_level = "NONE"
+      }
+    }
+  pass: |
+    resource "aws_appsync_graphql_api" "good" {
+      log_config {
+        field_log_level = "ERROR"
+      }
+    }

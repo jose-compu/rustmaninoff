@@ -1,0 +1,21 @@
+metadata:
+  id: CKV_AWS_278
+  name: Ensure MemoryDB snapshot is encrypted by KMS using a customer managed Key (CMK)
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_278. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_memorydb_snapshot
+definition:
+  cond_type: attribute
+  attribute: kms_key_arn
+  operator: exists
+fixtures:
+  fail: |
+    resource "aws_memorydb_snapshot" "bad" {
+    }
+  pass: |
+    resource "aws_memorydb_snapshot" "good" {
+      kms_key_arn = "arn:aws:kms:us-east-1:123456789012:key/abcd"
+    }

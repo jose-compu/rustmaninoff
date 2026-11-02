@@ -1,0 +1,52 @@
+metadata:
+  id: CKV_K8S_90
+  name: Ensure that the --profiling argument is set to false
+  category: KUBERNETES
+  severity: HIGH
+  framework: kubernetes
+  guidelines: Adapted from Checkov CKV_K8S_90. https://github.com/bridgecrewio/checkov
+resource_types:
+- Pod
+- Deployment
+- StatefulSet
+- DaemonSet
+- Job
+- CronJob
+- ReplicaSet
+definition:
+  or:
+  - cond_type: attribute
+    attribute: _containers.command
+    operator: not_contains
+    value: "kube-apiserver"
+  - cond_type: attribute
+    attribute: _containers.command
+    operator: contains
+    value: "--profiling=false"
+fixtures:
+  fail: |
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: app
+      namespace: kube-system
+    spec:
+      containers:
+        - name: app
+          image: k8s.gcr.io/kube-apiserver:v1.28.0
+          command:
+            - "kube-apiserver"
+            - "extra"
+  pass: |
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: app
+      namespace: kube-system
+    spec:
+      containers:
+        - name: app
+          image: k8s.gcr.io/kube-apiserver:v1.28.0
+          command:
+            - "kube-apiserver"
+            - "--profiling=false"
