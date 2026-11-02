@@ -194,6 +194,8 @@ repos:
     rev: v0.3.0
     hooks:
       - id: rustmaninoff
+```
+
 ### GitHub Action
 
 Composite action at the repo root (`action.yml`). Downloads a release binary and scans:
