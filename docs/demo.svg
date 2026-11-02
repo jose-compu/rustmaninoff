@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="220" viewBox="0 0 720 220" role="img" aria-label="Terminal demo: rustmaninoff finds CKV_AWS_3 on an unencrypted EBS volume">
+  <rect width="720" height="220" rx="10" fill="#0b0b0d"/>
+  <rect x="1" y="1" width="718" height="218" rx="9" fill="none" stroke="#2a2a30"/>
+  <circle cx="22" cy="22" r="6" fill="#ff5f56"/>
+  <circle cx="42" cy="22" r="6" fill="#ffbd2e"/>
+  <circle cx="62" cy="22" r="6" fill="#27c93f"/>
+  <text x="90" y="27" fill="#8b8b96" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12">rustmaninoff scan</text>
+  <text x="20" y="58" fill="#7ee787" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">$ cargo install rustmaninoff</text>
+  <text x="20" y="84" fill="#7ee787" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">$ rustmaninoff scan . --check CKV_AWS_3 --compact</text>
+  <text x="20" y="118" fill="#c9d1d9" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">Passed checks: 0, Failed checks: 1, Skipped checks: 0, Unknown checks: 0, Parse errors: 0</text>
+  <text x="20" y="144" fill="#ff7b72" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">FAILED HIGH CKV_AWS_3 ./main.tf:1 aws_ebs_volume.bad</text>
+  <text x="20" y="178" fill="#8b8b96" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">exit 1  ·  Checkov-compatible CKV id  ·  no Python</text>
+  <text x="20" y="202" fill="#58a6ff" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12"># ~225× faster than Checkov on a 1,540-resource synthetic corpus (self-reported)</text>
+</svg>
