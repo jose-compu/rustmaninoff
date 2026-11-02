@@ -1,0 +1,25 @@
+metadata:
+  id: CKV_AWS_304
+  name: Ensure Secrets Manager secrets should be rotated within 90 days
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_304. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_secretsmanager_secret_rotation
+definition:
+  cond_type: attribute
+  attribute: rotation_rules.automatically_after_days
+  operator: less_than_or_equal
+  value: 90
+fixtures:
+  fail: |
+    resource "aws_secretsmanager_secret_rotation" "bad" {
+      secret_id = "x"
+      rotation_rules { automatically_after_days = 180 }
+    }
+  pass: |
+    resource "aws_secretsmanager_secret_rotation" "good" {
+      secret_id = "x"
+      rotation_rules { automatically_after_days = 30 }
+    }

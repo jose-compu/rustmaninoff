@@ -1,0 +1,50 @@
+metadata:
+  id: CKV_AWS_99
+  name: Ensure Glue Security Configuration Encryption is enabled
+  category: ENCRYPTION
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_99. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_glue_security_configuration
+definition:
+  and:
+  - cond_type: attribute
+    attribute: encryption_configuration.cloudwatch_encryption.cloudwatch_encryption_mode
+    operator: equals
+    value: SSE-KMS
+  - cond_type: attribute
+    attribute: encryption_configuration.cloudwatch_encryption.kms_key_arn
+    operator: exists
+  - cond_type: attribute
+    attribute: encryption_configuration.job_bookmarks_encryption.job_bookmarks_encryption_mode
+    operator: equals
+    value: CSE-KMS
+  - cond_type: attribute
+    attribute: encryption_configuration.s3_encryption.s3_encryption_mode
+    operator: equals
+    value: SSE-KMS
+fixtures:
+  fail: |
+    resource "aws_glue_security_configuration" "bad" {
+      name = "bad"
+      encryption_configuration {}
+    }
+  pass: |
+    resource "aws_glue_security_configuration" "good" {
+      name = "good"
+      encryption_configuration {
+        cloudwatch_encryption {
+          cloudwatch_encryption_mode = "SSE-KMS"
+          kms_key_arn                = "arn:aws:kms:us-east-1:123:key/abc"
+        }
+        job_bookmarks_encryption {
+          job_bookmarks_encryption_mode = "CSE-KMS"
+          kms_key_arn                   = "arn:aws:kms:us-east-1:123:key/abc"
+        }
+        s3_encryption {
+          s3_encryption_mode = "SSE-KMS"
+          kms_key_arn        = "arn:aws:kms:us-east-1:123:key/abc"
+        }
+      }
+    }

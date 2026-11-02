@@ -1,0 +1,26 @@
+metadata:
+  id: CKV_AWS_233
+  name: Ensure Create before destroy for ACM certificates
+  category: BACKUP_AND_RECOVERY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_233. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_acm_certificate
+definition:
+  cond_type: attribute
+  attribute: lifecycle.create_before_destroy
+  operator: equals
+  value: true
+fixtures:
+  fail: |
+    resource "aws_acm_certificate" "bad" {
+      domain_name = "example.com"
+    }
+  pass: |
+    resource "aws_acm_certificate" "good" {
+      domain_name = "example.com"
+      lifecycle {
+        create_before_destroy = true
+      }
+    }

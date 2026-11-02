@@ -1,0 +1,39 @@
+metadata:
+  id: CKV_AWS_334
+  name: Ensure ECS containers should run as non-privileged
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_334. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_ecs_task_definition
+definition:
+  cond_type: no_element
+  attribute: container_definitions
+  where:
+    cond_type: attribute
+    attribute: privilege
+    operator: equals
+    value: true
+fixtures:
+  fail: |
+    resource "aws_ecs_task_definition" "bad" {
+      family = "app"
+      container_definitions = [
+        {
+          name      = "app"
+          image     = "app:1"
+          privilege = true
+        }
+      ]
+    }
+  pass: |
+    resource "aws_ecs_task_definition" "good" {
+      family = "app"
+      container_definitions = [
+        {
+          name  = "app"
+          image = "app:1"
+        }
+      ]
+    }

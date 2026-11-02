@@ -1,0 +1,40 @@
+metadata:
+  id: CKV_AWS_94
+  name: Ensure Glue Data Catalog Encryption is enabled
+  category: ENCRYPTION
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_94. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_glue_data_catalog_encryption_settings
+definition:
+  and:
+  - cond_type: attribute
+    attribute: data_catalog_encryption_settings.encryption_at_rest.catalog_encryption_mode
+    operator: equals
+    value: SSE-KMS
+  - cond_type: attribute
+    attribute: data_catalog_encryption_settings.encryption_at_rest.sse_aws_kms_key_id
+    operator: exists
+  - cond_type: attribute
+    attribute: data_catalog_encryption_settings.connection_password_encryption.return_connection_password_encrypted
+    operator: equals
+    value: true
+fixtures:
+  fail: |
+    resource "aws_glue_data_catalog_encryption_settings" "bad" {
+      data_catalog_encryption_settings {}
+    }
+  pass: |
+    resource "aws_glue_data_catalog_encryption_settings" "good" {
+      data_catalog_encryption_settings {
+        encryption_at_rest {
+          catalog_encryption_mode = "SSE-KMS"
+          sse_aws_kms_key_id      = "arn:aws:kms:us-east-1:123:key/abc"
+        }
+        connection_password_encryption {
+          return_connection_password_encrypted = true
+          aws_kms_key_id                       = "arn:aws:kms:us-east-1:123:key/abc"
+        }
+      }
+    }

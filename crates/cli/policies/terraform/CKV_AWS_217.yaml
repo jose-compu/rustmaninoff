@@ -1,0 +1,28 @@
+metadata:
+  id: CKV_AWS_217
+  name: Ensure Create before destroy for API deployments
+  category: BACKUP_AND_RECOVERY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_217. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_api_gateway_deployment
+definition:
+  cond_type: attribute
+  attribute: lifecycle.create_before_destroy
+  operator: equals
+  value: true
+fixtures:
+  fail: |
+    resource "aws_api_gateway_deployment" "bad" {
+      rest_api_id = "api"
+      stage_name  = "prod"
+    }
+  pass: |
+    resource "aws_api_gateway_deployment" "good" {
+      rest_api_id = "api"
+      stage_name  = "prod"
+      lifecycle {
+        create_before_destroy = true
+      }
+    }

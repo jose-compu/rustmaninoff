@@ -1,0 +1,33 @@
+metadata:
+  id: CKV_AWS_257
+  name: Ensure CodeCommit branch changes have at least 2 approvals
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_257. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_codecommit_approval_rule_template
+definition:
+  cond_type: attribute
+  attribute: content.Statements.NumberOfApprovalsNeeded
+  operator: greater_than_or_equal
+  value: 2
+fixtures:
+  fail: |
+    resource "aws_codecommit_approval_rule_template" "bad" {
+      name = "bad"
+      content = {
+        Statements = [{
+          NumberOfApprovalsNeeded = 1
+        }]
+      }
+    }
+  pass: |
+    resource "aws_codecommit_approval_rule_template" "good" {
+      name = "good"
+      content = {
+        Statements = [{
+          NumberOfApprovalsNeeded = 2
+        }]
+      }
+    }

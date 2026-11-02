@@ -1,0 +1,41 @@
+metadata:
+  id: CKV_AWS_253
+  name: Ensure DLM cross region events are encrypted
+  category: ENCRYPTION
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_253. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_dlm_lifecycle_policy
+definition:
+  cond_type: attribute
+  attribute: policy_details.action.cross_region_copy.encryption_configuration.encryption
+  operator: equals
+  value: true
+fixtures:
+  fail: |
+    resource "aws_dlm_lifecycle_policy" "bad" {
+      description = "bad"
+      policy_details {
+        action {
+          cross_region_copy {
+            encryption_configuration {
+              encryption = false
+            }
+          }
+        }
+      }
+    }
+  pass: |
+    resource "aws_dlm_lifecycle_policy" "good" {
+      description = "good"
+      policy_details {
+        action {
+          cross_region_copy {
+            encryption_configuration {
+              encryption = true
+            }
+          }
+        }
+      }
+    }
