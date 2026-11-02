@@ -13,8 +13,8 @@ fn builtin_pack_covers_at_least_160_policies_with_fixtures() {
     let policies = builtin_policies().expect("embedded policies");
     println!("builtin policies: {}", policies.len());
     assert!(
-        policies.len() >= 185,
-        "expected at least 185 builtin policies, found {}",
+        policies.len() >= 188,
+        "expected at least 188 builtin policies, found {}",
         policies.len()
     );
     for policy in &policies {

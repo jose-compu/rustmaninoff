@@ -1,0 +1,27 @@
+metadata:
+  id: CKV_DOCKER_10
+  name: Ensure that WORKDIR values are absolute paths
+  category: CONVENTION
+  severity: MEDIUM
+  framework: docker
+  guidelines: Adapted from Checkov CKV_DOCKER_10. https://github.com/bridgecrewio/checkov
+resource_types:
+- dockerfile
+definition:
+  or:
+  - cond_type: attribute
+    attribute: WORKDIR
+    operator: not_exists
+  - cond_type: attribute
+    attribute: WORKDIR
+    operator: regex_match
+    value: '^"?(/|\$|[A-Za-z]:\\)'
+fixtures:
+  fail: |
+    FROM nginx:1.27
+    WORKDIR app
+    USER app
+  pass: |
+    FROM nginx:1.27
+    WORKDIR /app
+    USER app
