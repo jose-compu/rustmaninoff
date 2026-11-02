@@ -143,10 +143,13 @@ pub fn scan(request: &ScanRequest) -> anyhow::Result<ScanResult> {
         .collect();
     let mut resources = Vec::new();
     let mut diagnostics = Vec::new();
+    let mut edges = Vec::new();
     for output in parsed {
         resources.extend(output.resources);
         diagnostics.extend(output.diagnostics);
+        edges.extend(output.edges);
     }
+    let _edges = edges;
     let policies = select_policies(request)?;
     let findings = evaluate(&resources, policies.as_ref());
     let failing = findings.iter().any(|finding| {
