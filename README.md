@@ -194,6 +194,22 @@ repos:
     rev: v0.3.0
     hooks:
       - id: rustmaninoff
+### GitHub Action
+
+Composite action at the repo root (`action.yml`). Downloads a release binary and scans:
+
+```yaml
+- uses: actions/checkout@v4
+- uses: jose-compu/rustmaninoff@v0.3.0
+  with:
+    path: .
+    fail-on: HIGH
+    output: sarif
+    sarif-file: rustmaninoff.sarif
+- uses: github/codeql-action/upload-sarif@v3
+  if: always()
+  with:
+    sarif_file: rustmaninoff.sarif
 ```
 
 ## Release
@@ -203,12 +219,6 @@ Pushing the tag `v0.3.0` runs `.github/workflows/release.yml`. It publishes Linu
 ```sh
 git tag v0.3.0
 git push origin v0.3.0
-```
-
-```yaml
-- uses: actions/checkout@v4
-- run: cargo install --path crates/cli --locked
-- run: rustmaninoff scan . --fail-on HIGH --output sarif --sarif-file rustmaninoff.sarif
 ```
 
 ## License

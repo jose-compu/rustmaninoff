@@ -1,0 +1,91 @@
+name: Rustmaninoff
+description: Scan IaC with rustmaninoff (Checkov-compatible CKV policies, single Rust binary)
+author: jose-compu
+branding:
+  icon: shield
+  color: orange
+
+inputs:
+  path:
+    description: Path to scan
+    required: false
+    default: "."
+  version:
+    description: rustmaninoff release version (without leading v), or "latest"
+    required: false
+    default: "0.3.0"
+  fail-on:
+    description: Minimum severity that fails the job (LOW, MEDIUM, HIGH, CRITICAL)
+    required: false
+    default: "HIGH"
+  output:
+    description: Comma-separated outputs (cli, json, sarif, junit)
+    required: false
+    default: "sarif"
+  sarif-file:
+    description: SARIF output path when sarif is requested
+    required: false
+    default: "rustmaninoff.sarif"
+  args:
+    description: Extra CLI arguments appended to `rustmaninoff scan`
+    required: false
+    default: ""
+  github-token:
+    description: Token for downloading the release binary (defaults to github.token)
+    required: false
+    default: ${{ github.token }}
+
+outputs:
+  sarif-file:
+    description: Path to the SARIF file when sarif is requested
+    value: ${{ inputs.sarif-file }}
+
+runs:
+  using: composite
+  steps:
+    - name: Install rustmaninoff
+      shell: bash
+      env:
+        VERSION: ${{ inputs.version }}
+        GH_TOKEN: ${{ inputs.github-token }}
+      run: |
+        set -euo pipefail
+        os="$(uname -s)"
+        arch="$(uname -m)"
+        case "$arch" in
+          x86_64|amd64) arch=x86_64 ;;
+          aarch64|arm64) arch=aarch64 ;;
+          *) echo "unsupported arch: $arch" >&2; exit 1 ;;
+        esac
+        case "$os" in
+          Linux) target="${arch}-unknown-linux-gnu" ;;
+          Darwin) target="${arch}-apple-darwin" ;;
+          *) echo "unsupported OS: $os" >&2; exit 1 ;;
+        esac
+
+        if [ "$VERSION" = "latest" ]; then
+          api="https://api.github.com/repos/jose-compu/rustmaninoff/releases/latest"
+          tag="$(curl -fsSL -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" "$api" | sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p' | head -1)"
+        else
+          tag="v${VERSION#v}"
+        fi
+        asset="rustmaninoff-${target}.tar.gz"
+        url="https://github.com/jose-compu/rustmaninoff/releases/download/${tag}/${asset}"
+        echo "Downloading ${url}"
+        tmp="$(mktemp -d)"
+        curl -fsSL -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/octet-stream" -o "$tmp/$asset" "$url"
+        tar -xzf "$tmp/$asset" -C "$tmp"
+        install -m 0755 "$tmp/rustmaninoff" "$RUNNER_TEMP/rustmaninoff"
+        echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
+        "$RUNNER_TEMP/rustmaninoff" --version
+
+    - name: Scan
+      shell: bash
+      run: |
+        set -euo pipefail
+        cmd=(rustmaninoff scan "${{ inputs.path }}" --fail-on "${{ inputs.fail-on }}" --output "${{ inputs.output }}")
+        case ",${{ inputs.output }}," in
+          *,sarif,*) cmd+=(--sarif-file "${{ inputs.sarif-file }}") ;;
+        esac
+        # shellcheck disable=SC2086
+        "${cmd[@]}" ${{ inputs.args }}
