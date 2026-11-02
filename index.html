@@ -115,17 +115,17 @@
   <div class="wrap">
     <section class="hero">
       <img class="hero-banner" src="img/banner.jpg" alt="Rustmaninoff, IaC security scanner">
-      <p class="kicker">v0.2.0 · Apache-2.0</p>
-      <h1>Attribute scanning for IaC, without the Python tax.</h1>
-      <p class="lede">Terraform, CloudFormation, Kubernetes, and Dockerfiles. Checkov-compatible YAML and CKV ids, in a Rust engine—not a Python port of Checkov, and not a full Trivy stack. Built for CI gates that have to finish in milliseconds.</p>
+      <p class="kicker">v0.3.0 · Apache-2.0</p>
+      <p class="badges" style="margin:0.6rem 0 0.8rem;display:flex;gap:0.4rem;flex-wrap:wrap;justify-content:center"><a href="https://crates.io/crates/rustmaninoff"><img src="https://img.shields.io/crates/v/rustmaninoff.svg" alt="crates.io"></a><a href="https://github.com/jose-compu/rustmaninoff/actions/workflows/ci.yml"><img src="https://github.com/jose-compu/rustmaninoff/actions/workflows/ci.yml/badge.svg" alt="CI"></a><a href="https://github.com/jose-compu/rustmaninoff/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="License"></a></p><h1>Checkov-compatible CKV policies. Single Rust binary. No Python.</h1>
+      <p class="lede">Compared to Checkov: same published CKV ids and skip comments, without the Python runtime — about 225× faster on a published synthetic corpus (self-reported). 185 checks including first-wave graph CKV2. Terraform, CloudFormation, Kubernetes, and Dockerfiles.</p><p style="text-align:center;margin:1rem 0"><img src="img/demo.svg" alt="Terminal demo: rustmaninoff fails CKV_AWS_3" width="720" style="max-width:100%;border-radius:10px"></p>
       <div class="cta-row">
         <a class="btn btn-primary" href="documentation.html">Read the docs</a>
-        <a class="btn btn-ghost" href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.2.0">GitHub release</a>
+        <a class="btn btn-ghost" href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.3.0">GitHub release</a>
         <a class="btn btn-ghost" href="https://crates.io/crates/rustmaninoff">Install from crates.io</a>
       </div>
       <div class="stats">
         <div class="stat"><b>20 ms</b><span>full synthetic corpus</span></div>
-        <div class="stat"><b>181</b><span>built-in checks</span></div>
+        <div class="stat"><b>185</b><span>built-in checks</span></div>
         <div class="stat"><b>4</b><span>frameworks</span></div>
         <div class="stat"><b>~225×</b><span>faster than Checkov on that corpus</span></div>
       </div>
@@ -155,8 +155,8 @@
           </thead>
           <tbody>
             <tr><td>Runtime</td><td>One Rust binary</td><td>Python + plugins</td><td>Go binary + DBs</td></tr>
-            <tr><td>IaC attribute checks</td><td>181 CKV-style</td><td>Large built-in pack</td><td>Misconfig policies</td></tr>
-            <tr><td>Graph / CKV2</td><td>No</td><td>Yes</td><td>Some</td></tr>
+            <tr><td>IaC attribute checks</td><td>185 CKV-style</td><td>Large built-in pack</td><td>Misconfig policies</td></tr>
+            <tr><td>Graph / CKV2</td><td>First-wave AWS</td><td>Yes</td><td>Some</td></tr>
             <tr><td>Helm / Kustomize / plan JSON</td><td>No</td><td>Yes</td><td>Yes</td></tr>
             <tr><td>Secrets / vulns / SBOM</td><td>No</td><td>Secrets (Checkov)</td><td>Yes</td></tr>
             <tr><td>Skip comments</td><td>Checkov-compatible</td><td>Native</td><td>Different</td></tr>
