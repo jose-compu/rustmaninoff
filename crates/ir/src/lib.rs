@@ -533,6 +533,18 @@ impl EdgeKind {
             Self::Mount => "mount",
         }
     }
+
+    pub fn parse(text: &str) -> Option<Self> {
+        match text.trim().to_ascii_lowercase().as_str() {
+            "references" | "reference" => Some(Self::References),
+            "depends_on" | "dependson" => Some(Self::DependsOn),
+            "ref" => Some(Self::Ref),
+            "get_att" | "getatt" => Some(Self::GetAtt),
+            "owner" | "owner_reference" | "ownerreferences" => Some(Self::Owner),
+            "mount" => Some(Self::Mount),
+            _ => None,
+        }
+    }
 }
 
 impl std::fmt::Display for EdgeKind {

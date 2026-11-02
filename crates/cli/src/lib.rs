@@ -7,7 +7,9 @@ use std::sync::OnceLock;
 use clap::Parser;
 use include_dir::{include_dir, Dir};
 use rayon::prelude::*;
-use rustmaninoff_engine::{evaluate, load_policy_dir, Policy, PolicyError, Severity};
+use rustmaninoff_engine::{
+    evaluate, evaluate_graph, load_policy_dir, Policy, PolicyError, Severity,
+};
 use rustmaninoff_ir::{
     input_limit, Diagnostic, Framework, ParseOutput, MAX_POLICY_BYTES, MAX_SOURCE_BYTES,
 };
@@ -149,9 +151,9 @@ pub fn scan(request: &ScanRequest) -> anyhow::Result<ScanResult> {
         diagnostics.extend(output.diagnostics);
         edges.extend(output.edges);
     }
-    let _edges = edges;
     let policies = select_policies(request)?;
-    let findings = evaluate(&resources, policies.as_ref());
+    let mut findings = evaluate(&resources, policies.as_ref());
+    findings.extend(evaluate_graph(&resources, &edges, policies.as_ref()));
     let failing = findings.iter().any(|finding| {
         finding.status == rustmaninoff_engine::Status::Failed && finding.severity >= request.fail_on
     });
