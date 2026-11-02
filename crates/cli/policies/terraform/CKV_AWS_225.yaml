@@ -1,0 +1,26 @@
+metadata:
+  id: CKV_AWS_225
+  name: Ensure API Gateway method setting caching is enabled
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_225. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_api_gateway_method_settings
+definition:
+  cond_type: attribute
+  attribute: settings.caching_enabled
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_api_gateway_method_settings" "bad" {
+      settings {
+        caching_enabled = false
+      }
+    }
+  pass: |
+    resource "aws_api_gateway_method_settings" "good" {
+      settings {
+        caching_enabled = true
+      }
+    }

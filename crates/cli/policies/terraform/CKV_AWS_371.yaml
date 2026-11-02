@@ -1,0 +1,27 @@
+metadata:
+  id: CKV_AWS_371
+  name: Ensure Amazon SageMaker Notebook Instance only allows for IMDSv2
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_371. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_sagemaker_notebook_instance
+definition:
+  cond_type: attribute
+  attribute: instance_metadata_service_configuration.minimum_instance_metadata_service_version
+  operator: equals
+  value: "2"
+fixtures:
+  fail: |
+    resource "aws_sagemaker_notebook_instance" "bad" {
+      instance_metadata_service_configuration {
+        minimum_instance_metadata_service_version = "BAD"
+      }
+    }
+  pass: |
+    resource "aws_sagemaker_notebook_instance" "good" {
+      instance_metadata_service_configuration {
+        minimum_instance_metadata_service_version = "2"
+      }
+    }

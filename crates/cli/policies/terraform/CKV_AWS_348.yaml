@@ -1,0 +1,27 @@
+metadata:
+  id: CKV_AWS_348
+  name: Ensure IAM root user does not have Access keys
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_348. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_iam_access_key
+definition:
+  or:
+  - cond_type: attribute
+    attribute: user
+    operator: not_exists
+  - cond_type: attribute
+    attribute: user
+    operator: not_equals
+    value: "root"
+fixtures:
+  fail: |
+    resource "aws_iam_access_key" "bad" {
+      user = "root"
+    }
+  pass: |
+    resource "aws_iam_access_key" "good" {
+      user = "GOOD"
+    }

@@ -1,0 +1,22 @@
+metadata:
+  id: CKV_AWS_344
+  name: Ensure that Network firewalls have deletion protection enabled
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_344. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_networkfirewall_firewall
+definition:
+  cond_type: attribute
+  attribute: delete_protection
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_networkfirewall_firewall" "bad" {
+      delete_protection = false
+    }
+  pass: |
+    resource "aws_networkfirewall_firewall" "good" {
+      delete_protection = true
+    }

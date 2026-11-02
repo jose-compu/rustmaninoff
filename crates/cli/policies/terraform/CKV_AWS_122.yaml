@@ -1,0 +1,27 @@
+metadata:
+  id: CKV_AWS_122
+  name: Ensure that direct internet access is disabled for an Amazon SageMaker Notebook Instance
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_122. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_sagemaker_notebook_instance
+definition:
+  or:
+  - cond_type: attribute
+    attribute: direct_internet_access
+    operator: not_exists
+  - cond_type: attribute
+    attribute: direct_internet_access
+    operator: equals
+    value: "Disabled"
+fixtures:
+  fail: |
+    resource "aws_sagemaker_notebook_instance" "bad" {
+      direct_internet_access = "Enabled"
+    }
+  pass: |
+    resource "aws_sagemaker_notebook_instance" "good" {
+      direct_internet_access = "Disabled"
+    }

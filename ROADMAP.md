@@ -1,6 +1,6 @@
 # Rustmaninoff roadmap
 
-**Now:** v0.3.0 — attribute + graph scanner (225 checks), Terraform vars/locals/`--var-file`, OpenTofu `.tofu`.
+**Now:** v0.3.0 — attribute + graph scanner (288 checks), Terraform vars/locals/`--var-file`, OpenTofu `.tofu`.
 
 **Position:** complementary — *run it next to Trivy, in place of Checkov*. Teams already use Trivy for CVEs. Rustmaninoff’s claim is narrow and provable: **Checkov-compatible CKV policies, single Rust binary, fast**. Broad “scanner platform” scope dilutes that. Do not take on CVE / image layer / vuln-DB work.
 

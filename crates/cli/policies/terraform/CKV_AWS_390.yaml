@@ -1,0 +1,22 @@
+metadata:
+  id: CKV_AWS_390
+  name: Ensure AWS EMR block public access setting is enabled
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_390. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_emr_block_public_access_configuration
+definition:
+  cond_type: attribute
+  attribute: block_public_security_group_rules
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_emr_block_public_access_configuration" "bad" {
+      block_public_security_group_rules = false
+    }
+  pass: |
+    resource "aws_emr_block_public_access_configuration" "good" {
+      block_public_security_group_rules = true
+    }

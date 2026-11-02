@@ -1,0 +1,21 @@
+metadata:
+  id: CKV_AWS_305
+  name: Ensure CloudFront distribution has a default root object configured
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_305. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_cloudfront_distribution
+definition:
+  cond_type: attribute
+  attribute: default_root_object
+  operator: exists
+fixtures:
+  fail: |
+    resource "aws_cloudfront_distribution" "bad" {
+    }
+  pass: |
+    resource "aws_cloudfront_distribution" "good" {
+      default_root_object = "enabled-value"
+    }

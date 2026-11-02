@@ -1,0 +1,22 @@
+metadata:
+  id: CKV_AWS_207
+  name: Ensure MQ Broker minor version updates are enabled
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_207. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_mq_broker
+definition:
+  cond_type: attribute
+  attribute: auto_minor_version_upgrade
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_mq_broker" "bad" {
+      auto_minor_version_upgrade = false
+    }
+  pass: |
+    resource "aws_mq_broker" "good" {
+      auto_minor_version_upgrade = true
+    }

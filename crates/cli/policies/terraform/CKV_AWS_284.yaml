@@ -1,0 +1,26 @@
+metadata:
+  id: CKV_AWS_284
+  name: Ensure State Machine has X-Ray tracing enabled
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_284. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_sfn_state_machine
+definition:
+  cond_type: attribute
+  attribute: tracing_configuration.enabled
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_sfn_state_machine" "bad" {
+      tracing_configuration {
+        enabled = false
+      }
+    }
+  pass: |
+    resource "aws_sfn_state_machine" "good" {
+      tracing_configuration {
+        enabled = true
+      }
+    }

@@ -1,0 +1,30 @@
+metadata:
+  id: CKV_AWS_276
+  name: Ensure Data Trace is not enabled in API Gateway Method Settings
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_276. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_api_gateway_method_settings
+definition:
+  or:
+  - cond_type: attribute
+    attribute: settings.data_trace_enabled
+    operator: not_exists
+  - cond_type: attribute
+    attribute: settings.data_trace_enabled
+    operator: is_false
+fixtures:
+  fail: |
+    resource "aws_api_gateway_method_settings" "bad" {
+      settings {
+        data_trace_enabled = true
+      }
+    }
+  pass: |
+    resource "aws_api_gateway_method_settings" "good" {
+      settings {
+        data_trace_enabled = false
+      }
+    }

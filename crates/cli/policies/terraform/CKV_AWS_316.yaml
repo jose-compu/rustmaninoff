@@ -1,0 +1,30 @@
+metadata:
+  id: CKV_AWS_316
+  name: Ensure CodeBuild project environments do not have privileged mode enabled
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_316. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_codebuild_project
+definition:
+  or:
+  - cond_type: attribute
+    attribute: environment.privileged_mode
+    operator: not_exists
+  - cond_type: attribute
+    attribute: environment.privileged_mode
+    operator: is_false
+fixtures:
+  fail: |
+    resource "aws_codebuild_project" "bad" {
+      environment {
+        privileged_mode = true
+      }
+    }
+  pass: |
+    resource "aws_codebuild_project" "good" {
+      environment {
+        privileged_mode = false
+      }
+    }

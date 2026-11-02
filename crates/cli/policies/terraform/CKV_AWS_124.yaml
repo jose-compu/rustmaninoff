@@ -1,0 +1,21 @@
+metadata:
+  id: CKV_AWS_124
+  name: Ensure that CloudFormation stacks are sending event notifications to an SNS topic
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_124. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_cloudformation_stack
+definition:
+  cond_type: attribute
+  attribute: notification_arns
+  operator: exists
+fixtures:
+  fail: |
+    resource "aws_cloudformation_stack" "bad" {
+    }
+  pass: |
+    resource "aws_cloudformation_stack" "good" {
+      notification_arns = "arn:aws:kms:us-east-1:123456789012:key/abcd"
+    }

@@ -1,0 +1,22 @@
+metadata:
+  id: CKV_AWS_309
+  name: Ensure API GatewayV2 routes specify an authorization type
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_309. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_apigatewayv2_route
+definition:
+  cond_type: attribute
+  attribute: authorization_type
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_apigatewayv2_route" "bad" {
+      authorization_type = false
+    }
+  pass: |
+    resource "aws_apigatewayv2_route" "good" {
+      authorization_type = true
+    }

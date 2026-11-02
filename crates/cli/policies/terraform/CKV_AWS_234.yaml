@@ -1,0 +1,30 @@
+metadata:
+  id: CKV_AWS_234
+  name: Verify logging preference for ACM certificates
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_234. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_acm_certificate
+definition:
+  or:
+  - cond_type: attribute
+    attribute: options.certificate_transparency_logging_preference
+    operator: not_exists
+  - cond_type: attribute
+    attribute: options.certificate_transparency_logging_preference
+    operator: is_true
+fixtures:
+  fail: |
+    resource "aws_acm_certificate" "bad" {
+      options {
+        certificate_transparency_logging_preference = false
+      }
+    }
+  pass: |
+    resource "aws_acm_certificate" "good" {
+      options {
+        certificate_transparency_logging_preference = true
+      }
+    }
