@@ -1,0 +1,29 @@
+metadata:
+  id: CKV_AWS_75
+  name: Ensure Global Accelerator accelerator has flow logs enabled
+  category: LOGGING
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_75. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_globalaccelerator_accelerator
+definition:
+  cond_type: attribute
+  attribute: attributes.flow_logs_enabled
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_globalaccelerator_accelerator" "bad" {
+      name            = "ga"
+      ip_address_type = "IPV4"
+    }
+  pass: |
+    resource "aws_globalaccelerator_accelerator" "good" {
+      name            = "ga"
+      ip_address_type = "IPV4"
+      attributes {
+        flow_logs_enabled   = true
+        flow_logs_s3_bucket = "logs"
+        flow_logs_s3_prefix = "ga"
+      }
+    }

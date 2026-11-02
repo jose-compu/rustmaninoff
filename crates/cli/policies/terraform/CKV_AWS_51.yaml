@@ -1,0 +1,25 @@
+metadata:
+  id: CKV_AWS_51
+  name: Ensure ECR Image Tags are immutable
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_51. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_ecr_repository
+definition:
+  cond_type: attribute
+  attribute: image_tag_mutability
+  operator: equals
+  value: IMMUTABLE
+fixtures:
+  fail: |
+    resource "aws_ecr_repository" "bad" {
+      name                 = "app"
+      image_tag_mutability = "MUTABLE"
+    }
+  pass: |
+    resource "aws_ecr_repository" "good" {
+      name                 = "app"
+      image_tag_mutability = "IMMUTABLE"
+    }
