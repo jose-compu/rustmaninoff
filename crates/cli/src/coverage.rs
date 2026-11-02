@@ -100,7 +100,7 @@ fn scan_paths_frameworks_and_outputs() {
     let clean = dir("clean");
     fs::write(
         clean.join("main.tf"),
-        "resource \"aws_ebs_volume\" \"disk\" {\n  encrypted = true\n}\n",
+        "resource \"aws_ebs_volume\" \"disk\" {\n  encrypted  = true\n  kms_key_id = \"arn:aws:kms:us-east-1:123456789012:key/abcd\"\n}\n",
     )
     .unwrap();
     assert_eq!(
@@ -287,7 +287,7 @@ fn write_failure_is_reported() {
     let root = dir("write");
     fs::write(
         root.join("main.tf"),
-        "resource \"aws_ebs_volume\" \"disk\" { encrypted = true }\n",
+        "resource \"aws_ebs_volume\" \"disk\" {\n  encrypted  = true\n  kms_key_id = \"arn:aws:kms:us-east-1:123456789012:key/abcd\"\n}\n",
     )
     .unwrap();
     let err = run(&[
