@@ -1,7 +1,7 @@
 {
   "machine": "local runner (see scripts/bench.sh)",
   "date": "2026-11-02",
-  "rustmaninoff": "0.4.0-dev release binary",
+  "rustmaninoff": "0.4.0 release binary",
   "catalog_checks": 536,
   "corpus": {
     "terraform_files": 40,

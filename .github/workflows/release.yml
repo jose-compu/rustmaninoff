@@ -68,3 +68,12 @@ jobs:
         with:
           files: dist/*
           generate_release_notes: true
+      # GITHUB_TOKEN releases do not trigger other workflows; dispatch explicitly.
+      - name: Bump Homebrew formula
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          gh workflow run homebrew-bump.yml \
+            --repo "${{ github.repository }}" \
+            -f "tag=${{ github.ref_name }}"

@@ -13,7 +13,7 @@ inputs:
   version:
     description: rustmaninoff release version (without leading v), or "latest"
     required: false
-    default: "0.3.0"
+    default: "0.4.0"
   fail-on:
     description: Minimum severity that fails the job (LOW, MEDIUM, HIGH, CRITICAL)
     required: false

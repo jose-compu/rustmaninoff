@@ -110,7 +110,7 @@ Checkov and Trivy both template Helm and scan plan/rendered surfaces. This relea
 | Pre-commit hook | [#30](https://github.com/jose-compu/rustmaninoff/issues/30) | **shipped** |
 | Homebrew tap | [#31](https://github.com/jose-compu/rustmaninoff/issues/31) | **shipped** (`jose-compu/homebrew-tap`) |
 | Official Docker image | [#32](https://github.com/jose-compu/rustmaninoff/issues/32) | **shipped** (`ghcr.io/jose-compu/rustmaninoff`) |
-| GitHub Marketplace listing | [#33](https://github.com/jose-compu/rustmaninoff/issues/33) | open |
+| GitHub Marketplace listing | [#33](https://github.com/jose-compu/rustmaninoff/issues/33) | metadata ready; publish from v0.4.0 release edit |
 | Baseline files (adopt without drowning in legacy findings) | [#58](https://github.com/jose-compu/rustmaninoff/issues/58) | open |
 
 ## Later — adjacent, same engine only
