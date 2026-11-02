@@ -373,6 +373,7 @@ fn skipped_file(path: &Path, message: &str) -> ParseOutput {
             line: 1,
             message: message.to_string(),
         }],
+        edges: Vec::new(),
     }
 }
 

@@ -24,6 +24,7 @@ pub fn parse_file(path: &Path, source: &str) -> ParseOutput {
                 line: 1,
                 message: err.to_string(),
             }],
+            edges: Vec::new(),
         },
     }
 }
@@ -276,6 +277,7 @@ fn parse_json(path: &Path, source: &str) -> ParseOutput {
                     message: err.to_string(),
                 }],
                 resources: Vec::new(),
+                edges: Vec::new(),
             };
         }
     };

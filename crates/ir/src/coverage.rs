@@ -15,6 +15,10 @@ fn framework_aliases_and_display() {
     assert_eq!(ResourceKind::Managed.to_string(), "managed");
     assert_eq!(ResourceKind::Data.to_string(), "data");
     assert_eq!(ResourceKind::default(), ResourceKind::Managed);
+    assert_eq!(EdgeKind::References.as_str(), "references");
+    assert_eq!(EdgeKind::Ref.as_str(), "ref");
+    assert_eq!(EdgeKind::Owner.as_str(), "owner");
+    assert_eq!(EdgeKind::Mount.as_str(), "mount");
 }
 
 #[test]

@@ -504,6 +504,114 @@ impl std::fmt::Display for ResourceKind {
     }
 }
 
+/// How two resources are related in the graph.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum EdgeKind {
+    /// Generic attribute/reference edge (e.g. Terraform interpolation to another resource).
+    References,
+    /// Explicit `depends_on` (Terraform) relationship.
+    DependsOn,
+    /// CloudFormation `Ref`.
+    Ref,
+    /// CloudFormation `Fn::GetAtt`.
+    GetAtt,
+    /// Kubernetes `ownerReferences`.
+    Owner,
+    /// Kubernetes volume / claim mount.
+    Mount,
+}
+
+impl EdgeKind {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::References => "references",
+            Self::DependsOn => "depends_on",
+            Self::Ref => "ref",
+            Self::GetAtt => "get_att",
+            Self::Owner => "owner",
+            Self::Mount => "mount",
+        }
+    }
+}
+
+impl std::fmt::Display for EdgeKind {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+/// Identity of a resource endpoint for a graph edge.
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct ResourceRef {
+    pub resource_type: String,
+    pub name: String,
+    /// Optional file hint when the same type.name appears in multiple files.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub file: Option<PathBuf>,
+}
+
+impl ResourceRef {
+    pub fn new(resource_type: impl Into<String>, name: impl Into<String>) -> Self {
+        Self {
+            resource_type: resource_type.into(),
+            name: name.into(),
+            file: None,
+        }
+    }
+
+    pub fn with_file(mut self, file: impl Into<PathBuf>) -> Self {
+        self.file = Some(file.into());
+        self
+    }
+
+    pub fn from_resource(resource: &Resource) -> Self {
+        Self {
+            resource_type: resource.resource_type.clone(),
+            name: resource.name.clone(),
+            file: Some(resource.file.clone()),
+        }
+    }
+
+    /// Matches another ref; file is compared only when both sides set it.
+    pub fn matches(&self, other: &ResourceRef) -> bool {
+        if self.resource_type != other.resource_type || self.name != other.name {
+            return false;
+        }
+        match (&self.file, &other.file) {
+            (Some(left), Some(right)) => left == right,
+            _ => true,
+        }
+    }
+}
+
+/// Directed relationship between two resources.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Edge {
+    pub from: ResourceRef,
+    pub to: ResourceRef,
+    pub kind: EdgeKind,
+    /// Optional attribute path that produced the edge (e.g. `logging.target_bucket`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub via: Option<String>,
+}
+
+impl Edge {
+    pub fn new(from: ResourceRef, to: ResourceRef, kind: EdgeKind) -> Self {
+        Self {
+            from,
+            to,
+            kind,
+            via: None,
+        }
+    }
+
+    pub fn via(mut self, path: impl Into<String>) -> Self {
+        self.via = Some(path.into());
+        self
+    }
+}
+
 /// A parsed infrastructure object.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Resource {
@@ -530,6 +638,25 @@ pub struct Diagnostic {
 pub struct ParseOutput {
     pub resources: Vec<Resource>,
     pub diagnostics: Vec<Diagnostic>,
+    /// Graph edges discovered while parsing this file (or merged corpus).
+    pub edges: Vec<Edge>,
+}
+
+impl ParseOutput {
+    pub fn push_edge(&mut self, edge: Edge) {
+        self.edges.push(edge);
+    }
+
+    pub fn extend_edges<I: IntoIterator<Item = Edge>>(&mut self, edges: I) {
+        self.edges.extend(edges);
+    }
+
+    /// Append another parse result's resources, diagnostics, and edges.
+    pub fn merge(&mut self, other: ParseOutput) {
+        self.resources.extend(other.resources);
+        self.diagnostics.extend(other.diagnostics);
+        self.edges.extend(other.edges);
+    }
 }
 
 /// `# checkov:skip=CKV_AWS_1:reason` and `//` comments.
@@ -707,6 +834,42 @@ resource "aws_security_group" "sg" {
             aliases.push_str(&format!("k{index}: *a\n"));
         }
         assert!(input_limit(&aliases).is_some());
+    }
+
+    #[test]
+    fn edge_kinds_and_parse_output_merge() {
+        assert_eq!(EdgeKind::DependsOn.to_string(), "depends_on");
+        assert_eq!(EdgeKind::GetAtt.as_str(), "get_att");
+        let from = ResourceRef::new("aws_s3_bucket", "logs").with_file("main.tf");
+        let to = ResourceRef::new("aws_s3_bucket", "data");
+        assert!(from.matches(&ResourceRef::new("aws_s3_bucket", "logs")));
+        assert!(!from.matches(&ResourceRef::new("aws_s3_bucket", "other")));
+        let edge =
+            Edge::new(from.clone(), to.clone(), EdgeKind::References).via("logging.target_bucket");
+        let mut left = ParseOutput::default();
+        left.push_edge(edge.clone());
+        let mut right = ParseOutput::default();
+        right.extend_edges([Edge::new(
+            ResourceRef::new("aws_iam_role", "app"),
+            ResourceRef::new("aws_iam_policy", "app"),
+            EdgeKind::DependsOn,
+        )]);
+        left.merge(right);
+        assert_eq!(left.edges.len(), 2);
+        assert_eq!(left.edges[0].via.as_deref(), Some("logging.target_bucket"));
+        assert_eq!(left.edges[1].kind, EdgeKind::DependsOn);
+        let resource = Resource {
+            framework: Framework::Terraform,
+            kind: ResourceKind::Managed,
+            resource_type: "aws_s3_bucket".into(),
+            name: "logs".into(),
+            attributes: Value::Null,
+            file: PathBuf::from("main.tf"),
+            start_line: 1,
+            end_line: 1,
+            skips: Vec::new(),
+        };
+        assert!(ResourceRef::from_resource(&resource).matches(&from));
     }
 }
 
