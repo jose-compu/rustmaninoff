@@ -1,0 +1,52 @@
+metadata:
+  id: CKV_K8S_102
+  name: Ensure that the --etcd-cafile argument is set as appropriate
+  category: KUBERNETES
+  severity: HIGH
+  framework: kubernetes
+  guidelines: Adapted from Checkov CKV_K8S_102. https://github.com/bridgecrewio/checkov
+resource_types:
+- Pod
+- Deployment
+- StatefulSet
+- DaemonSet
+- Job
+- CronJob
+- ReplicaSet
+definition:
+  or:
+  - cond_type: attribute
+    attribute: _containers.command
+    operator: not_contains
+    value: "kube-apiserver"
+  - and:
+    - cond_type: attribute
+      attribute: _containers.command
+      operator: contains
+      value: "--etcd-cafile=/x"
+fixtures:
+  fail: |
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: app
+      namespace: kube-system
+    spec:
+      containers:
+        - name: app
+          image: control:1
+          command:
+            - "kube-apiserver"
+  pass: |
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: app
+      namespace: kube-system
+    spec:
+      containers:
+        - name: app
+          image: control:1
+          command:
+            - "kube-apiserver"
+            - "--etcd-cafile=/x"

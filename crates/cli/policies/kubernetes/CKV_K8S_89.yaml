@@ -1,0 +1,51 @@
+metadata:
+  id: CKV_K8S_89
+  name: Ensure that the --secure-port argument is not set to 0
+  category: KUBERNETES
+  severity: HIGH
+  framework: kubernetes
+  guidelines: Adapted from Checkov CKV_K8S_89. https://github.com/bridgecrewio/checkov
+resource_types:
+- Pod
+- Deployment
+- StatefulSet
+- DaemonSet
+- Job
+- CronJob
+- ReplicaSet
+definition:
+  or:
+  - cond_type: attribute
+    attribute: _containers.command
+    operator: not_contains
+    value: "kube-apiserver"
+  - cond_type: attribute
+    attribute: _containers.command
+    operator: not_contains
+    value: "--secure-port=0"
+fixtures:
+  fail: |
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: app
+      namespace: kube-system
+    spec:
+      containers:
+        - name: app
+          image: control:1
+          command:
+            - "kube-apiserver"
+            - "--secure-port=0"
+  pass: |
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: app
+      namespace: kube-system
+    spec:
+      containers:
+        - name: app
+          image: control:1
+          command:
+            - "kube-apiserver"
