@@ -229,7 +229,7 @@ Multi-arch image on GHCR (`linux/amd64`, `linux/arm64`):
 docker run --rm -v "$PWD":/src -w /src ghcr.io/jose-compu/rustmaninoff:0.3.0 scan .
 ```
 
-Tags: `latest` (main), semver (`0.3.0`, `0.3`), and `sha-*`. Built by `.github/workflows/docker.yml`.
+Tags: `latest` (main), semver (`0.3.0`, `0.3`), and `sha-*`. Built by `.github/workflows/docker.yml` from GitHub Release binaries (use `--build-arg BUILD_MODE=source` for a full cargo image build).
 
 ## Release
 
