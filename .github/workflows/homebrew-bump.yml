@@ -1,0 +1,109 @@
+name: homebrew-bump
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag (e.g. v0.3.0)
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  bump:
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve tag
+        id: tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${{ github.event.release.tag_name }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout tap
+        uses: actions/checkout@v4
+        with:
+          repository: jose-compu/homebrew-tap
+          token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          path: tap
+
+      - name: Update formula
+        working-directory: tap
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          set -euo pipefail
+          version="${TAG#v}"
+          python3 <<'PY'
+          import hashlib, pathlib, urllib.request, os
+          tag = os.environ["TAG"]
+          version = tag.lstrip("v")
+          targets = [
+              "aarch64-apple-darwin",
+              "x86_64-apple-darwin",
+              "aarch64-unknown-linux-gnu",
+              "x86_64-unknown-linux-gnu",
+          ]
+          sha = {}
+          for t in targets:
+              url = f"https://github.com/jose-compu/rustmaninoff/releases/download/{tag}/rustmaninoff-{t}.tar.gz.sha256"
+              text = urllib.request.urlopen(url).read().decode().strip()
+              sha[t] = text.split()[0]
+          formula = f'''class Rustmaninoff < Formula
+            desc "Checkov-compatible IaC scanner in a single Rust binary"
+            homepage "https://github.com/jose-compu/rustmaninoff"
+            version "{version}"
+            license "Apache-2.0"
+
+            on_macos do
+              on_arm do
+                url "https://github.com/jose-compu/rustmaninoff/releases/download/{tag}/rustmaninoff-aarch64-apple-darwin.tar.gz"
+                sha256 "{sha["aarch64-apple-darwin"]}"
+              end
+              on_intel do
+                url "https://github.com/jose-compu/rustmaninoff/releases/download/{tag}/rustmaninoff-x86_64-apple-darwin.tar.gz"
+                sha256 "{sha["x86_64-apple-darwin"]}"
+              end
+            end
+
+            on_linux do
+              on_arm do
+                url "https://github.com/jose-compu/rustmaninoff/releases/download/{tag}/rustmaninoff-aarch64-unknown-linux-gnu.tar.gz"
+                sha256 "{sha["aarch64-unknown-linux-gnu"]}"
+              end
+              on_intel do
+                url "https://github.com/jose-compu/rustmaninoff/releases/download/{tag}/rustmaninoff-x86_64-unknown-linux-gnu.tar.gz"
+                sha256 "{sha["x86_64-unknown-linux-gnu"]}"
+              end
+            end
+
+            def install
+              bin.install "rustmaninoff"
+            end
+
+            test do
+              assert_match version.to_s, shell_output("#{{bin}}/rustmaninoff --version")
+            end
+          end
+          '''
+          # Fix accidental double-brace from f-string escaping for Ruby interpolation
+          formula = formula.replace("#{{bin}}", "#{bin}")
+          path = pathlib.Path("Formula/rustmaninoff.rb")
+          path.write_text(formula)
+          print(f"wrote {path} for {version}")
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Formula/rustmaninoff.rb
+          if git diff --cached --quiet; then
+            echo "Formula already up to date for ${TAG}"
+            exit 0
+          fi
+          git commit -m "Bump rustmaninoff to ${version}"
+          git push
