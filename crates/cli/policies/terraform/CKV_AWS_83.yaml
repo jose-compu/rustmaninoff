@@ -1,0 +1,33 @@
+metadata:
+  id: CKV_AWS_83
+  name: Ensure Elasticsearch Domain enforces HTTPS
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_83. Missing endpoint options passes (Checkov default). https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_elasticsearch_domain
+- aws_opensearch_domain
+definition:
+  or:
+  - cond_type: attribute
+    attribute: domain_endpoint_options.enforce_https
+    operator: not_exists
+  - cond_type: attribute
+    attribute: domain_endpoint_options.enforce_https
+    operator: is_true
+fixtures:
+  fail: |
+    resource "aws_elasticsearch_domain" "bad" {
+      domain_name = "es"
+      domain_endpoint_options {
+        enforce_https = false
+      }
+    }
+  pass: |
+    resource "aws_elasticsearch_domain" "good" {
+      domain_name = "es"
+      domain_endpoint_options {
+        enforce_https = true
+      }
+    }

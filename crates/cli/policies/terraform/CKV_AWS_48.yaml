@@ -1,0 +1,29 @@
+metadata:
+  id: CKV_AWS_48
+  name: Ensure MQ Broker logging is enabled
+  category: LOGGING
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_48. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_mq_broker
+definition:
+  cond_type: attribute
+  attribute: logs.general
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_mq_broker" "bad" {
+      broker_name = "mq"
+      engine_type = "ActiveMQ"
+      host_instance_type = "mq.t3.micro"
+    }
+  pass: |
+    resource "aws_mq_broker" "good" {
+      broker_name        = "mq"
+      engine_type        = "ActiveMQ"
+      host_instance_type = "mq.t3.micro"
+      logs {
+        general = true
+      }
+    }

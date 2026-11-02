@@ -1,0 +1,48 @@
+metadata:
+  id: CKV_AWS_92
+  name: Ensure the ELB has access logging enabled
+  category: LOGGING
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_92. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_elb
+definition:
+  and:
+  - cond_type: attribute
+    attribute: access_logs
+    operator: exists
+  - or:
+    - cond_type: attribute
+      attribute: access_logs.enabled
+      operator: not_exists
+    - cond_type: attribute
+      attribute: access_logs.enabled
+      operator: is_true
+fixtures:
+  fail: |
+    resource "aws_elb" "bad" {
+      name               = "elb"
+      availability_zones = ["us-east-1a"]
+      listener {
+        instance_port     = 80
+        instance_protocol = "http"
+        lb_port           = 80
+        lb_protocol       = "http"
+      }
+    }
+  pass: |
+    resource "aws_elb" "good" {
+      name               = "elb"
+      availability_zones = ["us-east-1a"]
+      access_logs {
+        bucket  = "logs"
+        enabled = true
+      }
+      listener {
+        instance_port     = 80
+        instance_protocol = "http"
+        lb_port           = 80
+        lb_protocol       = "http"
+      }
+    }

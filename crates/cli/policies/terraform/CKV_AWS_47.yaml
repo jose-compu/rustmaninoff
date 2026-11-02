@@ -1,0 +1,27 @@
+metadata:
+  id: CKV_AWS_47
+  name: Ensure DAX is encrypted at rest (default is unencrypted)
+  category: ENCRYPTION
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_47. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_dax_cluster
+definition:
+  cond_type: attribute
+  attribute: server_side_encryption.enabled
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_dax_cluster" "bad" {
+      cluster_name = "dax"
+      node_type    = "dax.t3.small"
+    }
+  pass: |
+    resource "aws_dax_cluster" "good" {
+      cluster_name = "dax"
+      node_type    = "dax.t3.small"
+      server_side_encryption {
+        enabled = true
+      }
+    }

@@ -19,10 +19,6 @@ SNAPSHOT = ROOT / "tools" / "checkov-ids" / "snapshot.json"
 # Known intentional ID / semantics divergences (document, do not hide).
 DIVERGENCES = [
     (
-        "CKV_DOCKER_8",
-        "Checkov RootUser overlaps rustmaninoff CKV_DOCKER_3 (USER exists and is not root).",
-    ),
-    (
         "CKV_K8S_1–7",
         "Checkov PSP-oriented ids; pod/workload equivalents live at CKV_K8S_16–20 / 23 / 28.",
     ),
