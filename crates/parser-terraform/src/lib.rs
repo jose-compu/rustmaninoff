@@ -148,7 +148,7 @@ fn collect_expr_edges(
         }
         Expression::Object(object) => {
             for (key, value) in object.iter() {
-                let child_via = object_key(key);
+                let child_via = object_key(key, &EvalContext::default());
                 collect_expr_edges(output, from, child_via.as_deref().or(via), value);
             }
         }
