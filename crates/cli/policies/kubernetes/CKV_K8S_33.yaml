@@ -1,0 +1,66 @@
+metadata:
+  id: CKV_K8S_33
+  name: Ensure the Kubernetes dashboard is not deployed
+  category: KUBERNETES
+  severity: HIGH
+  framework: kubernetes
+  guidelines: Adapted from Checkov CKV_K8S_33. https://github.com/bridgecrewio/checkov
+resource_types:
+- Deployment
+- Pod
+- DaemonSet
+- StatefulSet
+- ReplicaSet
+- Job
+- CronJob
+definition:
+  and:
+  - cond_type: attribute
+    attribute: metadata.name
+    operator: not_contains
+    value: kubernetes-dashboard
+  - or:
+    - cond_type: attribute
+      attribute: _containers.image
+      operator: not_exists
+    - cond_type: attribute
+      attribute: _containers.image
+      operator: not_contains
+      value: kubernetesui/dashboard
+fixtures:
+  fail: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: kubernetes-dashboard
+      namespace: kube-system
+    spec:
+      selector:
+        matchLabels:
+          app: kubernetes-dashboard
+      template:
+        metadata:
+          labels:
+            app: kubernetes-dashboard
+        spec:
+          containers:
+            - name: dashboard
+              image: kubernetesui/dashboard:v2.7.0
+  pass: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: app
+      namespace: prod
+    spec:
+      selector:
+        matchLabels:
+          app: app
+      template:
+        metadata:
+          labels:
+            app: app
+        spec:
+          containers:
+            - name: app
+              image: nginx:1.25

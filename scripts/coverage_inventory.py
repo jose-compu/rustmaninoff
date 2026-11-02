@@ -19,16 +19,16 @@ SNAPSHOT = ROOT / "tools" / "checkov-ids" / "snapshot.json"
 # Known intentional ID / semantics divergences (document, do not hide).
 DIVERGENCES = [
     (
-        "CKV_DOCKER_1",
-        "Checkov: EXPOSE must not publish port 22. rustmaninoff: base image must not use `:latest` (Checkov’s CKV_DOCKER_7).",
-    ),
-    (
-        "CKV_DOCKER_7",
-        "Checkov: ReferenceLatestTag. Covered today under rustmaninoff CKV_DOCKER_1 (same intent, different id).",
-    ),
-    (
         "CKV_DOCKER_8",
-        "Checkov: RootUser. Overlaps rustmaninoff CKV_DOCKER_3 (USER exists and is not root).",
+        "Checkov RootUser overlaps rustmaninoff CKV_DOCKER_3 (USER exists and is not root).",
+    ),
+    (
+        "CKV_K8S_1–7",
+        "Checkov PSP-oriented ids; pod/workload equivalents live at CKV_K8S_16–20 / 23 / 28.",
+    ),
+    (
+        "CKV_K8S_34",
+        "Checkov: Tiller not deployed. rustmaninoff: secrets via envFrom (closer to Checkov CKV_K8S_35 companion).",
     ),
 ]
 
