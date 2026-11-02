@@ -1,0 +1,19 @@
+metadata:
+  id: CKV2_AWS_59
+  name: Ensure Elasticsearch/OpenSearch has dedicated master nodes
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV2_AWS_59. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_elasticsearch_domain
+- aws_opensearch_domain
+definition:
+  cond_type: attribute
+  attribute: cluster_config.dedicated_master_enabled
+  operator: equals
+  value: true
+fixtures:
+  fail: "resource \"aws_elasticsearch_domain\" \"bad\" {\n  domain_name = \"es\"\n}\n"
+  pass: "resource \"aws_elasticsearch_domain\" \"good\" {\n  domain_name = \"es\"\n  cluster_config {\n    dedicated_master_enabled\
+    \ = true\n  }\n}\n"

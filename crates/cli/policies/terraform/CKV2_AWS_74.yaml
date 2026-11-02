@@ -1,0 +1,37 @@
+metadata:
+  id: CKV2_AWS_74
+  name: Ensure load balancer listener uses a modern TLS security policy
+  category: NETWORKING
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV2_AWS_74. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_lb_listener
+- aws_alb_listener
+definition:
+  or:
+  - cond_type: attribute
+    attribute: protocol
+    operator: not_within
+    value:
+    - HTTPS
+    - TLS
+  - and:
+    - cond_type: attribute
+      attribute: ssl_policy
+      operator: exists
+    - cond_type: attribute
+      attribute: ssl_policy
+      operator: not_within
+      value:
+      - ELBSecurityPolicy-2016-08
+      - ELBSecurityPolicy-2015-05
+      - ELBSecurityPolicy-TLS-1-0-2015-04
+      - ELBSecurityPolicy-TLS-1-1-2017-01
+      - ELBSecurityPolicy-2015-03
+      - ELBSecurityPolicy-2015-02
+fixtures:
+  fail: "resource \"aws_lb_listener\" \"bad\" {\n  load_balancer_arn = \"arn\"\n  port = 443\n  protocol = \"HTTPS\"\n  ssl_policy\
+    \ = \"ELBSecurityPolicy-2016-08\"\n  default_action {\n    type = \"fixed-response\"\n  }\n}\n"
+  pass: "resource \"aws_lb_listener\" \"good\" {\n  load_balancer_arn = \"arn\"\n  port = 443\n  protocol = \"HTTPS\"\n  ssl_policy\
+    \ = \"ELBSecurityPolicy-TLS13-1-2-2021-06\"\n  default_action {\n    type = \"fixed-response\"\n  }\n}\n"

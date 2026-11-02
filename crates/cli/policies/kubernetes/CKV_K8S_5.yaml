@@ -1,0 +1,21 @@
+metadata:
+  id: CKV_K8S_5
+  name: Containers should not run with allowPrivilegeEscalation in PodSecurityPolicy
+  category: KUBERNETES
+  severity: HIGH
+  framework: kubernetes
+  guidelines: Adapted from Checkov CKV_K8S_5. https://github.com/bridgecrewio/checkov
+resource_types:
+- PodSecurityPolicy
+definition:
+  cond_type: attribute
+  attribute: spec.allowPrivilegeEscalation
+  operator: equals
+  value: false
+fixtures:
+  fail: "apiVersion: policy/v1beta1\nkind: PodSecurityPolicy\nmetadata: {name: bad}\nspec:\n  allowPrivilegeEscalation: true\n\
+    \  seLinux: {rule: RunAsAny}\n  runAsUser: {rule: RunAsAny}\n  fsGroup: {rule: RunAsAny}\n  supplementalGroups: {rule:\
+    \ RunAsAny}\n"
+  pass: "apiVersion: policy/v1beta1\nkind: PodSecurityPolicy\nmetadata: {name: good}\nspec:\n  allowPrivilegeEscalation: false\n\
+    \  seLinux: {rule: RunAsAny}\n  runAsUser: {rule: RunAsAny}\n  fsGroup: {rule: RunAsAny}\n  supplementalGroups: {rule:\
+    \ RunAsAny}\n"

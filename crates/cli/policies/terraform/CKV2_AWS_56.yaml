@@ -1,0 +1,21 @@
+metadata:
+  id: CKV2_AWS_56
+  name: Ensure IAM attachments do not use IAMFullAccess
+  category: IAM
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV2_AWS_56. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_iam_role_policy_attachment
+- aws_iam_user_policy_attachment
+- aws_iam_group_policy_attachment
+definition:
+  cond_type: attribute
+  attribute: policy_arn
+  operator: not_contains
+  value: IAMFullAccess
+fixtures:
+  fail: "resource \"aws_iam_role_policy_attachment\" \"bad\" {\n  role = \"r\"\n  policy_arn = \"arn:aws:iam::aws:policy/IAMFullAccess\"\
+    \n}\n"
+  pass: "resource \"aws_iam_role_policy_attachment\" \"good\" {\n  role = \"r\"\n  policy_arn = \"arn:aws:iam::aws:policy/ReadOnlyAccess\"\
+    \n}\n"

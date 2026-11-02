@@ -1,0 +1,17 @@
+metadata:
+  id: CKV2_AWS_34
+  name: Ensure SSM parameters are of type SecureString
+  category: ENCRYPTION
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV2_AWS_34. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_ssm_parameter
+definition:
+  cond_type: attribute
+  attribute: type
+  operator: equals
+  value: SecureString
+fixtures:
+  fail: "resource \"aws_ssm_parameter\" \"bad\" {\n  name = \"p\"\n  type = \"String\"\n  value = \"x\"\n}\n"
+  pass: "resource \"aws_ssm_parameter\" \"good\" {\n  name = \"p\"\n  type = \"SecureString\"\n  value = \"x\"\n}\n"

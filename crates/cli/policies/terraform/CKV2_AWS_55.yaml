@@ -1,0 +1,18 @@
+metadata:
+  id: CKV2_AWS_55
+  name: Ensure EMR cluster has a security configuration
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV2_AWS_55. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_emr_cluster
+definition:
+  cond_type: attribute
+  attribute: security_configuration
+  operator: exists
+fixtures:
+  fail: "resource \"aws_emr_cluster\" \"bad\" {\n  name = \"bad\"\n  release_label = \"emr-6.0.0\"\n  service_role = \"r\"\
+    \n}\n"
+  pass: "resource \"aws_emr_cluster\" \"good\" {\n  name = \"good\"\n  release_label = \"emr-6.0.0\"\n  service_role = \"\
+    r\"\n  security_configuration = \"sec\"\n}\n"
