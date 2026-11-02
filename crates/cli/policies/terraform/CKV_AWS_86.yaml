@@ -1,0 +1,61 @@
+metadata:
+  id: CKV_AWS_86
+  name: Ensure CloudFront distribution has Access Logging enabled
+  category: LOGGING
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_86. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_cloudfront_distribution
+definition:
+  cond_type: attribute
+  attribute: logging_config.bucket
+  operator: exists
+fixtures:
+  fail: |
+    resource "aws_cloudfront_distribution" "bad" {
+      enabled = true
+      origin {
+        domain_name = "example.com"
+        origin_id   = "origin"
+      }
+      default_cache_behavior {
+        allowed_methods        = ["GET", "HEAD"]
+        cached_methods         = ["GET", "HEAD"]
+        target_origin_id       = "origin"
+        viewer_protocol_policy = "redirect-to-https"
+      }
+      restrictions {
+        geo_restriction {
+          restriction_type = "none"
+        }
+      }
+      viewer_certificate {
+        cloudfront_default_certificate = true
+      }
+    }
+  pass: |
+    resource "aws_cloudfront_distribution" "good" {
+      enabled = true
+      logging_config {
+        bucket = "logs.s3.amazonaws.com"
+      }
+      origin {
+        domain_name = "example.com"
+        origin_id   = "origin"
+      }
+      default_cache_behavior {
+        allowed_methods        = ["GET", "HEAD"]
+        cached_methods         = ["GET", "HEAD"]
+        target_origin_id       = "origin"
+        viewer_protocol_policy = "redirect-to-https"
+      }
+      restrictions {
+        geo_restriction {
+          restriction_type = "none"
+        }
+      }
+      viewer_certificate {
+        cloudfront_default_certificate = true
+      }
+    }

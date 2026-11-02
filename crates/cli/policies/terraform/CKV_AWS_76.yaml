@@ -1,0 +1,31 @@
+metadata:
+  id: CKV_AWS_76
+  name: Ensure API Gateway has Access Logging enabled
+  category: LOGGING
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_76. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_api_gateway_stage
+- aws_apigatewayv2_stage
+definition:
+  cond_type: attribute
+  attribute: access_log_settings.destination_arn
+  operator: exists
+fixtures:
+  fail: |
+    resource "aws_api_gateway_stage" "bad" {
+      stage_name    = "prod"
+      rest_api_id   = "api"
+      deployment_id = "dep"
+    }
+  pass: |
+    resource "aws_api_gateway_stage" "good" {
+      stage_name    = "prod"
+      rest_api_id   = "api"
+      deployment_id = "dep"
+      access_log_settings {
+        destination_arn = "arn:aws:logs:us-east-1:123456789012:log-group:apigw"
+        format          = "$context.requestId"
+      }
+    }
