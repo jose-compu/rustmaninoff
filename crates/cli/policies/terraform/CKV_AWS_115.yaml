@@ -1,0 +1,36 @@
+metadata:
+  id: CKV_AWS_115
+  name: Ensure that AWS Lambda function is configured for function-level concurrent execution limit
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_115. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_lambda_function
+definition:
+  and:
+  - cond_type: attribute
+    attribute: reserved_concurrent_executions
+    operator: exists
+  - cond_type: attribute
+    attribute: reserved_concurrent_executions
+    operator: not_equals
+    value: -1
+fixtures:
+  fail: |
+    resource "aws_lambda_function" "bad" {
+      function_name = "fn"
+      role          = "arn:aws:iam::123456789012:role/lambda"
+      handler       = "index.handler"
+      runtime       = "python3.12"
+      filename      = "fn.zip"
+    }
+  pass: |
+    resource "aws_lambda_function" "good" {
+      function_name                  = "fn"
+      role                           = "arn:aws:iam::123456789012:role/lambda"
+      handler                        = "index.handler"
+      runtime                        = "python3.12"
+      filename                       = "fn.zip"
+      reserved_concurrent_executions = 10
+    }

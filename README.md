@@ -32,7 +32,7 @@ Checkov and Trivy are broader platforms. Rustmaninoff is a **small, fast attribu
 - **One static binary.** `cargo install rustmaninoff` (or a GitHub Release binary). Checkov needs a Python environment and plugins. Trivy is a large Go binary that also covers vulns, secrets, and SBOMs you may not want in an IaC-only job.
 - **Checkov-shaped policies without the Checkov runtime.** Same published CKV ids, YAML pass-conditions, and `# checkov:skip=` / `checkov.io/skip` comments. The engine is Rust IR + attribute operators, not a Python port.
 - **Predictable CI.** Interpolations are **unknown**, not guessed. Unknowns never fail the process. Exit codes, `--fail-on`, SARIF 2.1.0, JUnit, and JSON are first-class.
-- **Focused catalog.** 207 checks (attribute + first-wave `CKV2_*` graph) with pass/fail fixtures. Still smaller than Checkov’s full pack: no Helm, Kustomize, plan JSON, or secrets/vuln scanning. Use those tools when you need that surface; use Rustmaninoff when you want fast CKV gates.
+- **Focused catalog.** 214 checks (attribute + first-wave `CKV2_*` graph) with pass/fail fixtures. Still smaller than Checkov’s full pack: no Helm, Kustomize, plan JSON, or secrets/vuln scanning. Use those tools when you need that surface; use Rustmaninoff when you want fast CKV gates.
 
 Site: [jose-compu.github.io/rustmaninoff](https://jose-compu.github.io/rustmaninoff/) · [llms.txt](https://jose-compu.github.io/rustmaninoff/llms.txt) for search and AI agents.
 
@@ -85,7 +85,7 @@ Directories named `.git`, `.terraform`, `.terragrunt-cache`, `node_modules`, `ve
 - CloudFormation YAML and JSON `Resources`. Attribute paths are relative to `Properties`.
 - Kubernetes multi-document YAML, including `List`.
 - Dockerfiles (`Dockerfile`, `Containerfile`, `*.dockerfile`): FROM, USER, ADD vs COPY, HEALTHCHECK, and privileged-ish RUN patterns.
-- 207 built-in checks including first-wave Terraform `CKV2_AWS_*` graph policies. Attribute path unchanged; graph is a second pass.
+- 214 built-in checks including first-wave Terraform `CKV2_AWS_*` graph policies. Attribute path unchanged; graph is a second pass.
 - Coverage vs Checkov: [docs/fidelity.md](docs/fidelity.md) (regenerable).
 - Text, JSON, SARIF 2.1.0, and JUnit reports.
 
