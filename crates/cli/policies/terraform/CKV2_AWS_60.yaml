@@ -1,0 +1,27 @@
+metadata:
+  id: CKV2_AWS_60
+  name: Ensure RDS instance copy tags to snapshots
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV2_AWS_60. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_db_instance
+definition:
+  and:
+  - cond_type: attribute
+    attribute: copy_tags_to_snapshot
+    operator: equals
+    value: true
+  - cond_type: attribute
+    attribute: engine
+    operator: not_within
+    value:
+    - neptune
+    - aurora
+    - docdb
+fixtures:
+  fail: "resource \"aws_db_instance\" \"bad\" {\n  engine = \"mysql\"\n  instance_class = \"db.t3.micro\"\n  copy_tags_to_snapshot\
+    \ = false\n}\n"
+  pass: "resource \"aws_db_instance\" \"good\" {\n  engine = \"mysql\"\n  instance_class = \"db.t3.micro\"\n  copy_tags_to_snapshot\
+    \ = true\n}\n"

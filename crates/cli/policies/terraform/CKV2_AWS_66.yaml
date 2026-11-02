@@ -1,0 +1,21 @@
+metadata:
+  id: CKV2_AWS_66
+  name: Ensure MWAA environment webserver access is private
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV2_AWS_66. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_mwaa_environment
+definition:
+  or:
+  - cond_type: attribute
+    attribute: webserver_access_mode
+    operator: not_exists
+  - cond_type: attribute
+    attribute: webserver_access_mode
+    operator: equals
+    value: PRIVATE_ONLY
+fixtures:
+  fail: "resource \"aws_mwaa_environment\" \"bad\" {\n  name = \"bad\"\n  webserver_access_mode = \"PUBLIC_ONLY\"\n}\n"
+  pass: "resource \"aws_mwaa_environment\" \"good\" {\n  name = \"good\"\n  webserver_access_mode = \"PRIVATE_ONLY\"\n}\n"

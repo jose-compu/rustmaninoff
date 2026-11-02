@@ -1,0 +1,53 @@
+metadata:
+  id: CKV_K8S_158
+  name: Minimize Roles and ClusterRoles that grant permissions to escalate Roles or ClusterRoles
+  category: IAM
+  severity: HIGH
+  framework: kubernetes
+  guidelines: Adapted from Checkov CKV_K8S_158.
+resource_types:
+- ClusterRole
+- Role
+definition:
+  cond_type: no_element
+  attribute: rules
+  where:
+    and:
+    - cond_type: attribute
+      attribute: apiGroups
+      operator: contains
+      value: rbac.authorization.k8s.io
+    - cond_type: attribute
+      attribute: resources
+      operator: contains
+      value: roles
+    - or:
+      - cond_type: attribute
+        attribute: verbs
+        operator: contains
+        value: create
+      - cond_type: attribute
+        attribute: verbs
+        operator: contains
+        value: update
+      - cond_type: attribute
+        attribute: verbs
+        operator: contains
+        value: patch
+      - cond_type: attribute
+        attribute: verbs
+        operator: contains
+        value: bind
+      - cond_type: attribute
+        attribute: verbs
+        operator: contains
+        value: escalate
+      - cond_type: attribute
+        attribute: verbs
+        operator: contains
+        value: approve
+fixtures:
+  fail: "apiVersion: rbac.authorization.k8s.io/v1\nkind: ClusterRole\nmetadata: {name: bad}\nrules:\n  - apiGroups: [\"rbac.authorization.k8s.io\"\
+    ]\n    resources: [\"roles\"]\n    verbs: [\"create\",\"update\",\"patch\"]\n"
+  pass: "apiVersion: rbac.authorization.k8s.io/v1\nkind: ClusterRole\nmetadata: {name: good}\nrules:\n  - apiGroups: [\"\"\
+    ]\n    resources: [\"pods\"]\n    verbs: [\"get\",\"list\"]\n"

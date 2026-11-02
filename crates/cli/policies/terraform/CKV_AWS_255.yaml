@@ -1,0 +1,19 @@
+metadata:
+  id: CKV_AWS_255
+  name: Ensure DLM cross region schedules are encrypted
+  category: ENCRYPTION
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_255.
+resource_types:
+- aws_dlm_lifecycle_policy
+definition:
+  cond_type: attribute
+  attribute: policy_details.schedule.cross_region_copy_rule.encrypted
+  operator: equals
+  value: true
+fixtures:
+  fail: "resource \"aws_dlm_lifecycle_policy\" \"bad\" {\n  description = \"bad\"\n  policy_details {\n    schedule {\n  \
+    \    cross_region_copy_rule {\n        encrypted = false\n        target = \"us-west-2\"\n      }\n    }\n  }\n}\n"
+  pass: "resource \"aws_dlm_lifecycle_policy\" \"good\" {\n  description = \"good\"\n  policy_details {\n    schedule {\n\
+    \      cross_region_copy_rule {\n        encrypted = true\n        target = \"us-west-2\"\n      }\n    }\n  }\n}\n"

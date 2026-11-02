@@ -1,0 +1,33 @@
+metadata:
+  id: CKV_AWS_167
+  name: Ensure Glacier Vault access policy is not public
+  category: IAM
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_167. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_glacier_vault
+definition:
+  cond_type: no_element
+  attribute: access_policy.Statement
+  where:
+    and:
+    - cond_type: attribute
+      attribute: Effect
+      operator: equals
+      value: Allow
+    - or:
+      - cond_type: attribute
+        attribute: Principal
+        operator: equals_any
+        value: '*'
+      - cond_type: attribute
+        attribute: Principal.AWS
+        operator: equals_any
+        value: '*'
+fixtures:
+  fail: "resource \"aws_glacier_vault\" \"bad\" {\n  name = \"bad\"\n  access_policy = jsonencode({ Statement = [{ Effect\
+    \ = \"Allow\", Principal = \"*\", Action = \"glacier:*\", Resource = \"*\" }] })\n}\n"
+  pass: "resource \"aws_glacier_vault\" \"good\" {\n  name = \"good\"\n  access_policy = jsonencode({ Statement = [{ Effect\
+    \ = \"Allow\", Principal = { AWS = \"arn:aws:iam::123:root\" }, Action = \"glacier:DescribeVault\", Resource = \"*\" }]\
+    \ })\n}\n"

@@ -1,0 +1,19 @@
+metadata:
+  id: CKV2_AWS_50
+  name: Ensure ElastiCache replication groups have automatic failover enabled
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV2_AWS_50. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_elasticache_replication_group
+definition:
+  cond_type: attribute
+  attribute: automatic_failover_enabled
+  operator: equals
+  value: true
+fixtures:
+  fail: "resource \"aws_elasticache_replication_group\" \"bad\" {\n  replication_group_id = \"bad\"\n  description = \"bad\"\
+    \n  automatic_failover_enabled = false\n}\n"
+  pass: "resource \"aws_elasticache_replication_group\" \"good\" {\n  replication_group_id = \"good\"\n  description = \"\
+    good\"\n  automatic_failover_enabled = true\n}\n"

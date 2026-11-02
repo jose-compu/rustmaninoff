@@ -1,0 +1,18 @@
+metadata:
+  id: CKV2_AWS_53
+  name: Ensure API Gateway method uses request validator
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV2_AWS_53. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_api_gateway_method
+definition:
+  cond_type: attribute
+  attribute: request_validator_id
+  operator: exists
+fixtures:
+  fail: "resource \"aws_api_gateway_method\" \"bad\" {\n  rest_api_id = \"a\"\n  resource_id = \"r\"\n  http_method = \"GET\"\
+    \n  authorization = \"NONE\"\n}\n"
+  pass: "resource \"aws_api_gateway_method\" \"good\" {\n  rest_api_id = \"a\"\n  resource_id = \"r\"\n  http_method = \"\
+    GET\"\n  authorization = \"NONE\"\n  request_validator_id = \"v\"\n}\n"

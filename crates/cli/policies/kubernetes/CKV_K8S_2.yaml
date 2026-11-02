@@ -1,0 +1,25 @@
+metadata:
+  id: CKV_K8S_2
+  name: Do not admit privileged containers
+  category: KUBERNETES
+  severity: HIGH
+  framework: kubernetes
+  guidelines: Adapted from Checkov CKV_K8S_2. https://github.com/bridgecrewio/checkov
+resource_types:
+- PodSecurityPolicy
+definition:
+  or:
+  - cond_type: attribute
+    attribute: spec.privileged
+    operator: not_exists
+  - cond_type: attribute
+    attribute: spec.privileged
+    operator: equals
+    value: false
+fixtures:
+  fail: "apiVersion: policy/v1beta1\nkind: PodSecurityPolicy\nmetadata:\n  name: bad\nspec:\n  privileged: true\n  seLinux:\n\
+    \    rule: RunAsAny\n  runAsUser:\n    rule: RunAsAny\n  fsGroup:\n    rule: RunAsAny\n  supplementalGroups:\n    rule:\
+    \ RunAsAny\n"
+  pass: "apiVersion: policy/v1beta1\nkind: PodSecurityPolicy\nmetadata:\n  name: good\nspec:\n  privileged: false\n  seLinux:\n\
+    \    rule: RunAsAny\n  runAsUser:\n    rule: RunAsAny\n  fsGroup:\n    rule: RunAsAny\n  supplementalGroups:\n    rule:\
+    \ RunAsAny\n"

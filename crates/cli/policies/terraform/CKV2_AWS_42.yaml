@@ -1,0 +1,22 @@
+metadata:
+  id: CKV2_AWS_42
+  name: Ensure CloudFront distribution uses custom SSL certificate
+  category: ENCRYPTION
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV2_AWS_42. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_cloudfront_distribution
+definition:
+  or:
+  - cond_type: attribute
+    attribute: viewer_certificate.iam_certificate_id
+    operator: exists
+  - cond_type: attribute
+    attribute: viewer_certificate.acm_certificate_arn
+    operator: exists
+fixtures:
+  fail: "resource \"aws_cloudfront_distribution\" \"bad\" {\n  enabled = true\n  viewer_certificate {\n    cloudfront_default_certificate\
+    \ = true\n  }\n}\n"
+  pass: "resource \"aws_cloudfront_distribution\" \"good\" {\n  enabled = true\n  viewer_certificate {\n    acm_certificate_arn\
+    \ = \"arn:aws:acm:us-east-1:123:certificate/abc\"\n    ssl_support_method  = \"sni-only\"\n  }\n}\n"

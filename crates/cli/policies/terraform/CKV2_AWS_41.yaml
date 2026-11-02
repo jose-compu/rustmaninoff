@@ -1,0 +1,17 @@
+metadata:
+  id: CKV2_AWS_41
+  name: Ensure EC2 instance uses an IAM instance profile
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV2_AWS_41. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_instance
+definition:
+  cond_type: attribute
+  attribute: iam_instance_profile
+  operator: exists
+fixtures:
+  fail: "resource \"aws_instance\" \"bad\" {\n  ami = \"ami-1\"\n  instance_type = \"t3.micro\"\n}\n"
+  pass: "resource \"aws_instance\" \"good\" {\n  ami = \"ami-1\"\n  instance_type = \"t3.micro\"\n  iam_instance_profile =\
+    \ \"profile\"\n}\n"

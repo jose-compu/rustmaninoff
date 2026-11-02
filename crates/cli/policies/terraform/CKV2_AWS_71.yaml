@@ -1,0 +1,26 @@
+metadata:
+  id: CKV2_AWS_71
+  name: Ensure ACM certificate domain name does not include wildcards
+  category: NETWORKING
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV2_AWS_71. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_acm_certificate
+definition:
+  and:
+  - cond_type: attribute
+    attribute: domain_name
+    operator: not_contains
+    value: '*'
+  - or:
+    - cond_type: attribute
+      attribute: subject_alternative_names
+      operator: not_exists
+    - cond_type: attribute
+      attribute: subject_alternative_names
+      operator: not_contains
+      value: '*'
+fixtures:
+  fail: "resource \"aws_acm_certificate\" \"bad\" {\n  domain_name = \"*.example.com\"\n}\n"
+  pass: "resource \"aws_acm_certificate\" \"good\" {\n  domain_name = \"example.com\"\n}\n"

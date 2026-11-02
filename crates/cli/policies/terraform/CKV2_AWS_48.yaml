@@ -1,0 +1,19 @@
+metadata:
+  id: CKV2_AWS_48
+  name: Ensure AWS Config recorder captures global resources
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV2_AWS_48. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_config_configuration_recorder
+definition:
+  cond_type: attribute
+  attribute: recording_group.include_global_resource_types
+  operator: equals
+  value: true
+fixtures:
+  fail: "resource \"aws_config_configuration_recorder\" \"bad\" {\n  name = \"bad\"\n  role_arn = \"arn:aws:iam::123:role/config\"\
+    \n}\n"
+  pass: "resource \"aws_config_configuration_recorder\" \"good\" {\n  name = \"good\"\n  role_arn = \"arn:aws:iam::123:role/config\"\
+    \n  recording_group {\n    include_global_resource_types = true\n  }\n}\n"
