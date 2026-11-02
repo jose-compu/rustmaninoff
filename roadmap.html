@@ -42,51 +42,51 @@
   <div class="wrap">
     <p class="kicker" style="margin-top:1.6rem;">Toward Checkov and Trivy coverage</p>
     <h1 style="margin:0 0 0.7rem;letter-spacing:-0.03em;">Roadmap</h1>
-    <p class="lede" style="margin-left:0;">v0.2 is an attribute scanner. The epics below close Checkov graph/plan/Helm/catalog gaps and Trivy secrets/SCA, without putting a CVE database on the default scan path.</p>
+    <p class="lede" style="margin-left:0;">v0.4.0 ships catalog credibility (536 checks, fidelity table, benches). Next: Helm + plan JSON (v0.5), then Action Marketplace / baseline (v0.6). No CVE database on the default scan path.</p>
     <p class="note"><a href="https://github.com/jose-compu/rustmaninoff/blob/main/ROADMAP.md">ROADMAP.md</a> · <a href="https://github.com/jose-compu/rustmaninoff/issues?q=is%3Aissue+label%3Aepic">All epics</a></p>
 
     <section class="section">
-      <h2>v0.3 — graph and Terraform evaluation</h2>
+      <h2>v0.3 — shipped core; follow-ups open</h2>
       <div class="grid">
         <article class="card">
           <h3><a href="https://github.com/jose-compu/rustmaninoff/issues/1">#1 Resource graph / CKV2_*</a></h3>
-          <p>Composite checks across resources. Checkov’s catalog is incomplete without this.</p>
+          <p><strong>Shipped</strong> in 0.3.0 (first-wave AWS). More graph policies still to come.</p>
         </article>
         <article class="card">
-          <h3><a href="https://github.com/jose-compu/rustmaninoff/issues/2">#2 Terraform eval, modules, plan JSON</a></h3>
-          <p>Variables, locals, OpenTofu, <code>terraform_plan</code>. Interpolations that resolve stop being unknown.</p>
+          <h3><a href="https://github.com/jose-compu/rustmaninoff/issues/16">#16 Vars, locals, OpenTofu</a></h3>
+          <p><strong>Shipped</strong> in 0.3.0. Defaults, <code>TF_VAR_*</code>, <code>--var-file</code>, <code>.tofu</code>.</p>
+        </article>
+        <article class="card">
+          <h3><a href="https://github.com/jose-compu/rustmaninoff/issues/2">#2 Modules and plan JSON</a></h3>
+          <p>Local/registry modules, <code>terraform_plan</code> still open (<a href="https://github.com/jose-compu/rustmaninoff/issues/17">#17</a>, <a href="https://github.com/jose-compu/rustmaninoff/issues/18">#18</a>).</p>
         </article>
       </div>
     </section>
 
     <section class="section">
-      <h2>v0.4 — packaging and more IaC</h2>
-      <div class="grid">
-        <article class="card">
-          <h3><a href="https://github.com/jose-compu/rustmaninoff/issues/3">#3 Helm and Kustomize</a></h3>
-          <p>Render to Kubernetes IR; reuse CKV_K8S_*. Same class of work as Checkov/Trivy config.</p>
-        </article>
-        <article class="card">
-          <h3><a href="https://github.com/jose-compu/rustmaninoff/issues/6">#6 ARM, Bicep, Ansible, Serverless, OpenAPI, SAM</a></h3>
-          <p>Formats Checkov already scans that 0.2 does not.</p>
-        </article>
-      </div>
-    </section>
-
-    <section class="section">
-      <h2>v0.5 — catalog, pipelines, secrets</h2>
+      <h2>v0.4 — coverage credibility (shipped in 0.4.0)</h2>
       <div class="grid">
         <article class="card">
           <h3><a href="https://github.com/jose-compu/rustmaninoff/issues/4">#4 Catalog depth</a></h3>
-          <p>Toward Checkov’s 1000+ policies: remaining AWS, then Azure and GCP. Every check keeps fixtures.</p>
+          <p><strong>Shipped</strong> in 0.4.0: 536 checks; Docker 100% / K8s 93.8% fidelity.</p>
         </article>
         <article class="card">
-          <h3><a href="https://github.com/jose-compu/rustmaninoff/issues/5">#5 CI/CD as code</a></h3>
-          <p>GitHub Actions, GitLab CI, Azure Pipelines, CircleCI, Argo Workflows.</p>
+          <h3><a href="https://github.com/jose-compu/rustmaninoff/issues/40">#40 Credibility</a></h3>
+          <p><strong>Shipped</strong>: benches, fidelity table, Checkov-compare CI. Corpus medians 54 ms / 3.50 s / 6.27 s.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>v0.5 — real pipeline inputs</h2>
+      <div class="grid">
+        <article class="card">
+          <h3><a href="https://github.com/jose-compu/rustmaninoff/issues/3">#3 Helm (then Kustomize)</a></h3>
+          <p>Render to Kubernetes IR; reuse CKV_K8S_*.</p>
         </article>
         <article class="card">
-          <h3><a href="https://github.com/jose-compu/rustmaninoff/issues/7">#7 Secrets</a></h3>
-          <p>Checkov <code>secrets</code> and Trivy secret rules, redacted in SARIF.</p>
+          <h3><a href="https://github.com/jose-compu/rustmaninoff/issues/18">#18 Terraform plan JSON</a></h3>
+          <p>Scan plan artifacts as real CI inputs.</p>
         </article>
       </div>
     </section>
@@ -110,7 +110,7 @@
     </section>
 
     <footer class="footer">
-      <span>v0.2.0</span>
+      <span>v0.4.0</span>
       <a href="https://github.com/jose-compu/rustmaninoff">jose-compu/rustmaninoff</a>
       <a href="llms.txt">llms.txt</a>
       <span>Apache-2.0</span>

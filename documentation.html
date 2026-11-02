@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Documentation — Rustmaninoff</title>
-  <meta name="description" content="Install, scan flags, config, policy dialect, and v0.2 scope for the Rustmaninoff IaC scanner.">
+  <meta name="description" content="Install, scan flags, config, policy dialect, and v0.4 scope for the Rustmaninoff IaC scanner.">
   <meta name="keywords" content="rustmaninoff, IaC scanner, terraform security, cloudformation, kubernetes, dockerfile, checkov, trivy, CKV, policy as code, rust, static analysis, rustmaninoff documentation, CKV_AWS, Dockerfile scanner">
   <meta name="author" content="jose-compu">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
@@ -22,7 +22,7 @@
   <meta property="og:locale" content="en_US">
   <meta property="og:url" content="https://jose-compu.github.io/rustmaninoff/documentation.html">
   <meta property="og:title" content="Documentation — Rustmaninoff">
-  <meta property="og:description" content="Install, scan flags, config, policy dialect, and v0.2 scope for the Rustmaninoff IaC scanner.">
+  <meta property="og:description" content="Install, scan flags, config, policy dialect, and v0.4 scope for the Rustmaninoff IaC scanner.">
   <meta property="og:image" content="https://jose-compu.github.io/rustmaninoff/img/banner.jpg">
   <meta property="og:image:type" content="image/jpeg">
   <meta property="og:image:width" content="1280">
@@ -30,7 +30,7 @@
   <meta property="og:image:alt" content="Rustmaninoff, IaC security scanner">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Documentation — Rustmaninoff">
-  <meta name="twitter:description" content="Install, scan flags, config, policy dialect, and v0.2 scope for the Rustmaninoff IaC scanner.">
+  <meta name="twitter:description" content="Install, scan flags, config, policy dialect, and v0.4 scope for the Rustmaninoff IaC scanner.">
   <meta name="twitter:image" content="https://jose-compu.github.io/rustmaninoff/img/banner.jpg">
   <meta name="twitter:image:alt" content="Rustmaninoff, IaC security scanner">
   <script type="application/ld+json">
@@ -38,9 +38,9 @@
     "@context": "https://schema.org",
     "@type": "TechArticle",
     "headline": "Rustmaninoff documentation",
-    "description": "Install, scan flags, config, policy dialect, and v0.2 scope for Rustmaninoff.",
+    "description": "Install, scan flags, config, policy dialect, and v0.4 scope for Rustmaninoff.",
     "url": "https://jose-compu.github.io/rustmaninoff/documentation.html",
-    "version": "0.2.0",
+    "version": "0.4.0",
     "author": {"@type": "Organization", "name": "jose-compu", "url": "https://github.com/jose-compu"},
     "isPartOf": {"@id": "https://jose-compu.github.io/rustmaninoff/#website"}
   }
@@ -78,9 +78,9 @@
   </header>
 
   <div class="wrap">
-    <p class="kicker" style="margin-top:1.6rem;">Documentation · v0.2.0</p>
+    <p class="kicker" style="margin-top:1.6rem;">Documentation · v0.4.0</p>
     <h1 style="margin:0 0 0.4rem;letter-spacing:-0.03em;">Using Rustmaninoff</h1>
-    <p class="lede" style="margin-left:0;">Attribute scanner for Terraform, CloudFormation, Kubernetes, and Dockerfiles. Policies are Checkov-compatible YAML.</p>
+    <p class="lede" style="margin-left:0;">Attribute scanner for Terraform, CloudFormation, Kubernetes, and Dockerfiles with Checkov-compatible CKV policies. Policies are Checkov-compatible YAML.</p>
 
     <div class="doc-layout">
       <aside class="toc">
@@ -90,7 +90,7 @@
         <a href="#config">Config</a>
         <a href="#policies">Policies</a>
         <a href="#skip">Skips</a>
-        <a href="#scope">v0.2 scope</a>
+        <a href="#scope">v0.4 scope</a>
         <a href="#ci">CI</a>
         <a href="#crates">Crates</a>
         <a href="#limits">Limits</a>
@@ -98,13 +98,13 @@
 
       <article class="doc">
         <h2 id="why">Why Rustmaninoff over Checkov and Trivy</h2>
-        <p>Checkov and Trivy are broader platforms. Rustmaninoff is a small attribute scanner for CI when you already know the CKV ids to enforce.</p>
+        <p>Checkov and Trivy are broader platforms. Rustmaninoff is a small IaC attribute scanner for CI when you already know the CKV ids to enforce.</p>
         <ul>
-          <li><strong>Speed.</strong> 20 ms on 1,540 resources vs 4.51 s Checkov (~225×) and 5.71 s Trivy (~285×). No Python interpreter, no policy-db refresh on the scan path.</li>
+          <li><strong>Speed.</strong> 54 ms on 1,540 resources vs 3.50 s Checkov (~65×) and 6.27 s Trivy (~116×). No Python interpreter, no policy-db refresh on the scan path.</li>
           <li><strong>One static binary.</strong> Checkov needs a Python environment. Trivy also covers vulns, secrets, and SBOMs that an IaC-only job may not want.</li>
           <li><strong>Checkov-shaped policies, Rust engine.</strong> Published CKV ids, YAML pass-conditions, and <code># checkov:skip=</code> / <code>checkov.io/skip</code>. Not a Python port of Checkov.</li>
-          <li><strong>Predictable CI.</strong> Interpolations are unknown, never fail. SARIF 2.1.0, JUnit, JSON, <code>--fail-on</code>.</li>
-          <li><strong>Focused catalog.</strong> 181 attribute checks, each with pass and fail fixtures. No graph checks, Helm, Kustomize, plan JSON, or secrets/vuln scanning—use Checkov or Trivy for that surface.</li>
+          <li><strong>Predictable CI.</strong> Unresolved interpolations are unknown, never fail. SARIF 2.1.0, JUnit, JSON, <code>--fail-on</code>.</li>
+          <li><strong>Focused catalog.</strong> 536 checks with published fidelity (Docker 100% / K8s 93.8% of pinned Checkov ids). Still no Helm, Kustomize, plan JSON, or secrets/vuln scanning—use Checkov or Trivy for that surface.</li>
         </ul>
 
         <h2 id="install">Install</h2>
@@ -114,7 +114,7 @@ rustmaninoff scan .</code></pre>
         <p>From a checkout:</p>
         <pre><code>cargo build --release -p rustmaninoff
 ./target/release/rustmaninoff scan .</code></pre>
-        <p>GitHub Release binaries for Linux and macOS (amd64 and arm64) are attached to <a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.2.0">v0.2.0</a>.</p>
+        <p>GitHub Release binaries for Linux and macOS (amd64 and arm64) are attached to <a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.4.0">v0.4.0</a>.</p>
 
         <h2 id="scan">Scan</h2>
         <pre><code>rustmaninoff scan [PATH] \
@@ -147,7 +147,7 @@ compact: false</code></pre>
         <h2 id="policies">Policies</h2>
         <p>A check definition is the <strong>pass</strong> condition. Built-in policies are rewritten YAML, attributed to <a href="https://github.com/bridgecrewio/checkov">Checkov</a> (Bridgecrew / Palo Alto Networks, Apache-2.0), and reuse published CKV ids.</p>
         <p>Operators: <code>equals</code>, <code>not_equals</code>, <code>exists</code>, <code>not_exists</code>, <code>contains</code>, <code>not_contains</code>, <code>within</code>, <code>regex_match</code>, <code>starting_with</code>, <code>ending_with</code>, numeric comparisons, <code>is_true</code>, <code>is_false</code>, <code>is_empty</code>, <code>length_greater_than</code>, <code>length_less_than</code>, and their negated forms. Combinators: <code>and</code>, <code>or</code>, <code>not</code>.</p>
-        <p>Extensions: <code>no_element</code>, <code>forbid_resource</code>, <code>equals_any</code>, <code>intersects</code>, <code>image_tag_pinned</code>, and <code>missing: pass|fail|unknown</code>. <code>scope</code> is ignored. Severity defaults to <code>MEDIUM</code> when omitted.</p>
+        <p>Extensions: <code>no_element</code>, <code>forbid_resource</code>, <code>equals_any</code>, <code>intersects</code>, <code>image_tag_pinned</code>, <code>connection</code> (graph neighbors), <code>filter</code> (attribute alias), and <code>missing: pass|fail|unknown</code>. <code>scope</code> is ignored. Severity defaults to <code>MEDIUM</code> when omitted.</p>
         <h3>Example</h3>
         <pre><code>metadata:
   id: CKV_DOCKER_1
@@ -167,26 +167,26 @@ definition:
         <p>Inline: <code># checkov:skip=CKV_AWS_3:reason</code>.</p>
         <p>Kubernetes annotation value: <code>checkov.io/skip: CKV_K8S_16=reason</code>.</p>
 
-        <h2 id="scope">v0.2 scope</h2>
+        <h2 id="scope">v0.4 scope</h2>
         <ul>
-          <li>Terraform <code>.tf</code> / <code>.tf.json</code> managed <code>resource</code> blocks and <code>data</code> sources (IR kind <code>data</code>, type <code>data.TYPE</code>). No module download and no full HCL evaluation.</li>
+          <li>Terraform <code>.tf</code> / <code>.tf.json</code> / OpenTofu <code>.tofu</code> managed <code>resource</code> blocks and <code>data</code> sources. Vars/locals via defaults, <code>TF_VAR_*</code>, and <code>--var-file</code>. No module download yet.</li>
           <li>CloudFormation YAML and JSON <code>Resources</code>. Attribute paths are relative to <code>Properties</code>.</li>
           <li>Kubernetes multi-document YAML, including <code>List</code>.</li>
           <li>Dockerfiles: FROM, USER, ADD vs COPY, HEALTHCHECK, and privileged-ish RUN patterns.</li>
-          <li>181 built-in checks: 94 Terraform, 51 CloudFormation, 32 Kubernetes, 4 Docker.</li>
+          <li><strong>536</strong> built-in checks with pass/fail fixtures. Docker 100% and Kubernetes 93.8% of pinned Checkov ids (<a href="https://github.com/jose-compu/rustmaninoff/blob/main/docs/fidelity.md">fidelity.md</a>).</li>
           <li>Text, JSON, SARIF 2.1.0, and JUnit reports.</li>
         </ul>
         <p>S3 encryption, versioning, and logging on current Terraform target <code>aws_s3_bucket_server_side_encryption_configuration</code>, <code>aws_s3_bucket_versioning</code>, and <code>aws_s3_bucket_logging</code>. <code>CKV_AWS_286</code> matches a static action subset, including <code>*</code> and <code>*:*</code>. <code>CKV_K8S_14</code> accepts a digest or a tag other than <code>latest</code>; an image whose last colon is a registry port and which has no tag is treated as pinned.</p>
-        <p><strong>Not in 0.2:</strong> graph checks (<code>CKV2_*</code>), Terraform plan JSON, remote modules, Helm, Kustomize, secrets scanning, full variable evaluation, and cfn-lint resource-spec validation.</p>
+        <p><strong>Not in v0.4.0 yet:</strong> Helm, Kustomize, Terraform plan JSON, local modules (v0.5); baseline/suppressions (v0.6); secrets scanning and Azure/GCP catalog depth.</p>
 
         <h2 id="ci">CI</h2>
         <pre><code>- uses: actions/checkout@v4
 - run: cargo install --path crates/cli --locked
 - run: rustmaninoff scan . --fail-on HIGH --output sarif --sarif-file rustmaninoff.sarif</code></pre>
-        <p>Or install a released crate: <code>cargo install rustmaninoff --locked --version 0.2.0</code>.</p>
+        <p>Or install a released crate: <code>cargo install rustmaninoff --locked --version 0.4.0</code>.</p>
 
         <h2 id="crates">Crates</h2>
-        <p>Workspace 0.2.0 on crates.io:</p>
+        <p>Workspace 0.4.0 on crates.io:</p>
         <ul>
           <li><a href="https://crates.io/crates/rustmaninoff">rustmaninoff</a> (CLI)</li>
           <li><a href="https://crates.io/crates/rustmaninoff-ir">rustmaninoff-ir</a></li>
@@ -205,7 +205,7 @@ definition:
     </div>
 
     <footer class="footer">
-      <span>v0.2.0</span>
+      <span>v0.4.0</span>
       <a href="https://github.com/jose-compu/rustmaninoff">jose-compu/rustmaninoff</a>
       <a href="llms.txt">llms.txt</a>
       <span>Apache-2.0</span>

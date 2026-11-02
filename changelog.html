@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Changelog — Rustmaninoff</title>
-  <meta name="description" content="Rustmaninoff 0.2.0 release notes: Terraform data sources, Dockerfile scanning, and 181 Checkov-compatible checks.">
-  <meta name="keywords" content="rustmaninoff changelog, 0.2.0, dockerfile, terraform data sources">
+  <meta name="description" content="Rustmaninoff 0.3.0 release notes: resource graph, first-wave CKV2, Terraform vars/locals, OpenTofu.">
+  <meta name="keywords" content="rustmaninoff changelog, 0.3.0, CKV2, terraform graph, opentofu">
   <meta name="author" content="jose-compu">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <meta name="googlebot" content="index, follow, max-image-preview:large">
@@ -22,7 +22,7 @@
   <meta property="og:locale" content="en_US">
   <meta property="og:url" content="https://jose-compu.github.io/rustmaninoff/changelog.html">
   <meta property="og:title" content="Changelog — Rustmaninoff">
-  <meta property="og:description" content="Rustmaninoff 0.2.0 release notes: Terraform data sources, Dockerfile scanning, and 181 Checkov-compatible checks.">
+  <meta property="og:description" content="Rustmaninoff 0.3.0 release notes: resource graph, first-wave CKV2, Terraform vars/locals, OpenTofu.">
   <meta property="og:image" content="https://jose-compu.github.io/rustmaninoff/img/banner.jpg">
   <meta property="og:image:type" content="image/jpeg">
   <meta property="og:image:width" content="1280">
@@ -30,7 +30,7 @@
   <meta property="og:image:alt" content="Rustmaninoff, IaC security scanner">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Changelog — Rustmaninoff">
-  <meta name="twitter:description" content="Rustmaninoff 0.2.0 release notes: Terraform data sources, Dockerfile scanning, and 181 Checkov-compatible checks.">
+  <meta name="twitter:description" content="Rustmaninoff 0.3.0 release notes: resource graph, first-wave CKV2, Terraform vars/locals, OpenTofu.">
   <meta name="twitter:image" content="https://jose-compu.github.io/rustmaninoff/img/banner.jpg">
   <meta name="twitter:image:alt" content="Rustmaninoff, IaC security scanner">
   <script type="application/ld+json">
@@ -39,7 +39,7 @@
     "@type": "WebPage",
     "name": "Rustmaninoff changelog",
     "url": "https://jose-compu.github.io/rustmaninoff/changelog.html",
-    "description": "Release notes for Rustmaninoff 0.2.0.",
+    "description": "Release notes for Rustmaninoff 0.3.0.",
     "isPartOf": {"@id": "https://jose-compu.github.io/rustmaninoff/#website"}
   }
   </script>
@@ -81,18 +81,47 @@
 <h1 style="margin:0 0 1.2rem;letter-spacing:-0.03em;">Changelog</h1>
 
     <article class="card">
-      <h2 style="margin-top:0;">0.2.0 — 2026-10-15</h2>
+      <h2 style="margin-top:0;">0.4.0 — 2026-11-02</h2>
       <h3>Added</h3>
       <ul>
-        <li>Terraform <code>data</code> sources in the HCL/JSON parsers. Data sources are IR resources with kind <code>data</code> and type <code>data.TYPE</code>.</li>
-        <li>Dockerfile parser crate <code>rustmaninoff-parser-docker</code> and <code>--framework docker</code>.</li>
-        <li>Docker checks <code>CKV_DOCKER_1</code>–<code>CKV_DOCKER_4</code> (pinned FROM tag, non-root USER, COPY vs ADD, HEALTHCHECK).</li>
-        <li>Additional Terraform, CloudFormation, and Kubernetes attribute checks (181 built-in total).</li>
+        <li>Catalog depth: <strong>536</strong> built-in checks. Docker <strong>100%</strong> and Kubernetes <strong>93.8%</strong> of pinned Checkov ids.</li>
+        <li>Reproducible benches (<code>benchmarks/</code>, <code>scripts/bench.sh</code>, <code>benchmarks/history.json</code>).</li>
+        <li>Checkov comparison CI and published fidelity table.</li>
       </ul>
       <h3>Changed</h3>
       <ul>
-        <li>Workspace crates are <strong>0.2.0</strong> on crates.io.</li>
-        <li>Interpolations remain unknown. Graph checks, plan JSON, Helm, and Kustomize are still out of scope.</li>
+        <li>Workspace crates are <strong>0.4.0</strong>.</li>
+        <li>Published corpus medians: Rustmaninoff <strong>54 ms</strong>, Checkov 3.3.21 <strong>3.50 s</strong> (~65×), Trivy 0.74.0 <strong>6.27 s</strong> (~116×).</li>
+      </ul>
+      <p class="note"><a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.4.0">GitHub release v0.4.0</a> · <a href="https://github.com/jose-compu/rustmaninoff/compare/v0.3.0...v0.4.0">Full changelog</a></p>
+    </article>
+
+    <article class="card" style="margin-top:0.9rem;">
+      <h2 style="margin-top:0;">0.3.0 — 2026-11-02</h2>
+      <h3>Added</h3>
+      <ul>
+        <li>Resource graph IR (<code>Edge</code>, <code>EdgeKind</code>, <code>ResourceRef</code>) on <code>ParseOutput</code>.</li>
+        <li>Static edge emission from Terraform, CloudFormation, and Kubernetes.</li>
+        <li>Graph policy dialect <code>cond_type: connection</code> (plus <code>filter</code> alias) and <code>evaluate_graph</code> second pass.</li>
+        <li>First-wave Terraform <code>CKV2_AWS_*</code> checks — <strong>185</strong> built-in policies total.</li>
+        <li>Terraform variable / local evaluation: defaults, <code>TF_VAR_*</code>, repeatable <code>--var-file</code>, same-file <code>locals</code>.</li>
+        <li>OpenTofu <code>.tofu</code> / <code>.tofu.json</code> treated as Terraform HCL.</li>
+      </ul>
+      <h3>Changed</h3>
+      <ul>
+        <li>Workspace crates are <strong>0.3.0</strong> on crates.io.</li>
+        <li>Attribute fast path unchanged; graph checks run as a separate pass.</li>
+      </ul>
+      <p class="note"><a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.3.0">GitHub release v0.3.0</a> · <a href="https://github.com/jose-compu/rustmaninoff/compare/v0.2.0...v0.3.0">Full changelog</a></p>
+    </article>
+
+    <article class="card" style="margin-top:0.9rem;">
+      <h2 style="margin-top:0;">0.2.0 — 2026-10-15</h2>
+      <h3>Added</h3>
+      <ul>
+        <li>Terraform <code>data</code> sources in the HCL/JSON parsers.</li>
+        <li>Dockerfile parser and <code>--framework docker</code>; Docker checks <code>CKV_DOCKER_1</code>–<code>CKV_DOCKER_4</code>.</li>
+        <li>Additional TF/CFN/K8s attribute checks (181 built-in total).</li>
       </ul>
       <p class="note"><a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.2.0">GitHub release v0.2.0</a> · <a href="https://github.com/jose-compu/rustmaninoff/compare/v0.1.0...v0.2.0">Full changelog</a></p>
     </article>
@@ -103,7 +132,7 @@
     </article>
 
     <footer class="footer">
-      <span>v0.2.0</span>
+      <span>v0.4.0</span>
       <a href="https://github.com/jose-compu/rustmaninoff">jose-compu/rustmaninoff</a>
       <a href="llms.txt">llms.txt</a>
       <span>Apache-2.0</span>

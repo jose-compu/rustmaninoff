@@ -270,9 +270,9 @@ td.num { text-align: right; font-variant-numeric: tabular-nums; font-family: var
 .bar-label { color: var(--muted); font-size: 0.88rem; }
 .bar-track { height: 10px; background: var(--bg-input); border-radius: 99px; overflow: hidden; }
 .bar-fill { height: 100%; border-radius: 99px; background: var(--copper); }
-.bar-fill.checkov { width: 79%; background: #2a9d8f; }
+.bar-fill.checkov { width: 56%; background: #2a9d8f; }
 .bar-fill.trivy { width: 100%; background: #3d5a80; }
-.bar-fill.self { width: 2%; }
+.bar-fill.self { width: 1%; }
 .bar-val { font-family: var(--mono); font-size: 0.8rem; color: var(--silver); text-align: right; }
 
 .doc-layout {
