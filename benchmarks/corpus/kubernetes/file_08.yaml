@@ -1,0 +1,95 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-8-0
+  namespace: bench
+spec:
+  containers:
+    - name: app
+      image: nginx:1.27
+      securityContext:
+        privileged: true
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-8-1
+  namespace: bench
+spec:
+  containers:
+    - name: app
+      image: nginx:1.27
+      securityContext:
+        privileged: false
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-8-2
+  namespace: bench
+spec:
+  containers:
+    - name: app
+      image: nginx:1.27
+      securityContext:
+        privileged: false
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-8-3
+  namespace: bench
+spec:
+  containers:
+    - name: app
+      image: nginx:1.27
+      securityContext:
+        privileged: true
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-8-4
+  namespace: bench
+spec:
+  containers:
+    - name: app
+      image: nginx:1.27
+      securityContext:
+        privileged: false
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-8-5
+  namespace: bench
+spec:
+  containers:
+    - name: app
+      image: nginx:1.27
+      securityContext:
+        privileged: false
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-8-6
+  namespace: bench
+spec:
+  containers:
+    - name: app
+      image: nginx:1.27
+      securityContext:
+        privileged: true
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-8-7
+  namespace: bench
+spec:
+  containers:
+    - name: app
+      image: nginx:1.27
+      securityContext:
+        privileged: false

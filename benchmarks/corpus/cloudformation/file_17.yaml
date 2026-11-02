@@ -1,0 +1,92 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Resources:
+  Vol170:
+    Type: AWS::EC2::Volume
+    Properties:
+      AvailabilityZone: us-east-1a
+      Size: 8
+      Encrypted: true
+  Vol171:
+    Type: AWS::EC2::Volume
+    Properties:
+      AvailabilityZone: us-east-1a
+      Size: 8
+      Encrypted: false
+  Vol172:
+    Type: AWS::EC2::Volume
+    Properties:
+      AvailabilityZone: us-east-1a
+      Size: 8
+      Encrypted: true
+  Vol173:
+    Type: AWS::EC2::Volume
+    Properties:
+      AvailabilityZone: us-east-1a
+      Size: 8
+      Encrypted: false
+  Vol174:
+    Type: AWS::EC2::Volume
+    Properties:
+      AvailabilityZone: us-east-1a
+      Size: 8
+      Encrypted: true
+  Vol175:
+    Type: AWS::EC2::Volume
+    Properties:
+      AvailabilityZone: us-east-1a
+      Size: 8
+      Encrypted: false
+  Vol176:
+    Type: AWS::EC2::Volume
+    Properties:
+      AvailabilityZone: us-east-1a
+      Size: 8
+      Encrypted: true
+  Vol177:
+    Type: AWS::EC2::Volume
+    Properties:
+      AvailabilityZone: us-east-1a
+      Size: 8
+      Encrypted: false
+  Vol178:
+    Type: AWS::EC2::Volume
+    Properties:
+      AvailabilityZone: us-east-1a
+      Size: 8
+      Encrypted: true
+  Vol179:
+    Type: AWS::EC2::Volume
+    Properties:
+      AvailabilityZone: us-east-1a
+      Size: 8
+      Encrypted: false
+  Vol1710:
+    Type: AWS::EC2::Volume
+    Properties:
+      AvailabilityZone: us-east-1a
+      Size: 8
+      Encrypted: true
+  Vol1711:
+    Type: AWS::EC2::Volume
+    Properties:
+      AvailabilityZone: us-east-1a
+      Size: 8
+      Encrypted: false
+  Vol1712:
+    Type: AWS::EC2::Volume
+    Properties:
+      AvailabilityZone: us-east-1a
+      Size: 8
+      Encrypted: true
+  Vol1713:
+    Type: AWS::EC2::Volume
+    Properties:
+      AvailabilityZone: us-east-1a
+      Size: 8
+      Encrypted: false
+  Vol1714:
+    Type: AWS::EC2::Volume
+    Properties:
+      AvailabilityZone: us-east-1a
+      Size: 8
+      Encrypted: true

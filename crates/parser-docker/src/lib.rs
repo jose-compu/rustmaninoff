@@ -164,7 +164,14 @@ fn attributes_from_instructions(instructions: &[Instruction]) -> Value {
     }
     let mut map = BTreeMap::new();
     if !from.is_empty() {
+        let aliases: Vec<Value> = from
+            .iter()
+            .filter_map(|item| item.get("alias").cloned())
+            .collect();
         map.insert("FROM".into(), Value::Array(from));
+        if !aliases.is_empty() {
+            map.insert("_from_aliases".into(), Value::Array(aliases));
+        }
     }
     if let Some(user) = user {
         map.insert("USER".into(), user);
@@ -199,6 +206,9 @@ fn from_object(args: &str) -> Value {
     let mut map = BTreeMap::new();
     map.insert("image".into(), maybe_string(&image));
     map.insert("unpinned".into(), from_unpinned(&image));
+    if let Some(alias) = from_alias(args) {
+        map.insert("alias".into(), maybe_string(&alias));
+    }
     Value::Object(map)
 }
 
@@ -214,6 +224,19 @@ fn from_image(args: &str) -> String {
         return part.to_string();
     }
     String::new()
+}
+
+fn from_alias(args: &str) -> Option<String> {
+    let mut parts = args.split_whitespace();
+    while let Some(part) = parts.next() {
+        if part.eq_ignore_ascii_case("as") {
+            return parts.next().map(str::to_string);
+        }
+        if part.starts_with("--") && !part.contains('=') {
+            parts.next();
+        }
+    }
+    None
 }
 
 fn from_unpinned(image: &str) -> Value {
