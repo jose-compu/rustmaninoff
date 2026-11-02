@@ -1,0 +1,33 @@
+metadata:
+  id: CKV_AWS_318
+  name: Ensure Elasticsearch domains are configured with at least three dedicated master nodes for HA
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_318. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_elasticsearch_domain
+- aws_opensearch_domain
+definition:
+  and:
+  - cond_type: attribute
+    attribute: cluster_config.dedicated_master_count
+    operator: greater_than_or_equal
+    value: 3
+  - cond_type: attribute
+    attribute: cluster_config.zone_awareness_enabled
+    operator: is_true
+fixtures:
+  fail: |
+    resource "aws_opensearch_domain" "bad" {
+      cluster_config {
+        dedicated_master_count = 1
+      }
+    }
+  pass: |
+    resource "aws_opensearch_domain" "good" {
+      cluster_config {
+        dedicated_master_count  = 3
+        zone_awareness_enabled  = true
+      }
+    }

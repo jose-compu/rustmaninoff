@@ -1,0 +1,22 @@
+metadata:
+  id: CKV_AWS_140
+  name: Ensure that RDS global clusters are encrypted
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_140. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_rds_global_cluster
+definition:
+  cond_type: attribute
+  attribute: storage_encrypted
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_rds_global_cluster" "bad" {
+      storage_encrypted = false
+    }
+  pass: |
+    resource "aws_rds_global_cluster" "good" {
+      storage_encrypted = true
+    }

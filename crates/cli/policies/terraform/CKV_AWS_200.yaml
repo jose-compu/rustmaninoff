@@ -1,0 +1,39 @@
+metadata:
+  id: CKV_AWS_200
+  name: Ensure that Image Recipe EBS Disk are encrypted with CMK
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_200. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_imagebuilder_image_recipe
+definition:
+  or:
+  - cond_type: attribute
+    attribute: block_device_mapping.ebs
+    operator: not_exists
+  - and:
+    - cond_type: attribute
+      attribute: block_device_mapping.ebs.encrypted
+      operator: is_true
+    - cond_type: attribute
+      attribute: block_device_mapping.ebs.kms_key_id
+      operator: exists
+fixtures:
+  fail: |
+    resource "aws_imagebuilder_image_recipe" "bad" {
+      block_device_mapping {
+        ebs {
+          encrypted = false
+        }
+      }
+    }
+  pass: |
+    resource "aws_imagebuilder_image_recipe" "good" {
+      block_device_mapping {
+        ebs {
+          encrypted  = true
+          kms_key_id = "arn:aws:kms:us-east-1:123456789012:key/abcd"
+        }
+      }
+    }

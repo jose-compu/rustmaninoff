@@ -1,0 +1,37 @@
+metadata:
+  id: CKV_AWS_104
+  name: Ensure DocumentDB has audit logs enabled
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_104. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_docdb_cluster_parameter_group
+definition:
+  and:
+  - cond_type: attribute
+    attribute: parameter.name
+    operator: equals
+    value: audit_logs
+  - cond_type: attribute
+    attribute: parameter.value
+    operator: within
+    value:
+    - enabled
+    - ddl
+    - all
+fixtures:
+  fail: |
+    resource "aws_docdb_cluster_parameter_group" "bad" {
+      parameter {
+        name  = "audit_logs"
+        value = "disabled"
+      }
+    }
+  pass: |
+    resource "aws_docdb_cluster_parameter_group" "good" {
+      parameter {
+        name  = "audit_logs"
+        value = "enabled"
+      }
+    }

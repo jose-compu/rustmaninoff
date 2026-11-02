@@ -1,0 +1,23 @@
+metadata:
+  id: CKV_AWS_252
+  name: Ensure CloudTrail defines an SNS Topic
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_252. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_cloudtrail
+definition:
+  cond_type: attribute
+  attribute: sns_topic_name
+  operator: exists
+fixtures:
+  fail: |
+    resource "aws_cloudtrail" "bad" {
+      name = "trail"
+    }
+  pass: |
+    resource "aws_cloudtrail" "good" {
+      name           = "trail"
+      sns_topic_name = "trail-topic"
+    }

@@ -1,0 +1,27 @@
+metadata:
+  id: CKV_AWS_381
+  name: Make sure that aws_codegurureviewer_repository_association has a CMK
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_381. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_codegurureviewer_repository_association
+definition:
+  cond_type: attribute
+  attribute: kms_key_details.encryption_option
+  operator: equals
+  value: CUSTOMER_MANAGED_CMK
+fixtures:
+  fail: |
+    resource "aws_codegurureviewer_repository_association" "bad" {
+      kms_key_details {
+        encryption_option = "AWS_OWNED_CMK"
+      }
+    }
+  pass: |
+    resource "aws_codegurureviewer_repository_association" "good" {
+      kms_key_details {
+        encryption_option = "CUSTOMER_MANAGED_CMK"
+      }
+    }

@@ -1,0 +1,37 @@
+metadata:
+  id: CKV_AWS_310
+  name: Ensure CloudFront distributions should have origin failover configured
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_310. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_cloudfront_distribution
+definition:
+  and:
+  - cond_type: attribute
+    attribute: origin_group.failover_criteria
+    operator: exists
+  - cond_type: attribute
+    attribute: origin_group.member
+    operator: exists
+fixtures:
+  fail: |
+    resource "aws_cloudfront_distribution" "bad" {
+      enabled = true
+    }
+  pass: |
+    resource "aws_cloudfront_distribution" "good" {
+      enabled = true
+      origin_group {
+        failover_criteria {
+          status_codes = [403, 404]
+        }
+        member {
+          origin_id = "a"
+        }
+        member {
+          origin_id = "b"
+        }
+      }
+    }

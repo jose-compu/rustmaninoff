@@ -1,0 +1,37 @@
+metadata:
+  id: CKV_AWS_312
+  name: Ensure Elastic Beanstalk environments have enhanced health reporting enabled
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_312. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_elastic_beanstalk_environment
+definition:
+  and:
+  - cond_type: attribute
+    attribute: setting.namespace
+    operator: equals
+    value: "aws:elasticbeanstalk:healthreporting:system"
+  - cond_type: attribute
+    attribute: setting.name
+    operator: equals
+    value: HealthStreamingEnabled
+  - cond_type: attribute
+    attribute: setting.value
+    operator: equals
+    value: "True"
+fixtures:
+  fail: |
+    resource "aws_elastic_beanstalk_environment" "bad" {
+      name = "env"
+    }
+  pass: |
+    resource "aws_elastic_beanstalk_environment" "good" {
+      name = "env"
+      setting {
+        namespace = "aws:elasticbeanstalk:healthreporting:system"
+        name      = "HealthStreamingEnabled"
+        value     = "True"
+      }
+    }

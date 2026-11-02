@@ -1,0 +1,37 @@
+metadata:
+  id: CKV_AWS_90
+  name: Ensure DocumentDB TLS is not disabled
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_90. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_docdb_cluster_parameter_group
+definition:
+  cond_type: no_element
+  attribute: parameter
+  where:
+    and:
+    - cond_type: attribute
+      attribute: name
+      operator: equals
+      value: tls
+    - cond_type: attribute
+      attribute: value
+      operator: equals
+      value: disabled
+fixtures:
+  fail: |
+    resource "aws_docdb_cluster_parameter_group" "bad" {
+      parameter {
+        name  = "tls"
+        value = "disabled"
+      }
+    }
+  pass: |
+    resource "aws_docdb_cluster_parameter_group" "good" {
+      parameter {
+        name  = "tls"
+        value = "enabled"
+      }
+    }

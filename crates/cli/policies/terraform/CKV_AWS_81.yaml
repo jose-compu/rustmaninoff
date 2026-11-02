@@ -1,0 +1,49 @@
+metadata:
+  id: CKV_AWS_81
+  name: Ensure MSK Cluster encryption in rest and transit is enabled
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_81. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_msk_cluster
+definition:
+  and:
+  - cond_type: attribute
+    attribute: encryption_info
+    operator: exists
+  - or:
+    - cond_type: attribute
+      attribute: encryption_info.encryption_in_transit
+      operator: not_exists
+    - and:
+      - or:
+        - cond_type: attribute
+          attribute: encryption_info.encryption_in_transit.client_broker
+          operator: not_exists
+        - cond_type: attribute
+          attribute: encryption_info.encryption_in_transit.client_broker
+          operator: equals
+          value: TLS
+      - or:
+        - cond_type: attribute
+          attribute: encryption_info.encryption_in_transit.in_cluster
+          operator: not_exists
+        - cond_type: attribute
+          attribute: encryption_info.encryption_in_transit.in_cluster
+          operator: is_true
+fixtures:
+  fail: |
+    resource "aws_msk_cluster" "bad" {
+      cluster_name = "msk"
+    }
+  pass: |
+    resource "aws_msk_cluster" "good" {
+      cluster_name = "msk"
+      encryption_info {
+        encryption_in_transit {
+          client_broker = "TLS"
+          in_cluster    = true
+        }
+      }
+    }
