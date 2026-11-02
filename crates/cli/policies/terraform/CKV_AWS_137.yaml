@@ -1,0 +1,26 @@
+metadata:
+  id: CKV_AWS_137
+  name: Ensure that Elasticsearch is configured inside a VPC
+  category: NETWORKING
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_137. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_elasticsearch_domain
+- aws_opensearch_domain
+definition:
+  cond_type: attribute
+  attribute: vpc_options
+  operator: exists
+fixtures:
+  fail: |
+    resource "aws_elasticsearch_domain" "bad" {
+      domain_name = "es"
+    }
+  pass: |
+    resource "aws_elasticsearch_domain" "good" {
+      domain_name = "es"
+      vpc_options {
+        subnet_ids = ["subnet-1"]
+      }
+    }

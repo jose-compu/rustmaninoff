@@ -1,0 +1,26 @@
+metadata:
+  id: CKV_AWS_146
+  name: Ensure that RDS database cluster snapshot is encrypted
+  category: ENCRYPTION
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_146. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_db_cluster_snapshot
+definition:
+  cond_type: attribute
+  attribute: storage_encrypted
+  operator: is_true
+fixtures:
+  fail: |
+    resource "aws_db_cluster_snapshot" "bad" {
+      db_cluster_identifier = "db"
+      db_cluster_snapshot_identifier = "snap"
+      storage_encrypted = false
+    }
+  pass: |
+    resource "aws_db_cluster_snapshot" "good" {
+      db_cluster_identifier = "db"
+      db_cluster_snapshot_identifier = "snap"
+      storage_encrypted = true
+    }

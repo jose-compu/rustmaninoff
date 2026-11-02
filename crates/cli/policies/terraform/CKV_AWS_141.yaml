@@ -1,0 +1,30 @@
+metadata:
+  id: CKV_AWS_141
+  name: Ensure that Redshift cluster allowing version upgrade by default
+  category: GENERAL_SECURITY
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_141. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_redshift_cluster
+definition:
+  or:
+  - cond_type: attribute
+    attribute: allow_version_upgrade
+    operator: not_exists
+  - cond_type: attribute
+    attribute: allow_version_upgrade
+    operator: is_true
+fixtures:
+  fail: |
+    resource "aws_redshift_cluster" "bad" {
+      cluster_identifier = "rs"
+      node_type = "dc2.large"
+      allow_version_upgrade = false
+    }
+  pass: |
+    resource "aws_redshift_cluster" "good" {
+      cluster_identifier = "rs"
+      node_type = "dc2.large"
+      allow_version_upgrade = true
+    }
