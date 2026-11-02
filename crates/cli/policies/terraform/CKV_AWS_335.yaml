@@ -1,0 +1,30 @@
+metadata:
+  id: CKV_AWS_335
+  name: Ensure ECS task definitions should not share the host's process namespace
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_335. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_ecs_task_definition
+definition:
+  or:
+  - cond_type: attribute
+    attribute: pid_mode
+    operator: not_exists
+  - cond_type: attribute
+    attribute: pid_mode
+    operator: not_equals
+    value: host
+fixtures:
+  fail: |
+    resource "aws_ecs_task_definition" "bad" {
+      family = "app"
+      pid_mode = "host"
+      container_definitions = "[]"
+    }
+  pass: |
+    resource "aws_ecs_task_definition" "good" {
+      family = "app"
+      container_definitions = "[]"
+    }

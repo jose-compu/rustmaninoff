@@ -1,0 +1,28 @@
+metadata:
+  id: CKV_AWS_380
+  name: Ensure AWS Transfer Server uses latest Security Policy
+  category: NETWORKING
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_380. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_transfer_server
+definition:
+  cond_type: attribute
+  attribute: security_policy_name
+  operator: within
+  value:
+  - TransferSecurityPolicy-2024-01
+  - TransferSecurityPolicy-2023-05
+  - TransferSecurityPolicy-2022-03
+  - TransferSecurityPolicy-FIPS-2024-01
+  - TransferSecurityPolicy-FIPS-2023-05
+fixtures:
+  fail: |
+    resource "aws_transfer_server" "bad" {
+      security_policy_name = "TransferSecurityPolicy-2018-11"
+    }
+  pass: |
+    resource "aws_transfer_server" "good" {
+      security_policy_name = "TransferSecurityPolicy-2024-01"
+    }

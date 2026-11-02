@@ -1,0 +1,51 @@
+metadata:
+  id: CKV_K8S_84
+  name: Ensure that the admission control plugin PodSecurityPolicy is set
+  category: KUBERNETES
+  severity: HIGH
+  framework: kubernetes
+  guidelines: Adapted from Checkov CKV_K8S_84. https://github.com/bridgecrewio/checkov
+resource_types:
+- Pod
+- Deployment
+- StatefulSet
+- DaemonSet
+- Job
+- CronJob
+- ReplicaSet
+definition:
+  or:
+  - cond_type: attribute
+    attribute: _containers.command
+    operator: not_contains
+    value: kube-apiserver
+  - cond_type: attribute
+    attribute: _containers.command
+    operator: contains
+    value: --enable-admission-plugins=PodSecurityPolicy
+fixtures:
+  fail: |
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: app
+      namespace: kube-system
+    spec:
+      containers:
+        - name: app
+          image: control:1
+          command:
+            - "kube-apiserver"
+  pass: |
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: app
+      namespace: kube-system
+    spec:
+      containers:
+        - name: app
+          image: control:1
+          command:
+            - "kube-apiserver"
+            - "--enable-admission-plugins=PodSecurityPolicy"

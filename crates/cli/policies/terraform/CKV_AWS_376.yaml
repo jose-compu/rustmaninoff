@@ -1,0 +1,52 @@
+metadata:
+  id: CKV_AWS_376
+  name: Ensure AWS Elastic Load Balancer listener uses TLS/SSL
+  category: NETWORKING
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_376. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_elb
+definition:
+  cond_type: no_element
+  attribute: listener
+  where:
+    or:
+    - cond_type: attribute
+      attribute: instance_protocol
+      operator: equals
+      value: http
+    - cond_type: attribute
+      attribute: instance_protocol
+      operator: equals
+      value: HTTP
+    - cond_type: attribute
+      attribute: instance_protocol
+      operator: equals
+      value: tcp
+    - cond_type: attribute
+      attribute: instance_protocol
+      operator: equals
+      value: TCP
+fixtures:
+  fail: |
+    resource "aws_elb" "bad" {
+      name = "bad"
+      listener {
+        instance_port     = 80
+        instance_protocol = "http"
+        lb_port           = 80
+        lb_protocol       = "http"
+      }
+    }
+  pass: |
+    resource "aws_elb" "good" {
+      name = "good"
+      listener {
+        instance_port      = 443
+        instance_protocol  = "https"
+        lb_port            = 443
+        lb_protocol        = "https"
+        ssl_certificate_id = "arn:aws:acm:us-east-1:123:certificate/abc"
+      }
+    }

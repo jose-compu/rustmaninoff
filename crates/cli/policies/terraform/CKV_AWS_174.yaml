@@ -1,0 +1,36 @@
+metadata:
+  id: CKV_AWS_174
+  name: Verify CloudFront Distribution Viewer Certificate is using TLS v1.2 or higher
+  category: ENCRYPTION
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_174. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_cloudfront_distribution
+definition:
+  and:
+  - cond_type: attribute
+    attribute: viewer_certificate.cloudfront_default_certificate
+    operator: not_equals
+    value: true
+  - cond_type: attribute
+    attribute: viewer_certificate.minimum_protocol_version
+    operator: regex_match
+    value: ^TLSv1\.(2|3)_\d{4}$
+fixtures:
+  fail: |
+    resource "aws_cloudfront_distribution" "bad" {
+      enabled = true
+      viewer_certificate {
+        cloudfront_default_certificate = true
+      }
+    }
+  pass: |
+    resource "aws_cloudfront_distribution" "good" {
+      enabled = true
+      viewer_certificate {
+        acm_certificate_arn      = "arn:aws:acm:us-east-1:123:certificate/abc"
+        ssl_support_method       = "sni-only"
+        minimum_protocol_version = "TLSv1.2_2021"
+      }
+    }

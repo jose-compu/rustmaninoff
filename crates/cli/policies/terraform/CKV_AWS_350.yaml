@@ -1,0 +1,43 @@
+metadata:
+  id: CKV_AWS_350
+  name: Ensure EMR Cluster security configuration encrypts EBS disks
+  category: ENCRYPTION
+  severity: HIGH
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_350. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_emr_security_configuration
+definition:
+  cond_type: attribute
+  attribute: configuration.EncryptionConfiguration.AtRestEncryptionConfiguration.LocalDiskEncryptionConfiguration.EnableEbsEncryption
+  operator: equals
+  value: true
+fixtures:
+  fail: |
+    resource "aws_emr_security_configuration" "bad" {
+      name = "bad"
+      configuration = {
+        EncryptionConfiguration = {
+          EnableAtRestEncryption = true
+          AtRestEncryptionConfiguration = {
+            LocalDiskEncryptionConfiguration = {}
+          }
+        }
+      }
+    }
+  pass: |
+    resource "aws_emr_security_configuration" "good" {
+      name = "good"
+      configuration = {
+        EncryptionConfiguration = {
+          EnableAtRestEncryption = true
+          AtRestEncryptionConfiguration = {
+            LocalDiskEncryptionConfiguration = {
+              EnableEbsEncryption = true
+              EncryptionKeyProviderType = "AwsKms"
+              AwsKmsKey = "arn:aws:kms:us-east-1:123:key/abc"
+            }
+          }
+        }
+      }
+    }

@@ -1,0 +1,51 @@
+metadata:
+  id: CKV_K8S_81
+  name: Ensure that the admission control plugin SecurityContextDeny is set if PodSecurityPolicy is not used
+  category: KUBERNETES
+  severity: HIGH
+  framework: kubernetes
+  guidelines: Adapted from Checkov CKV_K8S_81. https://github.com/bridgecrewio/checkov
+resource_types:
+- Pod
+- Deployment
+- StatefulSet
+- DaemonSet
+- Job
+- CronJob
+- ReplicaSet
+definition:
+  or:
+  - cond_type: attribute
+    attribute: _containers.command
+    operator: not_contains
+    value: kube-apiserver
+  - cond_type: attribute
+    attribute: _containers.command
+    operator: contains
+    value: --enable-admission-plugins=SecurityContextDeny
+fixtures:
+  fail: |
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: app
+      namespace: kube-system
+    spec:
+      containers:
+        - name: app
+          image: control:1
+          command:
+            - "kube-apiserver"
+  pass: |
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: app
+      namespace: kube-system
+    spec:
+      containers:
+        - name: app
+          image: control:1
+          command:
+            - "kube-apiserver"
+            - "--enable-admission-plugins=SecurityContextDeny"

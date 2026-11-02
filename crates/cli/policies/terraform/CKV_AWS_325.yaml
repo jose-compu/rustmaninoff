@@ -1,0 +1,32 @@
+metadata:
+  id: CKV_AWS_325
+  name: Ensure that RDS Cluster audit logging is enabled for MySQL engine
+  category: LOGGING
+  severity: MEDIUM
+  framework: terraform
+  guidelines: Adapted from Checkov CKV_AWS_325. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_rds_cluster
+definition:
+  or:
+  - cond_type: attribute
+    attribute: engine
+    operator: not_within
+    value:
+    - aurora
+    - aurora-mysql
+    - mysql
+  - cond_type: attribute
+    attribute: enabled_cloudwatch_logs_exports
+    operator: contains
+    value: audit
+fixtures:
+  fail: |
+    resource "aws_rds_cluster" "bad" {
+      engine = "aurora-mysql"
+    }
+  pass: |
+    resource "aws_rds_cluster" "good" {
+      engine = "aurora-mysql"
+      enabled_cloudwatch_logs_exports = ["audit"]
+    }
