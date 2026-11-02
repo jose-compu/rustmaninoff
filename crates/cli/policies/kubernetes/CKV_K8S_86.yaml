@@ -1,0 +1,51 @@
+metadata:
+  id: CKV_K8S_86
+  name: Ensure that the --insecure-bind-address argument is not set
+  category: KUBERNETES
+  severity: HIGH
+  framework: kubernetes
+  guidelines: Adapted from Checkov CKV_K8S_86. https://github.com/bridgecrewio/checkov
+resource_types:
+- Pod
+- Deployment
+- StatefulSet
+- DaemonSet
+- Job
+- CronJob
+- ReplicaSet
+definition:
+  or:
+  - cond_type: attribute
+    attribute: _containers.command
+    operator: not_contains
+    value: "kube-apiserver"
+  - cond_type: attribute
+    attribute: _containers.command
+    operator: not_contains
+    value: "--insecure-bind-address"
+fixtures:
+  fail: |
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: app
+      namespace: kube-system
+    spec:
+      containers:
+        - name: app
+          image: control:1
+          command:
+            - "kube-apiserver"
+            - "--insecure-bind-address"
+  pass: |
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: app
+      namespace: kube-system
+    spec:
+      containers:
+        - name: app
+          image: control:1
+          command:
+            - "kube-apiserver"
