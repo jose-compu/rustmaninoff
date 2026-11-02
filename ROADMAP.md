@@ -1,6 +1,6 @@
 # Rustmaninoff roadmap
 
-**Now:** v0.2.0 — attribute scanner for Terraform, CloudFormation, Kubernetes, and Dockerfiles (181 CKV-style checks).
+**Now:** v0.3.0 — attribute + graph scanner (185 checks), Terraform vars/locals/`--var-file`, OpenTofu `.tofu`.
 
 **Aim:** cover the same *job* as Checkov (IaC misconfig, including graph and packaging) and the misconfig/secrets slice of Trivy, without becoming a Python Checkov port or downloading a CVE database on the default scan path.
 
@@ -19,14 +19,17 @@ Issues: tracking [#11](https://github.com/jose-compu/rustmaninoff/issues/11) · 
 
 Not in 0.2: `CKV2_*`, plan JSON, modules, Helm, Kustomize, secrets, vulns, Azure/GCP catalog depth.
 
-## v0.3 — graph and Terraform evaluation
+## v0.3 (shipped core; follow-ups open)
 
-| Epic | Issue |
-| --- | ---: |
-| Resource graph and `CKV2_*` composite checks | [#1](https://github.com/jose-compu/rustmaninoff/issues/1) |
-| Terraform variables, locals, modules, OpenTofu, plan JSON | [#2](https://github.com/jose-compu/rustmaninoff/issues/2) |
+| Epic | Issue | Status |
+| --- | ---: | --- |
+| Resource graph and `CKV2_*` composite checks | [#1](https://github.com/jose-compu/rustmaninoff/issues/1) | **shipped** in 0.3.0 (first-wave AWS) |
+| Terraform variables, locals, OpenTofu | [#16](https://github.com/jose-compu/rustmaninoff/issues/16) | **shipped** in 0.3.0 |
+| Local modules / count / for_each | [#17](https://github.com/jose-compu/rustmaninoff/issues/17) | open (0.3.x) |
+| `terraform_plan` JSON | [#18](https://github.com/jose-compu/rustmaninoff/issues/18) | open (0.3.x) |
+| Graph bridge from resolved interpolations | [#19](https://github.com/jose-compu/rustmaninoff/issues/19) | open (0.3.x) |
 
-Checkov gap this closes: context-aware policies and the usual `terraform` / `terraform_plan` CI path.
+Parent epic [#2](https://github.com/jose-compu/rustmaninoff/issues/2) remains open until modules + plan JSON land.
 
 ## v0.4 — packaging and more IaC
 

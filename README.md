@@ -16,7 +16,7 @@ Checkov and Trivy are broader platforms. Rustmaninoff is a **small, fast attribu
 - **One static binary.** `cargo install rustmaninoff` (or a GitHub Release binary). Checkov needs a Python environment and plugins. Trivy is a large Go binary that also covers vulns, secrets, and SBOMs you may not want in an IaC-only job.
 - **Checkov-shaped policies without the Checkov runtime.** Same published CKV ids, YAML pass-conditions, and `# checkov:skip=` / `checkov.io/skip` comments. The engine is Rust IR + attribute operators, not a Python port.
 - **Predictable CI.** Interpolations are **unknown**, not guessed. Unknowns never fail the process. Exit codes, `--fail-on`, SARIF 2.1.0, JUnit, and JSON are first-class.
-- **Focused catalog.** 181 attribute checks with a pass fixture and a fail fixture each. That is smaller than Checkov’s built-in pack and narrower than Trivy config: no graph checks (`CKV2_*`), Helm, Kustomize, plan JSON, or secrets/vuln scanning. Use those tools when you need that surface; use Rustmaninoff when you want CKV attribute gates in milliseconds.
+- **Focused catalog.** 185 checks (attribute + first-wave `CKV2_*` graph) with pass/fail fixtures. Still smaller than Checkov’s full pack: no Helm, Kustomize, plan JSON, or secrets/vuln scanning. Use those tools when you need that surface; use Rustmaninoff when you want fast CKV gates.
 
 Site: [jose-compu.github.io/rustmaninoff](https://jose-compu.github.io/rustmaninoff/) · [llms.txt](https://jose-compu.github.io/rustmaninoff/llms.txt) for search and AI agents.
 
@@ -63,24 +63,24 @@ compact: false
 
 Directories named `.git`, `.terraform`, `.terragrunt-cache`, `node_modules`, `vendor`, and `target` are skipped. Symbolic links are not followed. Files larger than 10 MB, and files past the nesting or YAML-alias limits, are reported as diagnostics and are not parsed.
 
-## v0.2 scope
+## v0.3 scope
 
-- Terraform `.tf` and `.tf.json` managed `resource` blocks and `data` sources. Data sources are emitted as IR resources with kind `data` and type `data.TYPE` so policies can target them. No module download and no full HCL evaluation.
+- Terraform `.tf` / `.tf.json` / OpenTofu `.tofu` managed `resource` blocks and `data` sources. Vars/locals via defaults, `TF_VAR_*`, and `--var-file`. No module download yet.
 - CloudFormation YAML and JSON `Resources`. Attribute paths are relative to `Properties`.
 - Kubernetes multi-document YAML, including `List`.
 - Dockerfiles (`Dockerfile`, `Containerfile`, `*.dockerfile`): FROM, USER, ADD vs COPY, HEALTHCHECK, and privileged-ish RUN patterns.
-- 181 built-in checks (94 Terraform, 51 CloudFormation, 32 Kubernetes, 4 Docker). Each check has a pass fixture and a fail fixture.
+- 185 built-in checks including first-wave Terraform `CKV2_AWS_*` graph policies. Attribute path unchanged; graph is a second pass.
 - Text, JSON, SARIF 2.1.0, and JUnit reports.
 
 S3 encryption, versioning, and logging on current Terraform target `aws_s3_bucket_server_side_encryption_configuration`, `aws_s3_bucket_versioning`, and `aws_s3_bucket_logging`. `CKV_AWS_286` matches a static action subset, including `*` and `*:*`. `CKV_K8S_14` accepts a digest or a tag other than `latest`; an image whose last colon is a registry port and which has no tag is treated as pinned.
 
-Not in v0.2: graph checks (`CKV2_*`), Terraform plan JSON, remote modules, Helm, Kustomize, secrets scanning, full variable evaluation, and cfn-lint resource-spec validation.
+Not in v0.3.0 yet: Terraform plan JSON, module expansion, Helm, Kustomize, secrets scanning, Azure/GCP catalog depth.
 
 ## Policy dialect
 
 A check definition is the pass condition. Operators: `equals`, `not_equals`, `exists`, `not_exists`, `contains`, `not_contains`, `within`, `regex_match`, `starting_with`, `ending_with`, numeric comparisons, `is_true`, `is_false`, `is_empty`, `length_greater_than`, `length_less_than`, and their negated forms. Combinators: `and`, `or`, `not`.
 
-Extensions: `no_element`, `forbid_resource`, `equals_any`, `intersects`, `image_tag_pinned`, and `missing: pass|fail|unknown`. `scope` is ignored. Severity defaults to `MEDIUM` when omitted.
+Extensions: `no_element`, `forbid_resource`, `equals_any`, `intersects`, `image_tag_pinned`, `connection` (graph neighbors), `filter` (attribute alias), and `missing: pass|fail|unknown`. `scope` is ignored. Severity defaults to `MEDIUM` when omitted.
 
 ## Benchmark
 
@@ -168,11 +168,11 @@ rustmaninoff scan .
 
 ## Release
 
-Pushing the tag `v0.2.0` runs `.github/workflows/release.yml`. It publishes Linux and macOS binaries for amd64 and arm64, each with a SHA-256 checksum.
+Pushing the tag `v0.3.0` runs `.github/workflows/release.yml`. It publishes Linux and macOS binaries for amd64 and arm64, each with a SHA-256 checksum. Crates.io publish is manual (dependency order: `ir` → parsers/engine/report → `rustmaninoff`).
 
 ```sh
-git tag v0.2.0
-git push origin v0.2.0
+git tag v0.3.0
+git push origin v0.3.0
 ```
 
 ```yaml
