@@ -1,0 +1,16 @@
+# Register with:
+#   repos:
+#     - repo: https://github.com/jose-compu/rustmaninoff
+#       rev: v0.3.0
+#       hooks:
+#         - id: rustmaninoff
+#
+# Requires `rustmaninoff` on PATH (cargo install, GitHub Release, or Docker entrypoint).
+- id: rustmaninoff
+  name: rustmaninoff
+  description: Scan Terraform, CloudFormation, Kubernetes, and Dockerfiles with rustmaninoff
+  entry: rustmaninoff scan .
+  language: system
+  pass_filenames: false
+  always_run: true
+  stages: [pre-commit]

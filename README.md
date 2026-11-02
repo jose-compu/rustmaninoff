@@ -184,6 +184,18 @@ rustmaninoff scan .
 
 GitHub Release binaries: https://github.com/jose-compu/rustmaninoff/releases/tag/v0.3.0
 
+### Pre-commit
+
+Requires `rustmaninoff` on `PATH`. Add to `.pre-commit-config.yaml`:
+
+```yaml
+repos:
+  - repo: https://github.com/jose-compu/rustmaninoff
+    rev: v0.3.0
+    hooks:
+      - id: rustmaninoff
+```
+
 ## Release
 
 Pushing the tag `v0.3.0` runs `.github/workflows/release.yml`. It publishes Linux and macOS binaries for amd64 and arm64, each with a SHA-256 checksum. Crates.io publish is manual (dependency order: `ir` → parsers/engine/report → `rustmaninoff`).
