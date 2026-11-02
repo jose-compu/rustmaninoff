@@ -159,6 +159,7 @@ resource "aws_ebs_volume" "bad" {
         skip_checks: Vec::new(),
         fail_on: Severity::High,
         external_dirs: Vec::new(),
+        var_files: Vec::new(),
         show_unknown: false,
         show_passed: true,
         compact: false,

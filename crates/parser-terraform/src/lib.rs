@@ -1,5 +1,7 @@
 //! Parse Terraform `.tf` and `.tf.json` into resources.
 
+mod eval;
+
 use std::collections::{BTreeMap, HashMap};
 use std::path::Path;
 
@@ -10,14 +12,21 @@ use rustmaninoff_ir::{
     ResourceKind, ResourceRef, Value,
 };
 
+pub use eval::{parse_tfvars, EvalContext};
+
 pub fn parse_file(path: &Path, source: &str) -> ParseOutput {
+    parse_file_with_context(path, source, &EvalContext::default())
+}
+
+pub fn parse_file_with_context(path: &Path, source: &str, external: &EvalContext) -> ParseOutput {
     if path.extension().and_then(|ext| ext.to_str()) == Some("json")
         || path.to_string_lossy().ends_with(".tf.json")
+        || path.to_string_lossy().ends_with(".tofu.json")
     {
-        return parse_json(path, source);
+        return parse_json(path, source, external);
     }
     match hcl::from_str::<Body>(source) {
-        Ok(body) => parse_body(path, source, &body),
+        Ok(body) => parse_body(path, source, &body, external),
         Err(err) => ParseOutput {
             resources: Vec::new(),
             diagnostics: vec![rustmaninoff_ir::Diagnostic {
@@ -30,7 +39,8 @@ pub fn parse_file(path: &Path, source: &str) -> ParseOutput {
     }
 }
 
-fn parse_body(path: &Path, source: &str, body: &Body) -> ParseOutput {
+fn parse_body(path: &Path, source: &str, body: &Body, external: &EvalContext) -> ParseOutput {
+    let ctx = eval::collect_file_context(body, external);
     let spans = index_block_spans(source);
     let skips = extract_skip_comments(source);
     let mut output = ParseOutput::default();
@@ -62,7 +72,7 @@ fn parse_body(path: &Path, source: &str, body: &Body) -> ParseOutput {
             .and_then(|items| items.get(occurrence))
             .copied()
             .unwrap_or((1, 1));
-        let mut attributes = body_to_value(block.body());
+        let mut attributes = body_to_value(block.body(), &ctx);
         normalize_tree(&mut attributes);
         if kind == ResourceKind::Managed {
             if labels[0] == "aws_vpc_security_group_ingress_rule" {
@@ -138,7 +148,7 @@ fn collect_expr_edges(
         }
         Expression::Object(object) => {
             for (key, value) in object.iter() {
-                let child_via = object_key(key);
+                let child_via = object_key(key, &EvalContext::default());
                 collect_expr_edges(output, from, child_via.as_deref().or(via), value);
             }
         }
@@ -271,10 +281,13 @@ fn insert_type(attributes: &mut Value, type_name: &str) {
     }
 }
 
-fn body_to_value(body: &Body) -> Value {
+fn body_to_value(body: &Body, ctx: &EvalContext) -> Value {
     let mut map = BTreeMap::new();
     for attribute in body.attributes() {
-        map.insert(attribute.key().to_string(), expr_to_value(attribute.expr()));
+        map.insert(
+            attribute.key().to_string(),
+            expr_to_value_with_ctx(attribute.expr(), ctx),
+        );
     }
     let mut blocks: BTreeMap<String, Vec<Value>> = BTreeMap::new();
     for block in body.blocks() {
@@ -296,7 +309,7 @@ fn body_to_value(body: &Body) -> Value {
         blocks
             .entry(block.identifier().to_string())
             .or_default()
-            .push(body_to_value(block.body()));
+            .push(body_to_value(block.body(), ctx));
     }
     for (name, items) in blocks {
         map.insert(name, Value::Array(items));
@@ -343,20 +356,29 @@ fn normalize_rule(map: &mut BTreeMap<String, Value>) {
     }
 }
 
-fn expr_to_value(expr: &Expression) -> Value {
+pub(crate) fn expr_to_value_raw(expr: &Expression) -> Value {
+    expr_to_value_with_ctx(expr, &EvalContext::default())
+}
+
+pub(crate) fn expr_to_value_with_ctx(expr: &Expression, ctx: &EvalContext) -> Value {
     match expr {
         Expression::Null => Value::Null,
         Expression::Bool(value) => Value::Bool(*value),
         Expression::Number(number) => number_value(number),
         Expression::String(value) => Value::string(value.clone()),
-        Expression::Array(items) => Value::Array(items.iter().map(expr_to_value).collect()),
+        Expression::Array(items) => Value::Array(
+            items
+                .iter()
+                .map(|item| expr_to_value_with_ctx(item, ctx))
+                .collect(),
+        ),
         Expression::Object(object) => {
             let mut map = BTreeMap::new();
             let mut unknown = false;
             for (key, value) in object.iter() {
-                match object_key(key) {
+                match object_key(key, ctx) {
                     Some(name) => {
-                        map.insert(name, expr_to_value(value));
+                        map.insert(name, expr_to_value_with_ctx(value, ctx));
                     }
                     None => unknown = true,
                 }
@@ -369,19 +391,34 @@ fn expr_to_value(expr: &Expression) -> Value {
                 Value::Object(map)
             }
         }
-        Expression::TemplateExpr(template) => template_value(template),
-        Expression::FuncCall(call) => func_value(call),
-        Expression::Parenthesis(inner) => expr_to_value(inner),
-        Expression::Conditional(conditional) => match expr_to_value(&conditional.cond_expr) {
-            Value::Bool(true) => expr_to_value(&conditional.true_expr),
-            Value::Bool(false) => expr_to_value(&conditional.false_expr),
-            _ => Value::Unknown {
-                expr: "conditional".into(),
-            },
+        Expression::TemplateExpr(template) => template_value(template, ctx),
+        Expression::FuncCall(call) => func_value(call, ctx),
+        Expression::Parenthesis(inner) => expr_to_value_with_ctx(inner, ctx),
+        Expression::Conditional(conditional) => {
+            match expr_to_value_with_ctx(&conditional.cond_expr, ctx) {
+                Value::Bool(true) => expr_to_value_with_ctx(&conditional.true_expr, ctx),
+                Value::Bool(false) => expr_to_value_with_ctx(&conditional.false_expr, ctx),
+                _ => Value::Unknown {
+                    expr: "conditional".into(),
+                },
+            }
+        }
+        Expression::Traversal(traversal) => resolve_traversal(traversal, ctx),
+        Expression::Variable(variable) => Value::Unknown {
+            expr: variable.as_str().to_string(),
         },
         _ => Value::Unknown {
             expr: "expression".into(),
         },
+    }
+}
+
+fn resolve_traversal(traversal: &Traversal, ctx: &EvalContext) -> Value {
+    if let Some(value) = ctx.resolve_traversal(traversal) {
+        return value;
+    }
+    Value::Unknown {
+        expr: "expression".into(),
     }
 }
 
@@ -401,10 +438,10 @@ fn number_value(number: &hcl::Number) -> Value {
     Value::string(text)
 }
 
-fn object_key(key: &ObjectKey) -> Option<String> {
+fn object_key(key: &ObjectKey, ctx: &EvalContext) -> Option<String> {
     match key {
         ObjectKey::Identifier(ident) => Some(ident.to_string()),
-        ObjectKey::Expression(expr) => match expr_to_value(expr) {
+        ObjectKey::Expression(expr) => match expr_to_value_with_ctx(expr, ctx) {
             Value::String(value) => Some(value),
             _ => None,
         },
@@ -412,12 +449,15 @@ fn object_key(key: &ObjectKey) -> Option<String> {
     }
 }
 
-fn template_value(template: &TemplateExpr) -> Value {
+fn template_value(template: &TemplateExpr, ctx: &EvalContext) -> Value {
     let raw = match template {
         TemplateExpr::QuotedString(value) => value.clone(),
         TemplateExpr::Heredoc(heredoc) => heredoc.template.clone(),
     };
     if raw.contains("${") || raw.contains("%{") {
+        if let Some(resolved) = resolve_simple_template(&raw, ctx) {
+            return resolved;
+        }
         Value::Unknown {
             expr: "template".into(),
         }
@@ -426,11 +466,26 @@ fn template_value(template: &TemplateExpr) -> Value {
     }
 }
 
-fn func_value(call: &FuncCall) -> Value {
+fn resolve_simple_template(raw: &str, ctx: &EvalContext) -> Option<Value> {
+    // Only whole-string `${var.x}` / `${local.x}` interpolations.
+    let trimmed = raw.trim();
+    let inner = trimmed.strip_prefix("${")?.strip_suffix('}')?.trim();
+    if inner.contains("${") || inner.contains("%{") {
+        return None;
+    }
+    let parts: Vec<&str> = inner.split('.').collect();
+    match parts.as_slice() {
+        ["var", name] => ctx.variables.get(*name).cloned(),
+        ["local", name] => ctx.locals.get(*name).cloned(),
+        _ => None,
+    }
+}
+
+fn func_value(call: &FuncCall, ctx: &EvalContext) -> Value {
     let name = call.name.name.as_str();
     if name == "jsonencode" {
         if let Some(arg) = call.args.first() {
-            return expr_to_value(arg);
+            return expr_to_value_with_ctx(arg, ctx);
         }
     }
     Value::Unknown {
@@ -438,7 +493,7 @@ fn func_value(call: &FuncCall) -> Value {
     }
 }
 
-fn parse_json(path: &Path, source: &str) -> ParseOutput {
+fn parse_json(path: &Path, source: &str, external: &EvalContext) -> ParseOutput {
     let parsed: serde_json::Value = match serde_json::from_str(source) {
         Ok(value) => value,
         Err(err) => {
@@ -455,6 +510,7 @@ fn parse_json(path: &Path, source: &str) -> ParseOutput {
     };
     let skips = skips_between(&extract_skip_comments(source), 1, usize::MAX);
     let mut output = ParseOutput::default();
+    let _ = external;
     emit_json_section(
         &mut output,
         path,
@@ -812,6 +868,45 @@ resource "aws_ebs_volume" "x" {
         let output = parse_file(Path::new("vol.tf"), source);
         let resolved = lookup(&output.resources[0].attributes, "encrypted");
         assert!(resolved.unknown);
+    }
+
+    #[test]
+    fn variables_locals_and_tfvars_resolve() {
+        let source = r#"
+variable "encrypted" {
+  type    = bool
+  default = false
+}
+locals {
+  size = 8
+}
+resource "aws_ebs_volume" "x" {
+  availability_zone = "us-east-1a"
+  size              = local.size
+  encrypted         = var.encrypted
+}
+"#;
+        let mut ctx = EvalContext::default();
+        ctx.variables.insert("encrypted".into(), Value::Bool(true));
+        let output = parse_file_with_context(Path::new("vol.tf"), source, &ctx);
+        let encrypted = lookup(&output.resources[0].attributes, "encrypted");
+        assert_eq!(encrypted.values[0], &Value::Bool(true));
+        let size = lookup(&output.resources[0].attributes, "size");
+        assert_eq!(size.values[0].as_f64(), Some(8.0));
+        let tfvars = parse_tfvars("encrypted = true\n").expect("tfvars");
+        assert_eq!(tfvars.get("encrypted"), Some(&Value::Bool(true)));
+    }
+
+    #[test]
+    fn opentofu_extension_parses_as_terraform() {
+        let source = r#"
+resource "aws_ebs_volume" "x" {
+  encrypted = true
+}
+"#;
+        let output = parse_file(Path::new("vol.tofu"), source);
+        assert_eq!(output.resources.len(), 1);
+        assert_eq!(output.resources[0].framework, Framework::Terraform);
     }
 
     #[test]
