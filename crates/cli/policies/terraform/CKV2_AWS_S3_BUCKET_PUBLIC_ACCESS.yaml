@@ -1,0 +1,30 @@
+metadata:
+  id: CKV2_AWS_S3_BUCKET_PUBLIC_ACCESS
+  name: Ensure S3 bucket has a public access block companion resource
+  category: GENERAL_SECURITY
+  severity: HIGH
+  framework: terraform
+  guidelines: Graph check for aws_s3_bucket_public_access_block attachment. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_s3_bucket
+definition:
+  cond_type: connection
+  connected_resource_types:
+  - aws_s3_bucket_public_access_block
+  operator: exists
+fixtures:
+  fail: |
+    resource "aws_s3_bucket" "data" {
+      bucket = "data"
+    }
+  pass: |
+    resource "aws_s3_bucket" "data" {
+      bucket = "data"
+    }
+    resource "aws_s3_bucket_public_access_block" "data" {
+      bucket = aws_s3_bucket.data.id
+      block_public_acls       = true
+      block_public_policy     = true
+      ignore_public_acls      = true
+      restrict_public_buckets = true
+    }

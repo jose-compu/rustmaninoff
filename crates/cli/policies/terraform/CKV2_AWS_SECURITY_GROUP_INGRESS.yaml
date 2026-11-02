@@ -1,0 +1,42 @@
+metadata:
+  id: CKV2_AWS_SECURITY_GROUP_INGRESS
+  name: Ensure security group has no companion ingress rule open to 0.0.0.0/0
+  category: NETWORKING
+  severity: HIGH
+  framework: terraform
+  guidelines: Graph check over aws_vpc_security_group_ingress_rule edges. https://github.com/bridgecrewio/checkov
+resource_types:
+- aws_security_group
+definition:
+  cond_type: connection
+  connected_resource_types:
+  - aws_vpc_security_group_ingress_rule
+  operator: not_exists
+  attribute_filter:
+    cond_type: attribute
+    attribute: cidr_ipv4
+    operator: equals
+    value: 0.0.0.0/0
+fixtures:
+  fail: |
+    resource "aws_security_group" "web" {
+      name = "web"
+    }
+    resource "aws_vpc_security_group_ingress_rule" "ssh" {
+      security_group_id = aws_security_group.web.id
+      from_port         = 22
+      to_port           = 22
+      ip_protocol       = "tcp"
+      cidr_ipv4         = "0.0.0.0/0"
+    }
+  pass: |
+    resource "aws_security_group" "web" {
+      name = "web"
+    }
+    resource "aws_vpc_security_group_ingress_rule" "ssh" {
+      security_group_id = aws_security_group.web.id
+      from_port         = 22
+      to_port           = 22
+      ip_protocol       = "tcp"
+      cidr_ipv4         = "10.0.0.0/8"
+    }

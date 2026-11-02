@@ -13,8 +13,8 @@ fn builtin_pack_covers_at_least_160_policies_with_fixtures() {
     let policies = builtin_policies().expect("embedded policies");
     println!("builtin policies: {}", policies.len());
     assert!(
-        policies.len() >= 175,
-        "expected at least 175 builtin policies, found {}",
+        policies.len() >= 185,
+        "expected at least 185 builtin policies, found {}",
         policies.len()
     );
     for policy in &policies {
@@ -67,7 +67,12 @@ fn assert_fixture(
         "{} fixture produced no resources:\n{source}",
         policy.id
     );
-    let findings = rustmaninoff_engine::evaluate(&output.resources, related);
+    let mut findings = rustmaninoff_engine::evaluate(&output.resources, related);
+    findings.extend(rustmaninoff_engine::evaluate_graph(
+        &output.resources,
+        &output.edges,
+        related,
+    ));
     let matched: Vec<_> = findings
         .iter()
         .filter(|finding| finding.check_id == policy.id)
