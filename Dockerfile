@@ -13,7 +13,7 @@ RUN cargo build --release --locked -p rustmaninoff \
 
 FROM debian:bookworm-slim AS build-release
 ARG TARGETARCH
-ARG VERSION=0.3.0
+ARG VERSION=0.4.1
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ca-certificates curl \
     && rm -rf /var/lib/apt/lists/*
@@ -26,7 +26,17 @@ RUN set -eu; \
     asset="rustmaninoff-${target}.tar.gz"; \
     url="https://github.com/jose-compu/rustmaninoff/releases/download/v${VERSION}/${asset}"; \
     echo "Fetching ${url}"; \
-    curl -fsSL -o /tmp/rustmaninoff.tar.gz "$url"; \
+    # Retry briefly in case the image build starts just as assets finish uploading.
+    i=0; \
+    until curl -fsSL -o /tmp/rustmaninoff.tar.gz "$url"; do \
+      i=$((i+1)); \
+      if [ "$i" -ge 30 ]; then \
+        echo "failed to download ${url}" >&2; \
+        exit 1; \
+      fi; \
+      echo "retry ${i}/30…"; \
+      sleep 10; \
+    done; \
     mkdir -p /out; \
     tar -xzf /tmp/rustmaninoff.tar.gz -C /out; \
     chmod 755 /out/rustmaninoff; \
