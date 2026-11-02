@@ -22,7 +22,7 @@ rustmaninoff scan . --framework terraform,cloudformation,kubernetes,docker
 
 ## Why it exists vs Checkov and Trivy
 
-On one synthetic corpus (1,540 resources, Apple M2): Rustmaninoff 0.2.0 finished in 20 ms; Checkov 3.3.21 in 4.51 s (~225×); Trivy 0.74.0 in 5.71 s (~285×). Catalogs are not the same: Rustmaninoff ran 181 attribute checks.
+On one synthetic corpus (1,540 resources, Apple M2): Rustmaninoff 0.4.0 finished in 54 ms; Checkov 3.3.21 in 3.50 s (~65×); Trivy 0.74.0 in 6.27 s (~116×). Catalogs are not the same: Rustmaninoff ran 536 checks.
 
 Use Checkov or Trivy for graph checks, Helm, Kustomize, plan JSON, secrets, or vulnerability scanning. Use Rustmaninoff for CKV attribute gates in CI without a Python runtime or a full Trivy stack.
 
@@ -32,7 +32,7 @@ Use Checkov or Trivy for graph checks, Helm, Kustomize, plan JSON, secrets, or v
 - CloudFormation YAML/JSON Resources. Attribute paths are relative to Properties.
 - Kubernetes multi-document YAML, including List.
 - Dockerfiles: FROM tag, USER, COPY vs ADD, HEALTHCHECK.
-- 181 built-in checks (94 Terraform, 51 CloudFormation, 32 Kubernetes, 4 Docker).
+- 536 built-in checks (Docker 100% / Kubernetes 93.8% of pinned Checkov ids; see docs/fidelity.md).
 - Reports: text, JSON, SARIF 2.1.0, JUnit.
 - Interpolations (`${...}`, `Fn::*`, `!Ref`, `!GetAtt`) are unknown and do not fail the process.
 

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Rustmaninoff — IaC security scanner</title>
-  <meta name="description" content="Fast IaC attribute scanner. Checkov-compatible CKV policies in a Rust binary: about 225× faster than Checkov and 285× faster than Trivy on a 1,540-resource corpus.">
+  <meta name="description" content="Fast IaC attribute scanner. Checkov-compatible CKV policies in a Rust binary: about 65× faster than Checkov and 116× faster than Trivy on a 1,540-resource corpus.">
   <meta name="keywords" content="rustmaninoff, IaC scanner, terraform security, cloudformation, kubernetes, dockerfile, checkov, trivy, CKV, policy as code, rust, static analysis">
   <meta name="author" content="jose-compu">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
@@ -22,7 +22,7 @@
   <meta property="og:locale" content="en_US">
   <meta property="og:url" content="https://jose-compu.github.io/rustmaninoff/">
   <meta property="og:title" content="Rustmaninoff — IaC security scanner">
-  <meta property="og:description" content="Fast IaC attribute scanner. Checkov-compatible CKV policies in a Rust binary: about 225× faster than Checkov and 285× faster than Trivy on a 1,540-resource corpus.">
+  <meta property="og:description" content="Fast IaC attribute scanner. Checkov-compatible CKV policies in a Rust binary: about 65× faster than Checkov and 116× faster than Trivy on a 1,540-resource corpus.">
   <meta property="og:image" content="https://jose-compu.github.io/rustmaninoff/img/banner.jpg">
   <meta property="og:image:type" content="image/jpeg">
   <meta property="og:image:width" content="1280">
@@ -30,7 +30,7 @@
   <meta property="og:image:alt" content="Rustmaninoff, IaC security scanner">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Rustmaninoff — IaC security scanner">
-  <meta name="twitter:description" content="Fast IaC attribute scanner. Checkov-compatible CKV policies in a Rust binary: about 225× faster than Checkov and 285× faster than Trivy on a 1,540-resource corpus.">
+  <meta name="twitter:description" content="Fast IaC attribute scanner. Checkov-compatible CKV policies in a Rust binary: about 65× faster than Checkov and 116× faster than Trivy on a 1,540-resource corpus.">
   <meta name="twitter:image" content="https://jose-compu.github.io/rustmaninoff/img/banner.jpg">
   <meta name="twitter:image:alt" content="Rustmaninoff, IaC security scanner">
   <script type="application/ld+json">
@@ -65,7 +65,7 @@
         "downloadUrl": "https://crates.io/crates/rustmaninoff",
         "codeRepository": "https://github.com/jose-compu/rustmaninoff",
         "programmingLanguage": "Rust",
-        "description": "IaC security scanner for Terraform, CloudFormation, Kubernetes, and Dockerfiles. Checkov-compatible YAML and CKV ids. About 225 times faster than Checkov and 285 times faster than Trivy on a 1,540-resource corpus.",
+        "description": "IaC security scanner for Terraform, CloudFormation, Kubernetes, and Dockerfiles. Checkov-compatible YAML and CKV ids. About 65 times faster than Checkov and 116 times faster than Trivy on a 1,540-resource corpus.",
         "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}
       },
       {
@@ -115,19 +115,19 @@
   <div class="wrap">
     <section class="hero">
       <img class="hero-banner" src="img/banner.jpg" alt="Rustmaninoff, IaC security scanner">
-      <p class="kicker">v0.3.0 · Apache-2.0</p>
+      <p class="kicker">v0.4.0 · Apache-2.0</p>
       <p class="badges" style="margin:0.6rem 0 0.8rem;display:flex;gap:0.4rem;flex-wrap:wrap;justify-content:center"><a href="https://crates.io/crates/rustmaninoff"><img src="https://img.shields.io/crates/v/rustmaninoff.svg" alt="crates.io"></a><a href="https://github.com/jose-compu/rustmaninoff/actions/workflows/ci.yml"><img src="https://github.com/jose-compu/rustmaninoff/actions/workflows/ci.yml/badge.svg" alt="CI"></a><a href="https://github.com/jose-compu/rustmaninoff/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="License"></a></p><h1>Checkov-compatible CKV policies. Single Rust binary. No Python.</h1>
-      <p class="lede">Compared to Checkov: same published CKV ids and skip comments, without the Python runtime — about 225× faster on a published synthetic corpus (self-reported). 185 checks including first-wave graph CKV2. Terraform, CloudFormation, Kubernetes, and Dockerfiles.</p><p style="text-align:center;margin:1rem 0"><img src="img/demo.svg" alt="Terminal demo: rustmaninoff fails CKV_AWS_3" width="720" style="max-width:100%;border-radius:10px"></p>
+      <p class="lede">Compared to Checkov: same published CKV ids and skip comments, without the Python runtime — about 65× faster on a published synthetic corpus (self-reported). 536 checks; Docker 100% / K8s 93.8% Checkov fidelity. Terraform, CloudFormation, Kubernetes, and Dockerfiles.</p><p style="text-align:center;margin:1rem 0"><img src="img/demo.svg" alt="Terminal demo: rustmaninoff fails CKV_AWS_3" width="720" style="max-width:100%;border-radius:10px"></p>
       <div class="cta-row">
         <a class="btn btn-primary" href="documentation.html">Read the docs</a>
-        <a class="btn btn-ghost" href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.3.0">GitHub release</a>
+        <a class="btn btn-ghost" href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.4.0">GitHub release</a>
         <a class="btn btn-ghost" href="https://crates.io/crates/rustmaninoff">Install from crates.io</a>
       </div>
       <div class="stats">
         <div class="stat"><b>20 ms</b><span>full synthetic corpus</span></div>
         <div class="stat"><b>185</b><span>built-in checks</span></div>
         <div class="stat"><b>4</b><span>frameworks</span></div>
-        <div class="stat"><b>~225×</b><span>faster than Checkov on that corpus</span></div>
+        <div class="stat"><b>~65×</b><span>faster than Checkov on that corpus</span></div>
       </div>
     </section>
 
@@ -137,7 +137,7 @@
       <div class="grid grid-3" style="margin-top:1rem;">
         <article class="card">
           <h3>Milliseconds, not seconds</h3>
-          <p>20 ms on 1,540 resources vs 4.51 s Checkov (~225×) and 5.71 s Trivy (~285×). No Python VM and no policy-db refresh on the scan path.</p>
+          <p>20 ms on 1,540 resources vs 4.51 s Checkov (~65×) and 5.71 s Trivy (~285×). No Python VM and no policy-db refresh on the scan path.</p>
         </article>
         <article class="card">
           <h3>One static binary</h3>
@@ -197,7 +197,7 @@ rustmaninoff scan . --framework terraform,cloudformation,kubernetes,docker</code
 
     <section class="section">
       <h2>Speed, on one corpus</h2>
-      <p class="note">Wall-clock CLI time, Apple M2, macOS 14.8. Median of three runs after warmup. 40 Terraform files (1,080 resources), 20 CloudFormation files (300 resources), 20 Kubernetes files (160 resources). Catalogs are not the same: Rustmaninoff ran 181 attribute checks.</p>
+      <p class="note">Wall-clock CLI time, Apple M2, macOS 14.8. Median of three runs after warmup. 40 Terraform files (1,080 resources), 20 CloudFormation files (300 resources), 20 Kubernetes files (160 resources). Catalogs are not the same: Rustmaninoff ran 536 checks.</p>
       <div class="bars" style="margin: 1.1rem 0 1.2rem;">
         <div class="bar-row">
           <div class="bar-label">Rustmaninoff 0.2.0</div>
