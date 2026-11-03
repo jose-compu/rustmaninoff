@@ -1,0 +1,33 @@
+# Eat our own dog food: run the published Marketplace Action on this repo.
+name: rustmaninoff
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rustmaninoff IaC scan
+        uses: jose-compu/rustmaninoff@v0.4.3
+        with:
+          path: .
+          version: "0.4.3"
+          fail-on: HIGH
+          output: sarif
+          sarif-file: rustmaninoff.sarif
+
+      - name: Upload SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: rustmaninoff.sarif

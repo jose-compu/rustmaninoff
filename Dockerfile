@@ -47,8 +47,11 @@ FROM build-${BUILD_MODE} AS build
 FROM debian:bookworm-slim
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd --system --uid 10001 --create-home --home-dir /src rustmaninoff
 COPY --from=build /out/rustmaninoff /usr/local/bin/rustmaninoff
 WORKDIR /src
+USER rustmaninoff
+HEALTHCHECK CMD rustmaninoff --version
 ENTRYPOINT ["rustmaninoff"]
 CMD ["scan", "."]

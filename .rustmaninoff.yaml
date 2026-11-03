@@ -1,0 +1,7 @@
+# Dogfood config for CI / local scans of this repo.
+# Exclude intentional fail fixtures and the synthetic bench corpus.
+frameworks: [terraform, cloudformation, kubernetes, docker]
+fail_on: HIGH
+excluded_paths:
+  - benchmarks
+  - testdata
