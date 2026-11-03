@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.3 — 2026-11-03
+
+### Changed
+
+- Action Marketplace `description` shortened to ≤125 characters.
+- Workspace crates are **0.4.3**; Action default `version` pin is **0.4.3**.
+
 ## 0.4.2 — 2026-11-03
 
 ### Changed
