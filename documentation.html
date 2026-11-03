@@ -43,7 +43,7 @@
         "headline": "Rustmaninoff documentation — CLI and GitHub Action",
         "description": "Install Rustmaninoff via cargo, Homebrew, Docker, or GitHub Action. Scan flags, SARIF, Checkov-compatible CKV policies.",
         "url": "https://jose-compu.github.io/rustmaninoff/documentation.html",
-        "version": "0.4.2",
+        "version": "0.4.3",
         "author": {"@type": "Organization", "name": "jose-compu", "url": "https://github.com/jose-compu"},
         "isPartOf": {"@id": "https://jose-compu.github.io/rustmaninoff/#website"},
         "about": {"@id": "https://jose-compu.github.io/rustmaninoff/#app"}
@@ -54,7 +54,7 @@
         "url": "https://jose-compu.github.io/rustmaninoff/documentation.html#github-action",
         "step": [
           {"@type": "HowToStep", "name": "Checkout", "text": "uses: actions/checkout@v4"},
-          {"@type": "HowToStep", "name": "Scan", "text": "uses: jose-compu/rustmaninoff@v0.4.2 with path, fail-on, output sarif"},
+          {"@type": "HowToStep", "name": "Scan", "text": "uses: jose-compu/rustmaninoff@v0.4.3 with path, fail-on, output sarif"},
           {"@type": "HowToStep", "name": "Upload SARIF", "text": "uses: github/codeql-action/upload-sarif@v3"}
         ]
       }
@@ -135,15 +135,15 @@ rustmaninoff scan .</code></pre>
         <p>From a checkout:</p>
         <pre><code>cargo build --release -p rustmaninoff
 ./target/release/rustmaninoff scan .</code></pre>
-        <p>GitHub Release binaries for Linux and macOS (amd64 and arm64): <a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.4.2">v0.4.2</a> (Marketplace docs) · <a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.4.1">v0.4.1</a> (Action hardening) · <a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.4.0">v0.4.0</a> (catalog).</p>
+        <p>GitHub Release binaries for Linux and macOS (amd64 and arm64): <a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.4.3">v0.4.3</a> (Marketplace docs) · <a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.4.1">v0.4.1</a> (Action hardening) · <a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.4.0">v0.4.0</a> (catalog).</p>
 
         <h2 id="github-action">GitHub Action</h2>
         <p>Official Action on the <a href="https://github.com/marketplace/actions/rustmaninoff">GitHub Marketplace</a>. Composite Action at repo root (<code>action.yml</code>): downloads a release binary, verifies <code>.sha256</code>, validates inputs, and runs <code>rustmaninoff scan</code>. Full reference: <a href="https://github.com/jose-compu/rustmaninoff/blob/main/ACTION.md">ACTION.md</a>.</p>
         <pre><code>- uses: actions/checkout@v4
-- uses: jose-compu/rustmaninoff@v0.4.2
+- uses: jose-compu/rustmaninoff@v0.4.3
   with:
     path: .
-    version: "0.4.2"   # or "latest"
+    version: "0.4.3"   # or "latest"
     fail-on: HIGH
     output: sarif
     sarif-file: rustmaninoff.sarif
@@ -152,7 +152,7 @@ rustmaninoff scan .</code></pre>
   if: always()
   with:
     sarif_file: rustmaninoff.sarif</code></pre>
-        <p>Required permissions for SARIF upload: <code>security-events: write</code>. Pin the Action tag (<code>@v0.4.2</code>) in production; optionally pin by commit SHA for supply-chain hardening.</p>
+        <p>Required permissions for SARIF upload: <code>security-events: write</code>. Pin the Action tag (<code>@v0.4.3</code>) in production; optionally pin by commit SHA for supply-chain hardening.</p>
 
         <h2 id="scan">Scan</h2>
         <pre><code>rustmaninoff scan [PATH] \
@@ -218,7 +218,7 @@ definition:
         <p><strong>Not in v0.4.0 yet:</strong> Helm, Kustomize, Terraform plan JSON, local modules (v0.5); baseline/suppressions (v0.6); secrets scanning and Azure/GCP catalog depth.</p>
 
         <h2 id="ci">CI without the Action</h2>
-        <p>Prefer <a href="#github-action">jose-compu/rustmaninoff@v0.4.2</a>. Manual install path:</p>
+        <p>Prefer <a href="#github-action">jose-compu/rustmaninoff@v0.4.3</a>. Manual install path:</p>
         <pre><code>- uses: actions/checkout@v4
 - run: cargo install rustmaninoff --locked --version 0.4.0
 - run: rustmaninoff scan . --fail-on HIGH --output sarif --sarif-file rustmaninoff.sarif</code></pre>
@@ -243,7 +243,7 @@ definition:
     </div>
 
     <footer class="footer">
-      <span>v0.4.2</span>
+      <span>v0.4.3</span>
       <a href="https://github.com/jose-compu/rustmaninoff">jose-compu/rustmaninoff</a>
       <a href="https://github.com/marketplace/actions/rustmaninoff">Marketplace Action</a>
       <a href="llms.txt">llms.txt</a>
