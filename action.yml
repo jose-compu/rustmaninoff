@@ -13,7 +13,7 @@ inputs:
   version:
     description: rustmaninoff release version (without leading v), or "latest"
     required: false
-    default: "0.4.3"
+    default: "0.4.4"
   fail-on:
     description: Minimum severity that fails the job (LOW, MEDIUM, HIGH, CRITICAL)
     required: false
@@ -145,7 +145,8 @@ runs:
         args="${INPUT_ARGS}"
 
         # Reject metacharacters that would enable shell injection if ever mis-expanded.
-        safe_path='^[A-Za-z0-9._/=@+-][A-Za-z0-9._/=@+ -]*$'
+        # Use [[:space:]] (not a literal space) so unquoted =~ patterns are not word-split by bash.
+        safe_path='^[A-Za-z0-9._/=@+[:space:]-]+$'
         if [ -z "$path" ] || ! [[ "$path" =~ $safe_path ]]; then
           echo "invalid path input" >&2
           exit 1
@@ -158,12 +159,14 @@ runs:
           echo "invalid output input (expected comma-separated cli,json,sarif,junit)" >&2
           exit 1
         fi
-        if ! [[ "$sarif_file" =~ ^[A-Za-z0-9._/=@+-][A-Za-z0-9._/=@+ -]*$ ]]; then
+        safe_sarif='^[A-Za-z0-9._/=@+[:space:]-]+$'
+        if ! [[ "$sarif_file" =~ $safe_sarif ]]; then
           echo "invalid sarif-file input" >&2
           exit 1
         fi
         # Extra args are optional; allow a conservative CLI character set only.
-        if [ -n "$args" ] && ! [[ "$args" =~ ^[A-Za-z0-9_./=,:@+ -]+$ ]]; then
+        safe_args='^[A-Za-z0-9_./=,:@+[:space:]-]+$'
+        if [ -n "$args" ] && ! [[ "$args" =~ $safe_args ]]; then
           echo "invalid args input (forbidden characters)" >&2
           exit 1
         fi

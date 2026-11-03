@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.4.4 — 2026-11-03
+
+### Fixed
+
+- GitHub Action input validation: bash `=~` patterns no longer embed a literal space (word-split broke path/sarif/args checks with exit 2).
+
+### Changed
+
+- Workspace crates are **0.4.4**.
+- Action default `version` pin is **0.4.4**.
+
 ## 0.4.3 — 2026-11-03
 
 ### Changed

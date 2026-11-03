@@ -18,10 +18,10 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Rustmaninoff IaC scan
-        uses: jose-compu/rustmaninoff@v0.4.3
+        uses: jose-compu/rustmaninoff@v0.4.4
         with:
           path: .
-          version: "0.4.3"
+          version: "0.4.4"
           fail-on: HIGH
           output: sarif
           sarif-file: rustmaninoff.sarif
