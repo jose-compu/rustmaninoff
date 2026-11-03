@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Rustmaninoff — IaC security scanner</title>
-  <meta name="description" content="Fast IaC attribute scanner. Checkov-compatible CKV policies in a Rust binary: about 65× faster than Checkov and 116× faster than Trivy on a 1,540-resource corpus.">
-  <meta name="keywords" content="rustmaninoff, IaC scanner, terraform security, cloudformation, kubernetes, dockerfile, checkov, trivy, CKV, policy as code, rust, static analysis">
+  <title>Rustmaninoff — Fast Checkov-compatible IaC scanner (Terraform, K8s, Docker) + GitHub Action</title>
+  <meta name="description" content="Rustmaninoff is a fast Checkov-compatible IaC security scanner for Terraform, CloudFormation, Kubernetes, and Dockerfiles. Install via cargo, Homebrew, Docker, or the GitHub Action with SARIF upload. About 65× faster than Checkov on a published corpus.">
+  <meta name="keywords" content="rustmaninoff, IaC scanner, terraform security scanner, kubernetes security, dockerfile security, cloudformation security, checkov alternative, checkov compatible, trivy misconfig alternative, CKV policies, CKV_AWS, CKV_K8S, CKV_DOCKER, policy as code, rust iac scanner, github action iac scan, SARIF, code scanning, static analysis, infrastructure as code security">
+  <meta name="ai-content-declaration" content="product-documentation">
+  <link rel="alternate" hreflang="en" href="https://jose-compu.github.io/rustmaninoff/">
   <meta name="author" content="jose-compu">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <meta name="googlebot" content="index, follow, max-image-preview:large">
@@ -21,16 +23,16 @@
   <meta property="og:site_name" content="Rustmaninoff">
   <meta property="og:locale" content="en_US">
   <meta property="og:url" content="https://jose-compu.github.io/rustmaninoff/">
-  <meta property="og:title" content="Rustmaninoff — IaC security scanner">
-  <meta property="og:description" content="Fast IaC attribute scanner. Checkov-compatible CKV policies in a Rust binary: about 65× faster than Checkov and 116× faster than Trivy on a 1,540-resource corpus.">
+  <meta property="og:title" content="Rustmaninoff — Fast Checkov-compatible IaC scanner + GitHub Action">
+  <meta property="og:description" content="Checkov-compatible CKV policies in a Rust binary. Terraform, CloudFormation, Kubernetes, Dockerfiles. GitHub Action with SARIF. About 65× faster than Checkov on a published corpus.">
   <meta property="og:image" content="https://jose-compu.github.io/rustmaninoff/img/banner.jpg">
   <meta property="og:image:type" content="image/jpeg">
   <meta property="og:image:width" content="1280">
   <meta property="og:image:height" content="720">
   <meta property="og:image:alt" content="Rustmaninoff, IaC security scanner">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Rustmaninoff — IaC security scanner">
-  <meta name="twitter:description" content="Fast IaC attribute scanner. Checkov-compatible CKV policies in a Rust binary: about 65× faster than Checkov and 116× faster than Trivy on a 1,540-resource corpus.">
+  <meta name="twitter:title" content="Rustmaninoff — Fast Checkov-compatible IaC scanner + GitHub Action">
+  <meta name="twitter:description" content="Checkov-compatible CKV policies in a Rust binary. Terraform, K8s, Docker. GitHub Action with SARIF. About 65× faster than Checkov on a published corpus.">
   <meta name="twitter:image" content="https://jose-compu.github.io/rustmaninoff/img/banner.jpg">
   <meta name="twitter:image:alt" content="Rustmaninoff, IaC security scanner">
   <script type="application/ld+json">
@@ -42,9 +44,14 @@
         "@id": "https://jose-compu.github.io/rustmaninoff/#website",
         "url": "https://jose-compu.github.io/rustmaninoff/",
         "name": "Rustmaninoff",
-        "description": "Fast IaC attribute scanner with Checkov-compatible CKV policies, written in Rust.",
+        "description": "Fast Checkov-compatible IaC security scanner with a GitHub Action, written in Rust.",
         "inLanguage": "en",
-        "publisher": {"@id": "https://jose-compu.github.io/rustmaninoff/#org"}
+        "publisher": {"@id": "https://jose-compu.github.io/rustmaninoff/#org"},
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://github.com/search?q=repo%3Ajose-compu%2Frustmaninoff+{search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
       },
       {
         "@type": "Organization",
@@ -57,25 +64,101 @@
         "@type": "SoftwareApplication",
         "@id": "https://jose-compu.github.io/rustmaninoff/#app",
         "name": "Rustmaninoff",
-        "applicationCategory": "DeveloperApplication",
+        "alternateName": ["rustmaninoff", "Rustmaninoff IaC scanner"],
+        "applicationCategory": "SecurityApplication",
+        "applicationSubCategory": "Infrastructure as Code scanner",
         "operatingSystem": "Linux, macOS",
-        "softwareVersion": "0.4.0",
+        "softwareVersion": "0.4.1",
         "license": "https://www.apache.org/licenses/LICENSE-2.0",
         "url": "https://jose-compu.github.io/rustmaninoff/",
         "downloadUrl": "https://crates.io/crates/rustmaninoff",
+        "installUrl": "https://github.com/marketplace/actions/rustmaninoff",
         "codeRepository": "https://github.com/jose-compu/rustmaninoff",
         "programmingLanguage": "Rust",
-        "description": "IaC security scanner for Terraform, CloudFormation, Kubernetes, and Dockerfiles. Checkov-compatible YAML and CKV ids. About 65 times faster than Checkov and 116 times faster than Trivy on a 1,540-resource corpus.",
+        "keywords": "IaC scanner, Checkov alternative, Terraform security, Kubernetes security, Dockerfile security, GitHub Action, SARIF, CKV",
+        "description": "IaC security scanner for Terraform, CloudFormation, Kubernetes, and Dockerfiles. Checkov-compatible YAML and CKV ids. GitHub Action with checksum-verified binary and SARIF output. About 65 times faster than Checkov and 116 times faster than Trivy on a 1,540-resource corpus.",
+        "featureList": [
+          "Checkov-compatible CKV policy ids",
+          "Terraform, CloudFormation, Kubernetes, Dockerfile scanning",
+          "GitHub Action with SARIF Code Scanning upload",
+          "536 built-in checks with published fidelity table",
+          "Single Rust binary — no Python runtime"
+        ],
+        "sameAs": [
+          "https://github.com/jose-compu/rustmaninoff",
+          "https://crates.io/crates/rustmaninoff",
+          "https://github.com/marketplace/actions/rustmaninoff",
+          "https://docs.rs/rustmaninoff"
+        ],
         "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}
       },
       {
         "@type": "WebPage",
         "@id": "https://jose-compu.github.io/rustmaninoff/#webpage",
         "url": "https://jose-compu.github.io/rustmaninoff/",
-        "name": "Rustmaninoff — IaC security scanner",
+        "name": "Rustmaninoff — Fast Checkov-compatible IaC scanner + GitHub Action",
         "isPartOf": {"@id": "https://jose-compu.github.io/rustmaninoff/#website"},
         "about": {"@id": "https://jose-compu.github.io/rustmaninoff/#app"},
-        "primaryImageOfPage": "https://jose-compu.github.io/rustmaninoff/img/banner.jpg"
+        "primaryImageOfPage": "https://jose-compu.github.io/rustmaninoff/img/banner.jpg",
+        "speakable": {
+          "@type": "SpeakableSpecification",
+          "cssSelector": ["h1", ".lede"]
+        }
+      },
+      {
+        "@type": "HowTo",
+        "@id": "https://jose-compu.github.io/rustmaninoff/#howto-action",
+        "name": "Install the Rustmaninoff GitHub Action",
+        "description": "Add Rustmaninoff to a GitHub Actions workflow to scan IaC and upload SARIF to Code Scanning.",
+        "totalTime": "PT2M",
+        "tool": {"@type": "HowToTool", "name": "GitHub Actions"},
+        "step": [
+          {
+            "@type": "HowToStep",
+            "name": "Checkout the repository",
+            "text": "Use actions/checkout so the scanner can read Terraform, Kubernetes, CloudFormation, and Dockerfile paths."
+          },
+          {
+            "@type": "HowToStep",
+            "name": "Run jose-compu/rustmaninoff",
+            "text": "Add uses: jose-compu/rustmaninoff@v0.4.1 with path, fail-on HIGH, and output sarif."
+          },
+          {
+            "@type": "HowToStep",
+            "name": "Upload SARIF",
+            "text": "Use github/codeql-action/upload-sarif with sarif_file rustmaninoff.sarif."
+          }
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://jose-compu.github.io/rustmaninoff/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Is Rustmaninoff a Checkov alternative?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes for Checkov-compatible CKV attribute gates in CI. It reuses published CKV ids and skip comments in a Rust binary. It is not a full Checkov replacement for Helm, Kustomize, plan JSON, or deep graph coverage yet."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do I install the Rustmaninoff GitHub Action?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "In a workflow, use jose-compu/rustmaninoff@v0.4.1 after actions/checkout. Set output to sarif and optionally upload with github/codeql-action/upload-sarif. Marketplace: https://github.com/marketplace/actions/rustmaninoff"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does Rustmaninoff replace Trivy?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. Run Rustmaninoff next to Trivy for IaC CKV policies. Use Trivy for container CVE scanning, secrets product features, and SBOM. Rustmaninoff has no vulnerability database."
+            }
+          }
+        ]
       }
     ]
   }
@@ -115,13 +198,14 @@
   <div class="wrap">
     <section class="hero">
       <img class="hero-banner" src="img/banner.jpg" alt="Rustmaninoff, IaC security scanner">
-      <p class="kicker">v0.4.0 · Apache-2.0</p>
-      <p class="badges" style="margin:0.6rem 0 0.8rem;display:flex;gap:0.4rem;flex-wrap:wrap;justify-content:center"><a href="https://crates.io/crates/rustmaninoff"><img src="https://img.shields.io/crates/v/rustmaninoff.svg" alt="crates.io"></a><a href="https://github.com/jose-compu/rustmaninoff/actions/workflows/ci.yml"><img src="https://github.com/jose-compu/rustmaninoff/actions/workflows/ci.yml/badge.svg" alt="CI"></a><a href="https://github.com/jose-compu/rustmaninoff/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="License"></a></p><h1>Checkov-compatible CKV policies. Single Rust binary. No Python.</h1>
-      <p class="lede">Compared to Checkov: same published CKV ids and skip comments, without the Python runtime — about 65× faster on a published synthetic corpus (self-reported). 536 checks; Docker 100% / K8s 93.8% of pinned Checkov ids. Terraform, CloudFormation, Kubernetes, and Dockerfiles.</p><p style="text-align:center;margin:1rem 0"><img src="img/demo.svg" alt="Terminal demo: rustmaninoff fails CKV_AWS_3" width="720" style="max-width:100%;border-radius:10px"></p>
+      <p class="kicker">v0.4.1 · Apache-2.0 · GitHub Action + CLI</p>
+      <p class="badges" style="margin:0.6rem 0 0.8rem;display:flex;gap:0.4rem;flex-wrap:wrap;justify-content:center"><a href="https://crates.io/crates/rustmaninoff"><img src="https://img.shields.io/crates/v/rustmaninoff.svg" alt="crates.io"></a><a href="https://github.com/marketplace/actions/rustmaninoff"><img src="https://img.shields.io/badge/GitHub%20Action-Marketplace-2088FF?logo=githubactions&amp;logoColor=white" alt="GitHub Marketplace Action"></a><a href="https://github.com/jose-compu/rustmaninoff/actions/workflows/ci.yml"><img src="https://github.com/jose-compu/rustmaninoff/actions/workflows/ci.yml/badge.svg" alt="CI"></a><a href="https://github.com/jose-compu/rustmaninoff/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="License"></a></p><h1>Checkov-compatible CKV policies. Single Rust binary. GitHub Action. No Python.</h1>
+      <p class="lede">Fast IaC security scanner for Terraform, CloudFormation, Kubernetes, and Dockerfiles — a Checkov-compatible alternative for CKV gates in CI. Same published CKV ids and skip comments, without the Python runtime — about 65× faster on a published synthetic corpus (self-reported). 536 checks; Docker 100% / K8s 93.8% of pinned Checkov ids. Install with cargo, Homebrew, Docker, or <a href="#github-action">jose-compu/rustmaninoff</a> on GitHub Actions with SARIF upload.</p><p style="text-align:center;margin:1rem 0"><img src="img/demo.svg" alt="Terminal demo: rustmaninoff fails CKV_AWS_3 on unencrypted EBS — Checkov-compatible IaC scan" width="720" style="max-width:100%;border-radius:10px"></p>
       <div class="cta-row">
-        <a class="btn btn-primary" href="documentation.html">Read the docs</a>
-        <a class="btn btn-ghost" href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.4.0">GitHub release</a>
-        <a class="btn btn-ghost" href="https://crates.io/crates/rustmaninoff">Install from crates.io</a>
+        <a class="btn btn-primary" href="#github-action">Install GitHub Action</a>
+        <a class="btn btn-ghost" href="documentation.html">Read the docs</a>
+        <a class="btn btn-ghost" href="https://github.com/marketplace/actions/rustmaninoff">Marketplace</a>
+        <a class="btn btn-ghost" href="https://crates.io/crates/rustmaninoff">crates.io</a>
       </div>
       <div class="stats">
         <div class="stat"><b>54 ms</b><span>full synthetic corpus</span></div>
@@ -169,8 +253,59 @@
 
     <section class="section">
       <h2>Install</h2>
+      <p class="note">CLI, Homebrew, Docker, or the official GitHub Action. Prefer the Action for SARIF Code Scanning in CI.</p>
       <pre><code>cargo install rustmaninoff --locked
 rustmaninoff scan . --framework terraform,cloudformation,kubernetes,docker</code></pre>
+      <pre><code>brew install jose-compu/tap/rustmaninoff
+docker run --rm -v "$PWD":/src -w /src ghcr.io/jose-compu/rustmaninoff:0.4.0 scan .</code></pre>
+    </section>
+
+    <section class="section" id="github-action">
+      <h2>GitHub Action — install in CI</h2>
+      <p class="note">Official composite Action: downloads a release binary, verifies SHA-256, scans Terraform / CloudFormation / Kubernetes / Dockerfiles, and emits SARIF for GitHub Code Scanning. Marketplace: <a href="https://github.com/marketplace/actions/rustmaninoff">github.com/marketplace/actions/rustmaninoff</a>. Pin with <code>jose-compu/rustmaninoff@v0.4.1</code>.</p>
+      <pre><code># .github/workflows/iac-scan.yml
+name: IaC security
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+  security-events: write
+jobs:
+  rustmaninoff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jose-compu/rustmaninoff@v0.4.1
+        with:
+          path: .
+          fail-on: HIGH
+          output: sarif
+          sarif-file: rustmaninoff.sarif
+      - uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: rustmaninoff.sarif</code></pre>
+      <p class="note">Inputs: <code>path</code>, <code>version</code> (default <code>0.4.1</code>), <code>fail-on</code>, <code>output</code>, <code>sarif-file</code>, <code>args</code>. Full Action docs: <a href="https://github.com/jose-compu/rustmaninoff/blob/main/ACTION.md">ACTION.md</a> · <a href="documentation.html#github-action">documentation</a>.</p>
+    </section>
+
+    <section class="section" id="faq">
+      <h2>FAQ</h2>
+      <div class="grid">
+        <article class="card">
+          <h3>Checkov alternative?</h3>
+          <p>Yes for CKV attribute gates in CI: same published ids and <code># checkov:skip=</code> comments, Rust binary, no Python. Not yet a full swap for Helm, Kustomize, or plan JSON.</p>
+        </article>
+        <article class="card">
+          <h3>Next to Trivy?</h3>
+          <p>Yes. Use Rustmaninoff for IaC CKV policies; keep Trivy for image CVEs, secrets product features, and SBOM. No vuln DB here.</p>
+        </article>
+        <article class="card">
+          <h3>GitHub Action?</h3>
+          <p><code>uses: jose-compu/rustmaninoff@v0.4.1</code> then upload SARIF. See <a href="#github-action">install snippet</a> above.</p>
+        </article>
+      </div>
     </section>
 
     <section class="section">
@@ -262,8 +397,9 @@ definition:
     </section>
 
     <footer class="footer">
-      <span>v0.4.0</span>
+      <span>v0.4.1</span>
       <a href="https://github.com/jose-compu/rustmaninoff">jose-compu/rustmaninoff</a>
+      <a href="https://github.com/marketplace/actions/rustmaninoff">Marketplace Action</a>
       <a href="https://docs.rs/rustmaninoff">docs.rs</a>
       <a href="llms.txt">llms.txt</a>
       <a href="sitemap.xml">sitemap</a>

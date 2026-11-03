@@ -1,7 +1,7 @@
 {
   "name": "Rustmaninoff",
   "short_name": "Rustmaninoff",
-  "description": "Fast IaC security scanner with Checkov-compatible policies.",
+  "description": "Fast Checkov-compatible IaC security scanner for Terraform, Kubernetes, Docker, and CloudFormation. GitHub Action with SARIF.",
   "start_url": "./",
   "display": "browser",
   "background_color": "#0b0b0d",

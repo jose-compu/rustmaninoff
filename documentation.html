@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Documentation — Rustmaninoff</title>
-  <meta name="description" content="Install, scan flags, config, policy dialect, and v0.4 scope for the Rustmaninoff IaC scanner.">
-  <meta name="keywords" content="rustmaninoff, IaC scanner, terraform security, cloudformation, kubernetes, dockerfile, checkov, trivy, CKV, policy as code, rust, static analysis, rustmaninoff documentation, CKV_AWS, Dockerfile scanner">
+  <title>Documentation — Rustmaninoff IaC scanner &amp; GitHub Action</title>
+  <meta name="description" content="Install Rustmaninoff via cargo, Homebrew, Docker, or the GitHub Action. CLI flags, SARIF Code Scanning, Checkov-compatible CKV policies for Terraform, Kubernetes, CloudFormation, and Dockerfiles.">
+  <meta name="keywords" content="rustmaninoff documentation, rustmaninoff github action, install rustmaninoff, terraform security CI, kubernetes SARIF, checkov alternative github actions, CKV_AWS, Dockerfile scanner, cargo install rustmaninoff">
+  <meta name="ai-content-declaration" content="product-documentation">
   <meta name="author" content="jose-compu">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <meta name="googlebot" content="index, follow, max-image-preview:large">
@@ -21,28 +22,43 @@
   <meta property="og:site_name" content="Rustmaninoff">
   <meta property="og:locale" content="en_US">
   <meta property="og:url" content="https://jose-compu.github.io/rustmaninoff/documentation.html">
-  <meta property="og:title" content="Documentation — Rustmaninoff">
-  <meta property="og:description" content="Install, scan flags, config, policy dialect, and v0.4 scope for the Rustmaninoff IaC scanner.">
+  <meta property="og:title" content="Documentation — Rustmaninoff IaC scanner &amp; GitHub Action">
+  <meta property="og:description" content="Install via cargo, Homebrew, Docker, or jose-compu/rustmaninoff GitHub Action with SARIF. CLI, CKV policies, CI.">
   <meta property="og:image" content="https://jose-compu.github.io/rustmaninoff/img/banner.jpg">
   <meta property="og:image:type" content="image/jpeg">
   <meta property="og:image:width" content="1280">
   <meta property="og:image:height" content="720">
   <meta property="og:image:alt" content="Rustmaninoff, IaC security scanner">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Documentation — Rustmaninoff">
-  <meta name="twitter:description" content="Install, scan flags, config, policy dialect, and v0.4 scope for the Rustmaninoff IaC scanner.">
+  <meta name="twitter:title" content="Documentation — Rustmaninoff IaC scanner &amp; GitHub Action">
+  <meta name="twitter:description" content="Install via cargo, Homebrew, Docker, or jose-compu/rustmaninoff GitHub Action with SARIF. CLI, CKV policies, CI.">
   <meta name="twitter:image" content="https://jose-compu.github.io/rustmaninoff/img/banner.jpg">
   <meta name="twitter:image:alt" content="Rustmaninoff, IaC security scanner">
   <script type="application/ld+json">
 {
     "@context": "https://schema.org",
-    "@type": "TechArticle",
-    "headline": "Rustmaninoff documentation",
-    "description": "Install, scan flags, config, policy dialect, and v0.4 scope for Rustmaninoff.",
-    "url": "https://jose-compu.github.io/rustmaninoff/documentation.html",
-    "version": "0.4.0",
-    "author": {"@type": "Organization", "name": "jose-compu", "url": "https://github.com/jose-compu"},
-    "isPartOf": {"@id": "https://jose-compu.github.io/rustmaninoff/#website"}
+    "@graph": [
+      {
+        "@type": "TechArticle",
+        "headline": "Rustmaninoff documentation — CLI and GitHub Action",
+        "description": "Install Rustmaninoff via cargo, Homebrew, Docker, or GitHub Action. Scan flags, SARIF, Checkov-compatible CKV policies.",
+        "url": "https://jose-compu.github.io/rustmaninoff/documentation.html",
+        "version": "0.4.1",
+        "author": {"@type": "Organization", "name": "jose-compu", "url": "https://github.com/jose-compu"},
+        "isPartOf": {"@id": "https://jose-compu.github.io/rustmaninoff/#website"},
+        "about": {"@id": "https://jose-compu.github.io/rustmaninoff/#app"}
+      },
+      {
+        "@type": "HowTo",
+        "name": "Add Rustmaninoff GitHub Action to a workflow",
+        "url": "https://jose-compu.github.io/rustmaninoff/documentation.html#github-action",
+        "step": [
+          {"@type": "HowToStep", "name": "Checkout", "text": "uses: actions/checkout@v4"},
+          {"@type": "HowToStep", "name": "Scan", "text": "uses: jose-compu/rustmaninoff@v0.4.1 with path, fail-on, output sarif"},
+          {"@type": "HowToStep", "name": "Upload SARIF", "text": "uses: github/codeql-action/upload-sarif@v3"}
+        ]
+      }
+    ]
   }
   </script>
   <script>
@@ -86,6 +102,7 @@
       <aside class="toc">
         <a href="#why">Vs Checkov / Trivy</a>
         <a href="#install">Install</a>
+        <a href="#github-action">GitHub Action</a>
         <a href="#scan">Scan</a>
         <a href="#config">Config</a>
         <a href="#policies">Policies</a>
@@ -108,13 +125,34 @@
         </ul>
 
         <h2 id="install">Install</h2>
-        <p>Requires Rust 1.95 or newer.</p>
+        <p>Requires Rust 1.95 or newer for source builds. Prefer the <a href="#github-action">GitHub Action</a> for CI.</p>
         <pre><code>cargo install rustmaninoff --locked
 rustmaninoff scan .</code></pre>
+        <p>Homebrew:</p>
+        <pre><code>brew install jose-compu/tap/rustmaninoff</code></pre>
+        <p>Docker (GHCR):</p>
+        <pre><code>docker run --rm -v "$PWD":/src -w /src ghcr.io/jose-compu/rustmaninoff:0.4.0 scan .</code></pre>
         <p>From a checkout:</p>
         <pre><code>cargo build --release -p rustmaninoff
 ./target/release/rustmaninoff scan .</code></pre>
-        <p>GitHub Release binaries for Linux and macOS (amd64 and arm64) are attached to <a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.4.0">v0.4.0</a>.</p>
+        <p>GitHub Release binaries for Linux and macOS (amd64 and arm64): <a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.4.1">v0.4.1</a> (Action hardening) · <a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.4.0">v0.4.0</a> (catalog).</p>
+
+        <h2 id="github-action">GitHub Action</h2>
+        <p>Official Action on the <a href="https://github.com/marketplace/actions/rustmaninoff">GitHub Marketplace</a>. Composite Action at repo root (<code>action.yml</code>): downloads a release binary, verifies <code>.sha256</code>, validates inputs, and runs <code>rustmaninoff scan</code>. Full reference: <a href="https://github.com/jose-compu/rustmaninoff/blob/main/ACTION.md">ACTION.md</a>.</p>
+        <pre><code>- uses: actions/checkout@v4
+- uses: jose-compu/rustmaninoff@v0.4.1
+  with:
+    path: .
+    version: "0.4.1"   # or "latest"
+    fail-on: HIGH
+    output: sarif
+    sarif-file: rustmaninoff.sarif
+    # args: "--framework terraform,kubernetes"
+- uses: github/codeql-action/upload-sarif@v3
+  if: always()
+  with:
+    sarif_file: rustmaninoff.sarif</code></pre>
+        <p>Required permissions for SARIF upload: <code>security-events: write</code>. Pin the Action tag (<code>@v0.4.1</code>) in production; optionally pin by commit SHA for supply-chain hardening.</p>
 
         <h2 id="scan">Scan</h2>
         <pre><code>rustmaninoff scan [PATH] \
@@ -179,11 +217,11 @@ definition:
         <p>S3 encryption, versioning, and logging on current Terraform target <code>aws_s3_bucket_server_side_encryption_configuration</code>, <code>aws_s3_bucket_versioning</code>, and <code>aws_s3_bucket_logging</code>. <code>CKV_AWS_286</code> matches a static action subset, including <code>*</code> and <code>*:*</code>. <code>CKV_K8S_14</code> accepts a digest or a tag other than <code>latest</code>; an image whose last colon is a registry port and which has no tag is treated as pinned.</p>
         <p><strong>Not in v0.4.0 yet:</strong> Helm, Kustomize, Terraform plan JSON, local modules (v0.5); baseline/suppressions (v0.6); secrets scanning and Azure/GCP catalog depth.</p>
 
-        <h2 id="ci">CI</h2>
+        <h2 id="ci">CI without the Action</h2>
+        <p>Prefer <a href="#github-action">jose-compu/rustmaninoff@v0.4.1</a>. Manual install path:</p>
         <pre><code>- uses: actions/checkout@v4
-- run: cargo install --path crates/cli --locked
+- run: cargo install rustmaninoff --locked --version 0.4.0
 - run: rustmaninoff scan . --fail-on HIGH --output sarif --sarif-file rustmaninoff.sarif</code></pre>
-        <p>Or install a released crate: <code>cargo install rustmaninoff --locked --version 0.4.0</code>.</p>
 
         <h2 id="crates">Crates</h2>
         <p>Workspace 0.4.0 on crates.io:</p>
@@ -205,8 +243,9 @@ definition:
     </div>
 
     <footer class="footer">
-      <span>v0.4.0</span>
+      <span>v0.4.1</span>
       <a href="https://github.com/jose-compu/rustmaninoff">jose-compu/rustmaninoff</a>
+      <a href="https://github.com/marketplace/actions/rustmaninoff">Marketplace Action</a>
       <a href="llms.txt">llms.txt</a>
       <span>Apache-2.0</span>
     </footer>
