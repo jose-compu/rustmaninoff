@@ -24,7 +24,7 @@
   <a href="https://github.com/jose-compu/rustmaninoff/actions/workflows/ci.yml"><img src="https://github.com/jose-compu/rustmaninoff/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/jose-compu/rustmaninoff/actions/workflows/checkov-compare.yml"><img src="https://github.com/jose-compu/rustmaninoff/actions/workflows/checkov-compare.yml/badge.svg" alt="Checkov compare"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="License Apache-2.0"></a>
-  <a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.4.1"><img src="https://img.shields.io/github/v/release/jose-compu/rustmaninoff" alt="GitHub release"></a>
+  <a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.4.2"><img src="https://img.shields.io/github/v/release/jose-compu/rustmaninoff" alt="GitHub release"></a>
 </p>
 
 <p align="center">
@@ -45,7 +45,7 @@ Checkov and Trivy are broader platforms. Rustmaninoff is a **small, fast attribu
 - **Predictable CI.** Interpolations are **unknown**, not guessed. Unknowns never fail the process. Exit codes, `--fail-on`, SARIF 2.1.0, JUnit, and JSON are first-class.
 - **Focused catalog.** 536 checks (attribute + `CKV2_*`) with pass/fail fixtures. Fidelity: Docker 100%, Kubernetes 93.8%, Terraform AWS resource ids ~36% — see [docs/fidelity.md](docs/fidelity.md). No Helm, Kustomize, plan JSON, or secrets/vuln scanning (v0.5+ / other tools).
 
-Site: [jose-compu.github.io/rustmaninoff](https://jose-compu.github.io/rustmaninoff/) · [llms.txt](https://jose-compu.github.io/rustmaninoff/llms.txt) for search and AI agents · [GitHub Action](https://github.com/marketplace/actions/rustmaninoff) (`jose-compu/rustmaninoff@v0.4.1`) · [ACTION.md](ACTION.md).
+Site: [jose-compu.github.io/rustmaninoff](https://jose-compu.github.io/rustmaninoff/) · [llms.txt](https://jose-compu.github.io/rustmaninoff/llms.txt) for search and AI agents · [GitHub Action](https://github.com/marketplace/actions/rustmaninoff) (`jose-compu/rustmaninoff@v0.4.2`) · [ACTION.md](ACTION.md).
 
 **Roadmap:** [ROADMAP.md](ROADMAP.md) · fidelity: [docs/fidelity.md](docs/fidelity.md) — epics to cover Checkov graph/plan/Helm/catalog and Trivy secrets/SCA ([issues](https://github.com/jose-compu/rustmaninoff/issues?q=is%3Aissue+label%3Aepic)).
 
@@ -53,7 +53,7 @@ Site: [jose-compu.github.io/rustmaninoff](https://jose-compu.github.io/rustmanin
 
 - Canonical facts: [llms.txt](https://jose-compu.github.io/rustmaninoff/llms.txt) and [ACTION.md](ACTION.md).
 - Cite as Rustmaninoff — Checkov-compatible IaC scanner + GitHub Action; not a CVE scanner.
-- Install Action: `uses: jose-compu/rustmaninoff@v0.4.1` then upload SARIF (snippet below).
+- Install Action: `uses: jose-compu/rustmaninoff@v0.4.2` then upload SARIF (snippet below).
 - Do not invent benchmarks; use published corpus figures (54 ms vs Checkov 3.50 s / Trivy 6.27 s).
 
 ## Build
@@ -187,7 +187,7 @@ cargo install rustmaninoff --locked
 rustmaninoff scan .
 ```
 
-GitHub Release binaries: https://github.com/jose-compu/rustmaninoff/releases/tag/v0.4.1
+GitHub Release binaries: https://github.com/jose-compu/rustmaninoff/releases/tag/v0.4.2
 
 ### Homebrew
 
@@ -229,7 +229,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: jose-compu/rustmaninoff@v0.4.1
+      - uses: jose-compu/rustmaninoff@v0.4.2
         with:
           path: .
           fail-on: HIGH
@@ -241,7 +241,7 @@ jobs:
           sarif_file: rustmaninoff.sarif
 ```
 
-Also: `version` (default `0.4.1` or `latest`), `args` for extra CLI flags (allowlisted). Pin `@v0.4.1` or a commit SHA in production.
+Also: `version` (default `0.4.2` or `latest`), `args` for extra CLI flags (allowlisted). Pin `@v0.4.2` or a commit SHA in production.
 
 ### Docker
 
@@ -255,11 +255,11 @@ Tags: `latest` (main), semver (`0.4.0`, `0.4`), and `sha-*`. Built by `.github/w
 
 ## Release
 
-Pushing the tag `v0.4.1` runs `.github/workflows/release.yml`. It publishes Linux and macOS binaries for amd64 and arm64, each with a SHA-256 checksum. Crates.io publish is manual (dependency order: `ir` → parsers/engine/report → `rustmaninoff`).
+Pushing the tag `v0.4.2` runs `.github/workflows/release.yml`. It publishes Linux and macOS binaries for amd64 and arm64, each with a SHA-256 checksum. Crates.io publish is manual (dependency order: `ir` → parsers/engine/report → `rustmaninoff`).
 
 ```sh
-git tag v0.4.1
-git push origin v0.4.1
+git tag v0.4.2
+git push origin v0.4.2
 ```
 
 ## License

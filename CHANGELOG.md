@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.2 — 2026-11-03
+
+### Changed
+
+- Workspace crates are **0.4.2**.
+- Action default `version` pin is `0.4.2`.
+- Marketplace/docs refresh: Action install guidance, SEO, and [ACTION.md](ACTION.md) on the published listing README path.
+
 ## 0.4.1 — 2026-11-02
 
 ### Security
