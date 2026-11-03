@@ -1,5 +1,8 @@
 name: Rustmaninoff
-description: Fast Checkov-compatible IaC scanner (Terraform, Kubernetes, Docker, CloudFormation) with SARIF output
+description: >-
+  Fast Checkov-compatible IaC security scanner for Terraform, CloudFormation,
+  Kubernetes, and Dockerfiles. CKV policies, checksum-verified binary, SARIF for
+  GitHub Code Scanning. Checkov alternative for CI attribute gates; use next to Trivy.
 author: jose-compu
 branding:
   icon: shield
