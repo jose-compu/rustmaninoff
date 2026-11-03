@@ -68,7 +68,7 @@
         "applicationCategory": "SecurityApplication",
         "applicationSubCategory": "Infrastructure as Code scanner",
         "operatingSystem": "Linux, macOS",
-        "softwareVersion": "0.4.1",
+        "softwareVersion": "0.4.2",
         "license": "https://www.apache.org/licenses/LICENSE-2.0",
         "url": "https://jose-compu.github.io/rustmaninoff/",
         "downloadUrl": "https://crates.io/crates/rustmaninoff",
@@ -121,7 +121,7 @@
           {
             "@type": "HowToStep",
             "name": "Run jose-compu/rustmaninoff",
-            "text": "Add uses: jose-compu/rustmaninoff@v0.4.1 with path, fail-on HIGH, and output sarif."
+            "text": "Add uses: jose-compu/rustmaninoff@v0.4.2 with path, fail-on HIGH, and output sarif."
           },
           {
             "@type": "HowToStep",
@@ -147,7 +147,7 @@
             "name": "How do I install the Rustmaninoff GitHub Action?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "In a workflow, use jose-compu/rustmaninoff@v0.4.1 after actions/checkout. Set output to sarif and optionally upload with github/codeql-action/upload-sarif. Marketplace: https://github.com/marketplace/actions/rustmaninoff"
+              "text": "In a workflow, use jose-compu/rustmaninoff@v0.4.2 after actions/checkout. Set output to sarif and optionally upload with github/codeql-action/upload-sarif. Marketplace: https://github.com/marketplace/actions/rustmaninoff"
             }
           },
           {
@@ -198,7 +198,7 @@
   <div class="wrap">
     <section class="hero">
       <img class="hero-banner" src="img/banner.jpg" alt="Rustmaninoff, IaC security scanner">
-      <p class="kicker">v0.4.1 · Apache-2.0 · GitHub Action + CLI</p>
+      <p class="kicker">v0.4.2 · Apache-2.0 · GitHub Action + CLI</p>
       <p class="badges" style="margin:0.6rem 0 0.8rem;display:flex;gap:0.4rem;flex-wrap:wrap;justify-content:center"><a href="https://crates.io/crates/rustmaninoff"><img src="https://img.shields.io/crates/v/rustmaninoff.svg" alt="crates.io"></a><a href="https://github.com/marketplace/actions/rustmaninoff"><img src="https://img.shields.io/badge/GitHub%20Action-Marketplace-2088FF?logo=githubactions&amp;logoColor=white" alt="GitHub Marketplace Action"></a><a href="https://github.com/jose-compu/rustmaninoff/actions/workflows/ci.yml"><img src="https://github.com/jose-compu/rustmaninoff/actions/workflows/ci.yml/badge.svg" alt="CI"></a><a href="https://github.com/jose-compu/rustmaninoff/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="License"></a></p><h1>Checkov-compatible CKV policies. Single Rust binary. GitHub Action. No Python.</h1>
       <p class="lede">Fast IaC security scanner for Terraform, CloudFormation, Kubernetes, and Dockerfiles — a Checkov-compatible alternative for CKV gates in CI. Same published CKV ids and skip comments, without the Python runtime — about 65× faster on a published synthetic corpus (self-reported). 536 checks; Docker 100% / K8s 93.8% of pinned Checkov ids. Install with cargo, Homebrew, Docker, or <a href="#github-action">jose-compu/rustmaninoff</a> on GitHub Actions with SARIF upload.</p><p style="text-align:center;margin:1rem 0"><img src="img/demo.svg" alt="Terminal demo: rustmaninoff fails CKV_AWS_3 on unencrypted EBS — Checkov-compatible IaC scan" width="720" style="max-width:100%;border-radius:10px"></p>
       <div class="cta-row">
@@ -262,7 +262,7 @@ docker run --rm -v "$PWD":/src -w /src ghcr.io/jose-compu/rustmaninoff:0.4.0 sca
 
     <section class="section" id="github-action">
       <h2>GitHub Action — install in CI</h2>
-      <p class="note">Official composite Action: downloads a release binary, verifies SHA-256, scans Terraform / CloudFormation / Kubernetes / Dockerfiles, and emits SARIF for GitHub Code Scanning. Marketplace: <a href="https://github.com/marketplace/actions/rustmaninoff">github.com/marketplace/actions/rustmaninoff</a>. Pin with <code>jose-compu/rustmaninoff@v0.4.1</code>.</p>
+      <p class="note">Official composite Action: downloads a release binary, verifies SHA-256, scans Terraform / CloudFormation / Kubernetes / Dockerfiles, and emits SARIF for GitHub Code Scanning. Marketplace: <a href="https://github.com/marketplace/actions/rustmaninoff">github.com/marketplace/actions/rustmaninoff</a>. Pin with <code>jose-compu/rustmaninoff@v0.4.2</code>.</p>
       <pre><code># .github/workflows/iac-scan.yml
 name: IaC security
 on:
@@ -277,7 +277,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: jose-compu/rustmaninoff@v0.4.1
+      - uses: jose-compu/rustmaninoff@v0.4.2
         with:
           path: .
           fail-on: HIGH
@@ -287,7 +287,7 @@ jobs:
         if: always()
         with:
           sarif_file: rustmaninoff.sarif</code></pre>
-      <p class="note">Inputs: <code>path</code>, <code>version</code> (default <code>0.4.1</code>), <code>fail-on</code>, <code>output</code>, <code>sarif-file</code>, <code>args</code>. Full Action docs: <a href="https://github.com/jose-compu/rustmaninoff/blob/main/ACTION.md">ACTION.md</a> · <a href="documentation.html#github-action">documentation</a>.</p>
+      <p class="note">Inputs: <code>path</code>, <code>version</code> (default <code>0.4.2</code>), <code>fail-on</code>, <code>output</code>, <code>sarif-file</code>, <code>args</code>. Full Action docs: <a href="https://github.com/jose-compu/rustmaninoff/blob/main/ACTION.md">ACTION.md</a> · <a href="documentation.html#github-action">documentation</a>.</p>
     </section>
 
     <section class="section" id="faq">
@@ -303,7 +303,7 @@ jobs:
         </article>
         <article class="card">
           <h3>GitHub Action?</h3>
-          <p><code>uses: jose-compu/rustmaninoff@v0.4.1</code> then upload SARIF. See <a href="#github-action">install snippet</a> above.</p>
+          <p><code>uses: jose-compu/rustmaninoff@v0.4.2</code> then upload SARIF. See <a href="#github-action">install snippet</a> above.</p>
         </article>
       </div>
     </section>
@@ -397,7 +397,7 @@ definition:
     </section>
 
     <footer class="footer">
-      <span>v0.4.1</span>
+      <span>v0.4.2</span>
       <a href="https://github.com/jose-compu/rustmaninoff">jose-compu/rustmaninoff</a>
       <a href="https://github.com/marketplace/actions/rustmaninoff">Marketplace Action</a>
       <a href="https://docs.rs/rustmaninoff">docs.rs</a>
