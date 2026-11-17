@@ -43,7 +43,7 @@
         "headline": "Rustmaninoff documentation — CLI and GitHub Action",
         "description": "Install Rustmaninoff via cargo, Homebrew, Docker, or GitHub Action. Scan flags, SARIF, Checkov-compatible CKV policies.",
         "url": "https://jose-compu.github.io/rustmaninoff/documentation.html",
-        "version": "0.5.0",
+        "version": "0.5.1",
         "author": {"@type": "Organization", "name": "jose-compu", "url": "https://github.com/jose-compu"},
         "isPartOf": {"@id": "https://jose-compu.github.io/rustmaninoff/#website"},
         "about": {"@id": "https://jose-compu.github.io/rustmaninoff/#app"}
@@ -54,7 +54,7 @@
         "url": "https://jose-compu.github.io/rustmaninoff/documentation.html#github-action",
         "step": [
           {"@type": "HowToStep", "name": "Checkout", "text": "uses: actions/checkout@v4"},
-          {"@type": "HowToStep", "name": "Scan", "text": "uses: jose-compu/rustmaninoff@v0.5.0 with path, fail-on, output sarif"},
+          {"@type": "HowToStep", "name": "Scan", "text": "uses: jose-compu/rustmaninoff@v0.5.1 with path, fail-on, output sarif"},
           {"@type": "HowToStep", "name": "Upload SARIF", "text": "uses: github/codeql-action/upload-sarif@v3"}
         ]
       }
@@ -94,7 +94,7 @@
   </header>
 
   <div class="wrap">
-    <p class="kicker" style="margin-top:1.6rem;">Documentation · v0.5.0</p>
+    <p class="kicker" style="margin-top:1.6rem;">Documentation · v0.5.1</p>
     <h1 style="margin:0 0 0.4rem;letter-spacing:-0.03em;">Using Rustmaninoff</h1>
     <p class="lede" style="margin-left:0;">Attribute scanner for Terraform, CloudFormation, Kubernetes, and Dockerfiles with Checkov-compatible CKV policies. Policies are Checkov-compatible YAML.</p>
 
@@ -131,19 +131,19 @@ rustmaninoff scan .</code></pre>
         <p>Homebrew:</p>
         <pre><code>brew install jose-compu/tap/rustmaninoff</code></pre>
         <p>Docker (GHCR):</p>
-        <pre><code>docker run --rm -v "$PWD":/src -w /src ghcr.io/jose-compu/rustmaninoff:0.5.0 scan .</code></pre>
+        <pre><code>docker run --rm -v "$PWD":/src -w /src ghcr.io/jose-compu/rustmaninoff:0.5.1 scan .</code></pre>
         <p>From a checkout:</p>
         <pre><code>cargo build --release -p rustmaninoff
 ./target/release/rustmaninoff scan .</code></pre>
-        <p>GitHub Release binaries for Linux and macOS (amd64 and arm64): <a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.5.0">v0.5.0</a> (plan JSON) · <a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.4.0">v0.4.0</a> (catalog).</p>
+        <p>GitHub Release binaries for Linux and macOS (amd64 and arm64): <a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.5.1">v0.5.1</a> (plan JSON) · <a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.4.0">v0.4.0</a> (catalog).</p>
 
         <h2 id="github-action">GitHub Action</h2>
         <p>Official Action on the <a href="https://github.com/marketplace/actions/rustmaninoff">GitHub Marketplace</a>. Composite Action at repo root (<code>action.yml</code>): downloads a release binary, verifies <code>.sha256</code>, validates inputs, and runs <code>rustmaninoff scan</code>. Full reference: <a href="https://github.com/jose-compu/rustmaninoff/blob/main/ACTION.md">ACTION.md</a>.</p>
         <pre><code>- uses: actions/checkout@v4
-- uses: jose-compu/rustmaninoff@v0.5.0
+- uses: jose-compu/rustmaninoff@v0.5.1
   with:
     path: .
-    version: "0.5.0"   # or "latest"
+    version: "0.5.1"   # or "latest"
     fail-on: HIGH
     output: sarif
     sarif-file: rustmaninoff.sarif
@@ -152,7 +152,7 @@ rustmaninoff scan .</code></pre>
   if: always()
   with:
     sarif_file: rustmaninoff.sarif</code></pre>
-        <p>Required permissions for SARIF upload: <code>security-events: write</code>. Pin the Action tag (<code>@v0.5.0</code>) in production; optionally pin by commit SHA for supply-chain hardening.</p>
+        <p>Required permissions for SARIF upload: <code>security-events: write</code>. Pin the Action tag (<code>@v0.5.1</code>) in production; optionally pin by commit SHA for supply-chain hardening.</p>
 
         <h2 id="scan">Scan</h2>
         <pre><code>rustmaninoff scan [PATH] \
@@ -215,16 +215,16 @@ definition:
           <li>Text, JSON, SARIF 2.1.0, and JUnit reports.</li>
         </ul>
         <p>S3 encryption, versioning, and logging on current Terraform target <code>aws_s3_bucket_server_side_encryption_configuration</code>, <code>aws_s3_bucket_versioning</code>, and <code>aws_s3_bucket_logging</code>. <code>CKV_AWS_286</code> matches a static action subset, including <code>*</code> and <code>*:*</code>. <code>CKV_K8S_14</code> accepts a digest or a tag other than <code>latest</code>; an image whose last colon is a registry port and which has no tag is treated as pinned.</p>
-        <p><strong>0.5.0 shipped:</strong> opt-in Terraform plan JSON (<code>--framework terraform_plan</code>). <strong>Still open:</strong> Helm, Kustomize, local HCL modules; baseline/suppressions (v0.6); secrets scanning and Azure/GCP catalog depth.</p>
+        <p><strong>0.5.0 shipped:</strong> opt-in Terraform plan JSON (<code>--framework terraform_plan</code>). <strong>0.5.1:</strong> sensitive plan attributes redacted per Terraform markers. <strong>Still open:</strong> Helm, Kustomize, local HCL modules; baseline/suppressions (v0.6); secrets scanning and Azure/GCP catalog depth.</p>
 
         <h2 id="ci">CI without the Action</h2>
-        <p>Prefer <a href="#github-action">jose-compu/rustmaninoff@v0.5.0</a>. Manual install path:</p>
+        <p>Prefer <a href="#github-action">jose-compu/rustmaninoff@v0.5.1</a>. Manual install path:</p>
         <pre><code>- uses: actions/checkout@v4
-- run: cargo install rustmaninoff --locked --version 0.5.0
+- run: cargo install rustmaninoff --locked --version 0.5.1
 - run: rustmaninoff scan . --fail-on HIGH --output sarif --sarif-file rustmaninoff.sarif</code></pre>
 
         <h2 id="crates">Crates</h2>
-        <p>Workspace 0.5.0 on crates.io:</p>
+        <p>Workspace 0.5.1 on crates.io:</p>
         <ul>
           <li><a href="https://crates.io/crates/rustmaninoff">rustmaninoff</a> (CLI)</li>
           <li><a href="https://crates.io/crates/rustmaninoff-ir">rustmaninoff-ir</a></li>
@@ -243,7 +243,7 @@ definition:
     </div>
 
     <footer class="footer">
-      <span>v0.5.0</span>
+      <span>v0.5.1</span>
       <a href="https://github.com/jose-compu/rustmaninoff">jose-compu/rustmaninoff</a>
       <a href="https://github.com/marketplace/actions/rustmaninoff">Marketplace Action</a>
       <a href="llms.txt">llms.txt</a>
