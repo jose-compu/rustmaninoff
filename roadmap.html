@@ -43,7 +43,6 @@
     <p class="kicker" style="margin-top:1.6rem;">Daily releases from 0.5.1 to 1.0</p>
     <h1 style="margin:0 0 0.7rem;letter-spacing:-0.03em;">Roadmap</h1>
     <p class="lede" style="margin-left:0;">0.5.1 is current: Terraform, CloudFormation, Kubernetes, Dockerfiles, opt-in plan JSON, and sensitive plan values redacted. The daily release is a patch. A minor closes a milestone. 1.0.0 waits for the exit criteria. Checkboxes live in <a href="https://github.com/jose-compu/rustmaninoff/blob/main/ROADMAP.md">ROADMAP.md</a>.</p>
-    <p class="note"><strong>First daily patch:</strong> a CI benchmark that compares each pull request to <code>main</code> on the same runner and fails when a scenario is more than 15% slower (<a href="https://github.com/jose-compu/rustmaninoff/issues/89">#89</a>). That ships before the SARIF path fix. Warn above 5%.</p>
     <p class="note">A patch (<code>0.x.Y</code>) is a fix, a false positive, speed, docs, hardening, or one new check. A minor (<code>0.X.0</code>) closes the open milestone or adds a framework, an output format, or a scan mode. No CVE database on any path.</p>
 
     <section class="section">
@@ -99,8 +98,8 @@
           <p>First 20 <code>CKV_GCP_*</code> ids. The snapshot has 123. Same rule as Azure.</p>
         </article>
         <article class="card">
-          <h3>0.17.0 — Larger corpus</h3>
-          <p>After the CI regression job (#89) is required: a larger pinned repository, plus wall time and RSS in <code>history.json</code>. The 5% / 15% gate is not this milestone.</p>
+          <h3>0.17.0 — Large-repo benches</h3>
+          <p>One pinned larger repository, wall time and RSS, and a CI budget for the synthetic corpus.</p>
         </article>
         <article class="card">
           <h3>0.18.0 — Library API and MSRV</h3>
@@ -134,7 +133,7 @@
         <li>Docker attribute ids stay at 100%. Kubernetes attribute ids reach 100% after documented divergences. The 25 missing AWS resource ids are implemented or named as exclusions.</li>
         <li>Plan scans default to create and update, keep sensitive redaction, and expand local modules with no network. Helm and Kustomize render with no implicit remote fetch. <code>--baseline</code> can hold a fixture at exit 0.</li>
         <li><code>SECURITY.md</code> and <code>CONTRIBUTING.md</code> exist. <code>cargo test --workspace</code>, fmt, and clippy <code>-D warnings</code> are green. Every built-in policy still has pass and fail fixtures.</li>
-        <li>The CI benchmark compares the 1.0 commit to <code>main</code> on the same runner. No unexplained regression over 15%. A result over 5% is a warning. ACTION.md and the release workflow list the same OS and architecture pairs.</li>
+        <li>The bench script still runs. ACTION.md and the release workflow list the same OS and architecture pairs.</li>
       </ul>
       <p class="note">Azure, GCP, extra output formats, Windows, secret patterns, and the compliance filter are scheduled and do not block the 1.0 tag except where the criteria above name them. Full Checkov parity for those catalogs is later patch work.</p>
     </section>
