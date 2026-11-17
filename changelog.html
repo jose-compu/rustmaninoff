@@ -77,10 +77,25 @@
 
   <div class="wrap">
     <p class="kicker" style="margin-top:1.6rem;">Release notes</p>
-    <p class="note">See the repository <a href="https://github.com/jose-compu/rustmaninoff/blob/main/CHANGELOG.md">CHANGELOG.md</a> for 0.4.0.</p>
+    <p class="note">See the repository <a href="https://github.com/jose-compu/rustmaninoff/blob/main/CHANGELOG.md">CHANGELOG.md</a> for 0.5.0.</p>
 <h1 style="margin:0 0 1.2rem;letter-spacing:-0.03em;">Changelog</h1>
 
     <article class="card">
+      <h2 style="margin-top:0;">0.5.0 — 2026-11-17</h2>
+      <h3>Added</h3>
+      <ul>
+        <li>Opt-in Terraform plan scanning: <code>rustmaninoff scan --framework terraform_plan</code> on <code>terraform show -json</code> output.</li>
+        <li>Planned resources and child-module resources use existing Terraform checks. Unknown planned values do not fail the process.</li>
+        <li>Crates.io publish on version tags via GitHub Actions.</li>
+      </ul>
+      <h3>Changed</h3>
+      <ul>
+        <li>Workspace crates and Action default <code>version</code> pin are <strong>0.5.0</strong>.</li>
+      </ul>
+      <p class="note"><a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.5.0">GitHub release v0.5.0</a> · <a href="https://github.com/jose-compu/rustmaninoff/compare/v0.4.4...v0.5.0">Full changelog</a></p>
+    </article>
+
+    <article class="card" style="margin-top:0.9rem;">
       <h2 style="margin-top:0;">0.4.0 — 2026-11-02</h2>
       <h3>Added</h3>
       <ul>
@@ -132,7 +147,7 @@
     </article>
 
     <footer class="footer">
-      <span>v0.4.0</span>
+      <span>v0.5.0</span>
       <a href="https://github.com/jose-compu/rustmaninoff">jose-compu/rustmaninoff</a>
       <a href="llms.txt">llms.txt</a>
       <span>Apache-2.0</span>
