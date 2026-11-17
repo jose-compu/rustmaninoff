@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Roadmap — Rustmaninoff</title>
-  <meta name="description" content="Rustmaninoff roadmap: epics to cover Checkov graph, Terraform plan, Helm, catalog depth, and Trivy secrets/SCA.">
+  <meta name="description" content="Rustmaninoff roadmap from 0.5.1 to 1.0: daily patch releases, Checkov parity, plan scans, Helm, baselines, and a stable CLI.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://jose-compu.github.io/rustmaninoff/roadmap.html">
   <link rel="alternate" type="text/plain" href="https://jose-compu.github.io/rustmaninoff/llms.txt" title="llms.txt">
@@ -40,73 +40,108 @@
   </header>
 
   <div class="wrap">
-    <p class="kicker" style="margin-top:1.6rem;">Toward Checkov and Trivy coverage</p>
+    <p class="kicker" style="margin-top:1.6rem;">Daily releases from 0.5.1 to 1.0</p>
     <h1 style="margin:0 0 0.7rem;letter-spacing:-0.03em;">Roadmap</h1>
-    <p class="lede" style="margin-left:0;">v0.5.0 shipped Terraform plan JSON (opt-in). Next: Helm chart rendering, then baseline files (v0.6). No CVE database on the default scan path.</p>
-    <p class="note"><a href="https://github.com/jose-compu/rustmaninoff/blob/main/ROADMAP.md">ROADMAP.md</a> · <a href="https://github.com/jose-compu/rustmaninoff/issues?q=is%3Aissue+label%3Aepic">All epics</a></p>
+    <p class="lede" style="margin-left:0;">0.5.1 is current: Terraform, CloudFormation, Kubernetes, Dockerfiles, opt-in plan JSON, and sensitive plan values redacted. The daily release is a patch. A minor closes a milestone. 1.0.0 waits for the exit criteria. Checkboxes live in <a href="https://github.com/jose-compu/rustmaninoff/blob/main/ROADMAP.md">ROADMAP.md</a>.</p>
+    <p class="note">A patch (<code>0.x.Y</code>) is a fix, a false positive, speed, docs, hardening, or one new check. A minor (<code>0.X.0</code>) closes the open milestone or adds a framework, an output format, or a scan mode. No CVE database on any path.</p>
 
     <section class="section">
-      <h2>v0.3 — shipped core; follow-ups open</h2>
+      <h2>Already in 0.5.1</h2>
+      <p>536 checks (Docker attribute ids 11/11, Kubernetes 106/113, Terraform <code>CKV_AWS_*</code> resource ids 336/361). The 36.2% figure in the fidelity table is the whole Terraform resource directory (928 ids, including Azure, GCP, and smaller clouds), not the AWS slice. CLI, JSON, SARIF, and JUnit. GitHub Action, pre-commit, Homebrew, GHCR, crates.io. Linux and macOS release archives. Config file and <code>--external-checks-dir</code> already exist. Inline <code>checkov:skip</code> already exists.</p>
+    </section>
+
+    <section class="section">
+      <h2>Milestones</h2>
       <div class="grid">
         <article class="card">
-          <h3><a href="https://github.com/jose-compu/rustmaninoff/issues/1">#1 Resource graph / CKV2_*</a></h3>
-          <p><strong>Shipped</strong> in 0.3.0 (first-wave AWS). More graph policies still to come.</p>
+          <h3>0.6.0 — Plan scans and SARIF</h3>
+          <p>Fail plan scans on create and update. Run existing <code>CKV2_*</code> checks when the plan shows the edge. SARIF paths that GitHub code scanning can open.</p>
         </article>
         <article class="card">
-          <h3><a href="https://github.com/jose-compu/rustmaninoff/issues/16">#16 Vars, locals, OpenTofu</a></h3>
-          <p><strong>Shipped</strong> in 0.3.0. Defaults, <code>TF_VAR_*</code>, <code>--var-file</code>, <code>.tofu</code>.</p>
+          <h3>0.7.0 — Kubernetes attribute pack</h3>
+          <p>The seven missing <code>CKV_K8S_*</code> ids, after dotted keys and command-array matching work. Docker stays at 100%.</p>
         </article>
         <article class="card">
-          <h3><a href="https://github.com/jose-compu/rustmaninoff/issues/2">#2 Modules and plan JSON</a></h3>
-          <p><code>terraform_plan</code> shipped in 0.5.0 (<a href="https://github.com/jose-compu/rustmaninoff/issues/18">#18</a>). Local/registry modules still open (<a href="https://github.com/jose-compu/rustmaninoff/issues/17">#17</a>).</p>
+          <h3>0.8.0 — Remaining AWS resource ids</h3>
+          <p>The 25 missing <code>CKV_AWS_*</code> resource ids, including IAM policy-document checks <code>CKV_AWS_45</code> and <code>CKV_AWS_287</code>–<code>290</code>.</p>
+        </article>
+        <article class="card">
+          <h3>0.9.0 — Modules, count, for_each</h3>
+          <p>Local modules and static <code>count</code> / <code>for_each</code>. No Terraform registry calls on the default path.</p>
+        </article>
+        <article class="card">
+          <h3>0.10.0 — Helm, then Kustomize</h3>
+          <p><code>--framework helm</code> and <code>--framework kustomize</code>. Render locally. Remote fetches stay behind a flag.</p>
+        </article>
+        <article class="card">
+          <h3>0.11.0 — Baselines and config</h3>
+          <p><code>--baseline</code> so an existing repo can adopt the scanner without failing on recorded legacy findings.</p>
+        </article>
+        <article class="card">
+          <h3>0.12.0 — CloudFormation denominator</h3>
+          <p>Scrape Checkov CloudFormation ids (51 local policies today, mostly a <code>_2</code> suffix). Then one id per patch toward 80%.</p>
+        </article>
+        <article class="card">
+          <h3>0.13.0 — Graph check count</h3>
+          <p>Publish the <code>CKV2_*</code> denominator. Align four local graph id names. Grow exact AWS graph ids to 40.</p>
+        </article>
+        <article class="card">
+          <h3>0.14.0 — Output formats</h3>
+          <p>Golden files for JSON, SARIF, and JUnit. Add Markdown and GitLab SAST. CycloneDX is out of scope.</p>
+        </article>
+        <article class="card">
+          <h3>0.15.0 — Azure starter</h3>
+          <p>First 20 <code>CKV_AZURE_*</code> ids. The snapshot has 242. The rest stay on the patch train and do not block 1.0.</p>
+        </article>
+        <article class="card">
+          <h3>0.16.0 — GCP starter</h3>
+          <p>First 20 <code>CKV_GCP_*</code> ids. The snapshot has 123. Same rule as Azure.</p>
+        </article>
+        <article class="card">
+          <h3>0.17.0 — Large-repo benches</h3>
+          <p>One pinned larger repository, wall time and RSS, and a CI budget for the synthetic corpus.</p>
+        </article>
+        <article class="card">
+          <h3>0.18.0 — Library API and MSRV</h3>
+          <p><code>rust-version</code>, a semver policy for the library crates, and a CI check on supported signatures.</p>
+        </article>
+        <article class="card">
+          <h3>0.19.0 — Docs and security policy</h3>
+          <p><code>SECURITY.md</code>, <code>CONTRIBUTING.md</code>, and an example external policy. This page tracks that list.</p>
+        </article>
+        <article class="card">
+          <h3>0.20.0 — Windows and packages</h3>
+          <p>Windows release archive and Action support. Scoop manifest. A <code>.deb</code> on the GitHub Release. No apt repository in this milestone.</p>
+        </article>
+        <article class="card">
+          <h3>0.21.0 — Narrow secret patterns</h3>
+          <p>Opt-in token shapes inside IaC files, redacted in every report. Not a secrets product.</p>
+        </article>
+        <article class="card">
+          <h3>0.22.0 — Compliance filter</h3>
+          <p><code>--compliance</code> over CKV ids that already exist. One CIS AWS map. Built-ins stay YAML.</p>
         </article>
       </div>
     </section>
 
     <section class="section">
-      <h2>v0.4 — coverage credibility (shipped in 0.4.0)</h2>
-      <div class="grid">
-        <article class="card">
-          <h3><a href="https://github.com/jose-compu/rustmaninoff/issues/4">#4 Catalog depth</a></h3>
-          <p><strong>Shipped</strong> in 0.4.0: 536 checks; Docker 100% / K8s 93.8% fidelity.</p>
-        </article>
-        <article class="card">
-          <h3><a href="https://github.com/jose-compu/rustmaninoff/issues/40">#40 Credibility</a></h3>
-          <p><strong>Shipped</strong>: benches, fidelity table, Checkov-compare CI. Corpus medians 54 ms / 3.50 s / 6.27 s.</p>
-        </article>
-      </div>
+      <h2>1.0.0 exit criteria</h2>
+      <ul>
+        <li>0.5.1 CLI flags and exit codes 0, 1, and 2 are unchanged. New flags are documented.</li>
+        <li>JSON, SARIF 2.1.0, and JUnit have golden files. SARIF paths are relative to the scan root.</li>
+        <li>Library semver and MSRV are written down, <code>rust-version</code> is set, and CI compiles with that toolchain.</li>
+        <li>Docker attribute ids stay at 100%. Kubernetes attribute ids reach 100% after documented divergences. The 25 missing AWS resource ids are implemented or named as exclusions.</li>
+        <li>Plan scans default to create and update, keep sensitive redaction, and expand local modules with no network. Helm and Kustomize render with no implicit remote fetch. <code>--baseline</code> can hold a fixture at exit 0.</li>
+        <li><code>SECURITY.md</code> and <code>CONTRIBUTING.md</code> exist. <code>cargo test --workspace</code>, fmt, and clippy <code>-D warnings</code> are green. Every built-in policy still has pass and fail fixtures.</li>
+        <li>The bench script still runs. ACTION.md and the release workflow list the same OS and architecture pairs.</li>
+      </ul>
+      <p class="note">Azure, GCP, extra output formats, Windows, secret patterns, and the compliance filter are scheduled and do not block the 1.0 tag except where the criteria above name them. Full Checkov parity for those catalogs is later patch work.</p>
     </section>
 
     <section class="section">
-      <h2>v0.5 — real pipeline inputs</h2>
-      <div class="grid">
-        <article class="card">
-          <h3><a href="https://github.com/jose-compu/rustmaninoff/issues/3">#3 Helm (then Kustomize)</a></h3>
-          <p>Render to Kubernetes IR; reuse CKV_K8S_*.</p>
-        </article>
-        <article class="card">
-          <h3><a href="https://github.com/jose-compu/rustmaninoff/issues/18">#18 Terraform plan JSON</a></h3>
-          <p><strong>Shipped</strong> in 0.5.0 (opt-in <code>terraform_plan</code>).</p>
-        </article>
-      </div>
-    </section>
-
-    <section class="section">
-      <h2>v1.0 — compliance and optional Trivy SCA</h2>
-      <div class="grid">
-        <article class="card">
-          <h3><a href="https://github.com/jose-compu/rustmaninoff/issues/10">#10 Compliance and Rego</a></h3>
-          <p>CIS/NSA packs; optional Rego for existing Conftest/Trivy policies.</p>
-        </article>
-        <article class="card">
-          <h3><a href="https://github.com/jose-compu/rustmaninoff/issues/9">#9 Live Kubernetes</a></h3>
-          <p>Trivy <code>k8s</code>-style cluster scan via kubeconfig. No mutation.</p>
-        </article>
-        <article class="card">
-          <h3><a href="https://github.com/jose-compu/rustmaninoff/issues/8">#8 Vulns, licenses, SBOM</a></h3>
-          <p>Opt-in <code>--scanners vuln</code>. Default scan stays IaC-only so CI does not fetch a CVE DB.</p>
-        </article>
-      </div>
+      <h2>Parked, and out of scope</h2>
+      <p>Not milestones: Ansible, ARM, Bicep, Serverless, OpenAPI, SAM, CDK, GitHub Actions workflow checks, GitLab CI checks, other CI systems, Argo, and the smaller clouds in the Terraform snapshot (Alibaba, Yandex, OCI, NCP, Palo Alto, Tencent, Linode, DigitalOcean, OpenStack, Okta). Live cluster scanning stays deferred.</p>
+      <p>Out of scope: image and filesystem CVEs, vulnerability databases, license feeds, and SBOM output. Use Trivy for those.</p>
     </section>
 
     <footer class="footer">

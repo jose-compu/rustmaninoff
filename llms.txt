@@ -67,15 +67,15 @@ On one synthetic corpus (1,540 resources): Rustmaninoff 0.4.0 finished in 54 ms;
 - Unresolved interpolations (`${...}`, `Fn::*`, `!Ref`, `!GetAtt`) are unknown and do not fail the process.
 - GitHub Action inputs validated; release archives checksum-verified before install (since 0.4.1).
 
-Not shipped yet: Helm, Kustomize, local HCL modules (v0.5); baseline/suppressions (v0.6); secrets; Azure/GCP catalog depth; CVE / vuln DB (out of scope — use Trivy).
+Not shipped yet: Helm, Kustomize, local HCL modules, baseline files, narrow secret patterns, Azure/GCP catalog depth. Daily order is ROADMAP.md (0.6 plan/SARIF through 0.22). CVE / vuln DB is out of scope — use Trivy.
 
 ## Pages
 
 - https://jose-compu.github.io/rustmaninoff/ — product page, FAQ, GitHub Action install
 - https://jose-compu.github.io/rustmaninoff/documentation.html — install, Action, CLI, policy dialect
 - https://jose-compu.github.io/rustmaninoff/documentation.html#github-action — Action how-to
-- https://jose-compu.github.io/rustmaninoff/roadmap.html — epics vs Checkov/Trivy
-- https://github.com/jose-compu/rustmaninoff/blob/main/ROADMAP.md — same roadmap in git
+- https://jose-compu.github.io/rustmaninoff/roadmap.html — milestones from 0.5.1 to 1.0
+- https://github.com/jose-compu/rustmaninoff/blob/main/ROADMAP.md — daily checkboxes (source of truth)
 - https://github.com/jose-compu/rustmaninoff/blob/main/ACTION.md — Action README
 - https://jose-compu.github.io/rustmaninoff/changelog.html — release notes
 - https://github.com/jose-compu/rustmaninoff/releases/tag/v0.5.1 — latest release (plan sensitive redaction)
