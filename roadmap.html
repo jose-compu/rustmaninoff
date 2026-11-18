@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Roadmap — Rustmaninoff</title>
-  <meta name="description" content="Rustmaninoff roadmap from 0.5.1 to 1.0: daily patch releases, Checkov parity, plan scans, Helm, baselines, and a stable CLI.">
+  <meta name="description" content="Rustmaninoff roadmap from 0.5.2 to 1.0: daily patch releases, Checkov parity, plan scans, Helm, baselines, and a stable CLI.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://jose-compu.github.io/rustmaninoff/roadmap.html">
   <link rel="alternate" type="text/plain" href="https://jose-compu.github.io/rustmaninoff/llms.txt" title="llms.txt">
@@ -40,15 +40,15 @@
   </header>
 
   <div class="wrap">
-    <p class="kicker" style="margin-top:1.6rem;">Daily releases from 0.5.1 to 1.0</p>
+    <p class="kicker" style="margin-top:1.6rem;">Daily releases from 0.5.2 to 1.0</p>
     <h1 style="margin:0 0 0.7rem;letter-spacing:-0.03em;">Roadmap</h1>
-    <p class="lede" style="margin-left:0;">0.5.1 is current: Terraform, CloudFormation, Kubernetes, Dockerfiles, opt-in plan JSON, and sensitive plan values redacted. The daily release is a patch. A minor closes a milestone. 1.0.0 waits for the exit criteria. Checkboxes live in <a href="https://github.com/jose-compu/rustmaninoff/blob/main/ROADMAP.md">ROADMAP.md</a>.</p>
-    <p class="note"><strong>First daily patch:</strong> a CI benchmark that compares each pull request to <code>main</code> on the same runner and fails when a scenario is more than 15% slower (<a href="https://github.com/jose-compu/rustmaninoff/issues/89">#89</a>). That ships before the SARIF path fix. Warn above 5%.</p>
+    <p class="lede" style="margin-left:0;">0.5.2 is current: CI speed regression checks on every pull request, five new Terraform AWS checks, 541 built-in CKV policies, opt-in plan JSON, and sensitive plan redaction. The daily release is a patch. A minor closes a milestone. 1.0.0 waits for the exit criteria. Checkboxes live in <a href="https://github.com/jose-compu/rustmaninoff/blob/main/ROADMAP.md">ROADMAP.md</a>.</p>
+    <p class="note"><strong>Next patch:</strong> SARIF locations relative to the scan root (<a href="https://github.com/jose-compu/rustmaninoff/issues/84">#84</a>) opens milestone 0.6.0. The CI benchmark gate from <a href="https://github.com/jose-compu/rustmaninoff/issues/89">#89</a> shipped in 0.5.2.</p>
     <p class="note">A patch (<code>0.x.Y</code>) is a fix, a false positive, speed, docs, hardening, or one new check. A minor (<code>0.X.0</code>) closes the open milestone or adds a framework, an output format, or a scan mode. No CVE database on any path.</p>
 
     <section class="section">
-      <h2>Already in 0.5.1</h2>
-      <p>536 checks (Docker attribute ids 11/11, Kubernetes 106/113, Terraform <code>CKV_AWS_*</code> resource ids 336/361). The 36.2% figure in the fidelity table is the whole Terraform resource directory (928 ids, including Azure, GCP, and smaller clouds), not the AWS slice. CLI, JSON, SARIF, and JUnit. GitHub Action, pre-commit, Homebrew, GHCR, crates.io. Linux and macOS release archives. Config file and <code>--external-checks-dir</code> already exist. Inline <code>checkov:skip</code> already exists.</p>
+      <h2>Already in 0.5.2</h2>
+      <p>541 checks (Docker attribute ids 11/11, Kubernetes 106/113, Terraform <code>CKV_AWS_*</code> resource ids 341/361). CI benchmark regression gate on pull requests. CLI, JSON, SARIF, and JUnit. GitHub Action, pre-commit, Homebrew, GHCR, crates.io. Linux and macOS release archives.</p>
     </section>
 
     <section class="section">
@@ -128,7 +128,7 @@
     <section class="section">
       <h2>1.0.0 exit criteria</h2>
       <ul>
-        <li>0.5.1 CLI flags and exit codes 0, 1, and 2 are unchanged. New flags are documented.</li>
+        <li>0.5.2 CLI flags and exit codes 0, 1, and 2 are unchanged. New flags are documented.</li>
         <li>JSON, SARIF 2.1.0, and JUnit have golden files. SARIF paths are relative to the scan root.</li>
         <li>Library semver and MSRV are written down, <code>rust-version</code> is set, and CI compiles with that toolchain.</li>
         <li>Docker attribute ids stay at 100%. Kubernetes attribute ids reach 100% after documented divergences. The 25 missing AWS resource ids are implemented or named as exclusions.</li>
@@ -146,7 +146,7 @@
     </section>
 
     <footer class="footer">
-      <span>v0.5.1</span>
+      <span>v0.5.2</span>
       <a href="https://github.com/jose-compu/rustmaninoff">jose-compu/rustmaninoff</a>
       <a href="llms.txt">llms.txt</a>
       <span>Apache-2.0</span>
