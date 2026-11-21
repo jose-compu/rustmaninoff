@@ -77,8 +77,21 @@
 
   <div class="wrap">
     <p class="kicker" style="margin-top:1.6rem;">Release notes</p>
-    <p class="note">See the repository <a href="https://github.com/jose-compu/rustmaninoff/blob/main/CHANGELOG.md">CHANGELOG.md</a> for 0.5.6.</p>
+    <p class="note">See the repository <a href="https://github.com/jose-compu/rustmaninoff/blob/main/CHANGELOG.md">CHANGELOG.md</a> for 0.6.0.</p>
 <h1 style="margin:0 0 1.2rem;letter-spacing:-0.03em;">Changelog</h1>
+
+    <article class="card">
+      <h2 style="margin-top:0;">0.6.0 — 2026-11-21</h2>
+      <h3>Added</h3>
+      <ul>
+        <li>The README and <a href="https://github.com/jose-compu/rustmaninoff/blob/main/ACTION.md">ACTION.md</a> show how to scan a saved Terraform plan JSON from GitHub Actions (<code>terraform show -json</code>, then <code>--framework terraform_plan</code>). A default directory scan does not select <code>terraform_plan</code>.</li>
+      </ul>
+      <h3>Changed</h3>
+      <ul>
+        <li>Milestone <strong>0.6.0</strong> is closed (<a href="https://github.com/jose-compu/rustmaninoff/issues/83">#83</a>). Scanner behavior unchanged. Catalog remains <strong>541</strong> checks. Workspace crates and Action default <code>version</code> pin are <strong>0.6.0</strong>.</li>
+      </ul>
+      <p class="note"><a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.6.0">GitHub release v0.6.0</a> · <a href="https://github.com/jose-compu/rustmaninoff/compare/v0.5.6...v0.6.0">Full changelog</a></p>
+    </article>
 
     <article class="card">
       <h2 style="margin-top:0;">0.5.6 — 2026-11-20</h2>
@@ -232,7 +245,7 @@
     </article>
 
     <footer class="footer">
-      <span>v0.5.6</span>
+      <span>v0.6.0</span>
       <a href="https://github.com/jose-compu/rustmaninoff">jose-compu/rustmaninoff</a>
       <a href="llms.txt">llms.txt</a>
       <span>Apache-2.0</span>
