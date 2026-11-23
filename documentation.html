@@ -43,7 +43,7 @@
         "headline": "Rustmaninoff documentation — CLI and GitHub Action",
         "description": "Install Rustmaninoff via cargo, Homebrew, Docker, or GitHub Action. Scan flags, SARIF, Checkov-compatible CKV policies.",
         "url": "https://jose-compu.github.io/rustmaninoff/documentation.html",
-        "version": "0.6.1",
+        "version": "0.6.2",
         "author": {"@type": "Organization", "name": "jose-compu", "url": "https://github.com/jose-compu"},
         "isPartOf": {"@id": "https://jose-compu.github.io/rustmaninoff/#website"},
         "about": {"@id": "https://jose-compu.github.io/rustmaninoff/#app"}
@@ -54,7 +54,7 @@
         "url": "https://jose-compu.github.io/rustmaninoff/documentation.html#github-action",
         "step": [
           {"@type": "HowToStep", "name": "Checkout", "text": "uses: actions/checkout@v4"},
-          {"@type": "HowToStep", "name": "Scan", "text": "uses: jose-compu/rustmaninoff@v0.6.1 with path, fail-on, output sarif"},
+          {"@type": "HowToStep", "name": "Scan", "text": "uses: jose-compu/rustmaninoff@v0.6.2 with path, fail-on, output sarif"},
           {"@type": "HowToStep", "name": "Upload SARIF", "text": "uses: github/codeql-action/upload-sarif@v3"}
         ]
       }
@@ -94,7 +94,7 @@
   </header>
 
   <div class="wrap">
-    <p class="kicker" style="margin-top:1.6rem;">Documentation · v0.6.1</p>
+    <p class="kicker" style="margin-top:1.6rem;">Documentation · v0.6.2</p>
     <h1 style="margin:0 0 0.4rem;letter-spacing:-0.03em;">Using Rustmaninoff</h1>
     <p class="lede" style="margin-left:0;">Attribute scanner for Terraform, CloudFormation, Kubernetes, and Dockerfiles with Checkov-compatible CKV policies. Policies are Checkov-compatible YAML.</p>
 
@@ -131,19 +131,19 @@ rustmaninoff scan .</code></pre>
         <p>Homebrew:</p>
         <pre><code>brew install jose-compu/tap/rustmaninoff</code></pre>
         <p>Docker (GHCR):</p>
-        <pre><code>docker run --rm -v "$PWD":/src -w /src ghcr.io/jose-compu/rustmaninoff:0.6.1 scan .</code></pre>
+        <pre><code>docker run --rm -v "$PWD":/src -w /src ghcr.io/jose-compu/rustmaninoff:0.6.2 scan .</code></pre>
         <p>From a checkout:</p>
         <pre><code>cargo build --release -p rustmaninoff
 ./target/release/rustmaninoff scan .</code></pre>
-        <p>GitHub Release binaries for Linux and macOS (amd64 and arm64): <a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.6.1">v0.6.1</a> (quoted annotation keys) · <a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.6.0">v0.6.0</a> (plan Action workflow).</p>
+        <p>GitHub Release binaries for Linux and macOS (amd64 and arm64): <a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.6.2">v0.6.2</a> (Lua in ingress snippets) · <a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.6.1">v0.6.1</a> (quoted annotation keys).</p>
 
         <h2 id="github-action">GitHub Action</h2>
         <p>Official Action on the <a href="https://github.com/marketplace/actions/rustmaninoff">GitHub Marketplace</a>. Composite Action at repo root (<code>action.yml</code>): downloads a release binary, verifies <code>.sha256</code>, validates inputs, and runs <code>rustmaninoff scan</code>. Full reference: <a href="https://github.com/jose-compu/rustmaninoff/blob/main/ACTION.md">ACTION.md</a>.</p>
         <pre><code>- uses: actions/checkout@v4
-- uses: jose-compu/rustmaninoff@v0.6.1
+- uses: jose-compu/rustmaninoff@v0.6.2
   with:
     path: .
-    version: "0.6.1"   # or "latest"
+    version: "0.6.2"   # or "latest"
     fail-on: HIGH
     output: sarif
     sarif-file: rustmaninoff.sarif
@@ -152,7 +152,7 @@ rustmaninoff scan .</code></pre>
   if: always()
   with:
     sarif_file: rustmaninoff.sarif</code></pre>
-        <p>Required permissions for SARIF upload: <code>security-events: write</code>. Pin the Action tag (<code>@v0.6.1</code>) in production; optionally pin by commit SHA for supply-chain hardening.</p>
+        <p>Required permissions for SARIF upload: <code>security-events: write</code>. Pin the Action tag (<code>@v0.6.2</code>) in production; optionally pin by commit SHA for supply-chain hardening.</p>
 
         <h2 id="scan">Scan</h2>
         <pre><code>rustmaninoff scan [PATH] \
@@ -184,7 +184,7 @@ compact: false</code></pre>
 
         <h2 id="policies">Policies</h2>
         <p>A check definition is the <strong>pass</strong> condition. Built-in policies are rewritten YAML, attributed to <a href="https://github.com/bridgecrewio/checkov">Checkov</a> (Bridgecrew / Palo Alto Networks, Apache-2.0), and reuse published CKV ids.</p>
-        <p>Operators: <code>equals</code>, <code>not_equals</code>, <code>exists</code>, <code>not_exists</code>, <code>contains</code>, <code>not_contains</code>, <code>within</code>, <code>regex_match</code>, <code>starting_with</code>, <code>ending_with</code>, numeric comparisons, <code>is_true</code>, <code>is_false</code>, <code>is_empty</code>, <code>length_greater_than</code>, <code>length_less_than</code>, and their negated forms. Combinators: <code>and</code>, <code>or</code>, <code>not</code>. Wrap a single path segment in double quotes when the key name contains dots or slashes (for example a Kubernetes annotation).</p>
+        <p>Operators: <code>equals</code>, <code>not_equals</code>, <code>exists</code>, <code>not_exists</code>, <code>contains</code>, <code>not_contains</code>, <code>within</code>, <code>regex_match</code>, <code>starting_with</code>, <code>ending_with</code>, numeric comparisons, <code>is_true</code>, <code>is_false</code>, <code>is_empty</code>, <code>length_greater_than</code>, <code>length_less_than</code>, and their negated forms. Combinators: <code>and</code>, <code>or</code>, <code>not</code>. Wrap a single path segment in double quotes when the key name contains dots or slashes (for example a Kubernetes annotation). On a map of strings, <code>no_element</code> can read each entry's <code>key</code> and <code>value</code> in the <code>where</code> clause.</p>
         <p>Extensions: <code>no_element</code>, <code>forbid_resource</code>, <code>equals_any</code>, <code>intersects</code>, <code>image_tag_pinned</code>, <code>connection</code> (graph neighbors), <code>filter</code> (attribute alias), and <code>missing: pass|fail|unknown</code>. <code>scope</code> is ignored. Severity defaults to <code>MEDIUM</code> when omitted.</p>
         <h3>Example</h3>
         <pre><code>metadata:
@@ -218,13 +218,13 @@ definition:
         <p><strong>0.5.0 shipped:</strong> opt-in Terraform plan JSON (<code>--framework terraform_plan</code>). <strong>0.5.3:</strong> SARIF paths for GitHub code scanning. <strong>0.5.4:</strong> default plan scan reports creates and updates; <code>--plan-scope all</code> scans the whole state. <strong>0.5.5:</strong> plan scans follow <code>depends_on</code> and address references for companion checks. <strong>0.5.6:</strong> plan scan coverage is published in <a href="https://github.com/jose-compu/rustmaninoff/blob/main/docs/fidelity.md#plan-scan">docs/fidelity.md</a>. <strong>0.6.0 shipped:</strong> README and Action plan workflow (<a href="https://github.com/jose-compu/rustmaninoff/issues/83">#83</a>); milestone 0.6.0 is closed. <strong>Still open:</strong> the remaining Kubernetes ids, local HCL modules, Helm, Kustomize, and baselines. The order is the <a href="roadmap.html">roadmap</a>.</p>
 
         <h2 id="ci">CI without the Action</h2>
-        <p>Prefer <a href="#github-action">jose-compu/rustmaninoff@v0.6.1</a>. Manual install path:</p>
+        <p>Prefer <a href="#github-action">jose-compu/rustmaninoff@v0.6.2</a>. Manual install path:</p>
         <pre><code>- uses: actions/checkout@v4
-- run: cargo install rustmaninoff --locked --version 0.6.1
+- run: cargo install rustmaninoff --locked --version 0.6.2
 - run: rustmaninoff scan . --fail-on HIGH --output sarif --sarif-file rustmaninoff.sarif</code></pre>
 
         <h2 id="crates">Crates</h2>
-        <p>Workspace 0.6.1 on crates.io:</p>
+        <p>Workspace 0.6.2 on crates.io:</p>
         <ul>
           <li><a href="https://crates.io/crates/rustmaninoff">rustmaninoff</a> (CLI)</li>
           <li><a href="https://crates.io/crates/rustmaninoff-ir">rustmaninoff-ir</a></li>
@@ -243,7 +243,7 @@ definition:
     </div>
 
     <footer class="footer">
-      <span>v0.6.1</span>
+      <span>v0.6.2</span>
       <a href="https://github.com/jose-compu/rustmaninoff">jose-compu/rustmaninoff</a>
       <a href="https://github.com/marketplace/actions/rustmaninoff">Marketplace Action</a>
       <a href="llms.txt">llms.txt</a>
