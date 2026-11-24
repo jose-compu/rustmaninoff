@@ -43,11 +43,11 @@ Checkov and Trivy are broader platforms. Rustmaninoff is a **small, fast attribu
 - **One static binary.** `cargo install rustmaninoff` (or a GitHub Release binary). Checkov needs a Python environment and plugins. Trivy is a large Go binary that also covers vulns, secrets, and SBOMs you may not want in an IaC-only job.
 - **Checkov-shaped policies without the Checkov runtime.** Same published CKV ids, YAML pass-conditions, and `# checkov:skip=` / `checkov.io/skip` comments. The engine is Rust IR + attribute operators, not a Python port. CI compares shared fixtures to Checkov ([checkov-compare](.github/workflows/checkov-compare.yml)).
 - **Predictable CI.** Interpolations are **unknown**, not guessed. Unknowns never fail the process. Exit codes, `--fail-on`, SARIF 2.1.0, JUnit, and JSON are first-class.
-- **Focused catalog.** 544 checks (attribute + `CKV2_*`) with pass/fail fixtures. Fidelity: Docker 100%, Kubernetes 96.5%, Terraform AWS resource ids ~36.7% — see [docs/fidelity.md](docs/fidelity.md). Opt-in `terraform_plan` for saved plan JSON (0.5.6): default scan reports creates and updates and follows `depends_on` and address references so companion checks can run (a matching name alone is not a link); `--plan-scope all` scans the whole planned state; [docs/fidelity.md](docs/fidelity.md) lists what a plan scan covers. CI benches every change against `main` (median + spread). No Helm, Kustomize, or secrets/vuln scanning yet (other tools).
+- **Focused catalog.** **544** built-in checks (Terraform 373, CloudFormation 51, Kubernetes 109, Docker 11; attribute + `CKV2_*`), each with pass/fail fixtures. Fidelity: Docker 11/11, Kubernetes 109/113 (96.5%), Terraform AWS resource ids ~36.7% — see [docs/fidelity.md](docs/fidelity.md). Opt-in `terraform_plan` for saved plan JSON (0.5.6): default scan reports creates and updates and follows `depends_on` and address references so companion checks can run (a matching name alone is not a link); `--plan-scope all` scans the whole planned state; [docs/fidelity.md](docs/fidelity.md) lists what a plan scan covers. CI benches every change against `main` (median + spread). No Helm, Kustomize, or secrets/vuln scanning yet (other tools).
 
 Site: [jose-compu.github.io/rustmaninoff](https://jose-compu.github.io/rustmaninoff/) · [llms.txt](https://jose-compu.github.io/rustmaninoff/llms.txt) for search and AI agents · [GitHub Action](https://github.com/marketplace/actions/rustmaninoff) (`jose-compu/rustmaninoff@v0.6.4`) · [ACTION.md](ACTION.md).
 
-**Roadmap:** [ROADMAP.md](ROADMAP.md) (daily patches from 0.6.4 through 1.0) · fidelity: [docs/fidelity.md](docs/fidelity.md) · [epics](https://github.com/jose-compu/rustmaninoff/issues?q=is%3Aissue+label%3Aepic).
+**Roadmap:** [ROADMAP.md](ROADMAP.md) (patch releases about every 12 hours from **0.6.4** through 1.0; milestone **0.7.0** is open — next work is `starting_with` across command/args arrays, then the four remaining Kubernetes ids) · fidelity: [docs/fidelity.md](docs/fidelity.md) · [epics](https://github.com/jose-compu/rustmaninoff/issues?q=is%3Aissue+label%3Aepic).
 
 ### For AI agents / Agentic SEO
 
@@ -76,6 +76,8 @@ rustmaninoff scan [PATH] \
   --fail-on HIGH \
   --external-checks-dir ./extra
 ```
+
+Frameworks: `terraform`, `terraform_plan`, `cloudformation`, `kubernetes`, `docker` (comma-separated). Plan JSON requires `terraform_plan` explicitly. Other flags: `--config`, `--var-file`, `--plan-scope` (`changes` or `all`), `--show-passed`, `--compact`, `--show-unknown`, `--soft-fail`.
 
 Exit codes: `0` when nothing fails the threshold, `1` when a finding is at or above `--fail-on` (default `HIGH`) or a file fails to parse, `2` on usage errors. `--soft-fail` always exits `0`.
 
@@ -143,11 +145,11 @@ Wall-clock time of each CLI on the published synthetic corpus under [benchmarks/
 
 | Scanner | Full corpus | Terraform | Notes |
 | --- | ---: | ---: | --- |
-| Rustmaninoff 0.4.0 | 54 ms | 39 ms | 536 built-in checks |
+| Rustmaninoff 0.4.0 | 54 ms | 39 ms | 536 built-in checks (pinned bench) |
 | Checkov 3.3.21 | 3.50 s | 2.83 s | full framework packs |
 | Trivy 0.74.0 | 6.27 s | — | misconfig policies |
 
-On the full corpus that is about **65×** Checkov and **116×** Trivy versus Rustmaninoff. Catalogs differ. Real-world sample (terraform-aws-modules/terraform-aws-s3-bucket@v4.1.2): Rustmaninoff **45 ms**, Checkov **12.0 s**. See [benchmarks/history.json](benchmarks/history.json).
+On the full corpus that is about **65×** Checkov and **116×** Trivy versus Rustmaninoff. Catalogs differ; the current built-in pack is **544** checks ([docs/fidelity.md](docs/fidelity.md)). Real-world sample (terraform-aws-modules/terraform-aws-s3-bucket@v4.1.2): Rustmaninoff **45 ms**, Checkov **12.0 s**. See [benchmarks/history.json](benchmarks/history.json).
 
 ```mermaid
 %%{init: {"themeVariables": {"xyChart": {"plotColorPalette": "#E07A3D, #2A9D8F, #3D5A80", "titleColor": "#C44536", "xAxisLineColor": "#E07A3D", "yAxisLineColor": "#2A9D8F", "xAxisTickColor": "#E9C46A", "yAxisTickColor": "#7B6CF6"}}}}%%
@@ -205,7 +207,9 @@ cargo install rustmaninoff --locked
 rustmaninoff scan .
 ```
 
-GitHub Release binaries: https://github.com/jose-compu/rustmaninoff/releases/tag/v0.6.4
+Workspace libraries on [crates.io](https://crates.io/) (same **0.6.4** release): `rustmaninoff-ir`, `rustmaninoff-engine`, `rustmaninoff-report`, `rustmaninoff-parser-terraform`, `rustmaninoff-parser-cfn`, `rustmaninoff-parser-k8s`, `rustmaninoff-parser-docker`.
+
+GitHub Release binaries: https://github.com/jose-compu/rustmaninoff/releases/latest (current: [v0.6.4](https://github.com/jose-compu/rustmaninoff/releases/tag/v0.6.4)) — `x86_64-unknown-linux-gnu`, `aarch64-unknown-linux-gnu`, `aarch64-apple-darwin`, `x86_64-apple-darwin`.
 
 ### Homebrew
 
@@ -287,11 +291,11 @@ Multi-arch image on GHCR (`linux/amd64`, `linux/arm64`):
 docker run --rm -v "$PWD":/src -w /src ghcr.io/jose-compu/rustmaninoff:0.6.4 scan .
 ```
 
-Tags: `latest` (main), semver (`0.4.0`, `0.4`), and `sha-*`. Built by `.github/workflows/docker.yml` from GitHub Release binaries (use `--build-arg BUILD_MODE=source` for a full cargo image build).
+Tags: `latest` (main), semver (`0.6.4`, `0.6`), and `sha-*`. Built by `.github/workflows/docker.yml` from GitHub Release binaries (use `--build-arg BUILD_MODE=source` for a full cargo image build).
 
 ## Release
 
-Pushing the tag `v0.6.4` runs `.github/workflows/release.yml` (binaries + checksums) and `.github/workflows/publish.yml` (crates.io, dependency order: `ir` → parsers/engine/report → `rustmaninoff`, skipping versions already on the index).
+Maintainers cut patch tags from [ROADMAP.md](ROADMAP.md) on a cadence of about **12 hours**. Pushing `v0.6.4` (or the next patch) runs [release.yml](.github/workflows/release.yml) (multi-arch binaries + checksums) and [publish.yml](.github/workflows/publish.yml) (crates.io in order: `rustmaninoff-ir` → `rustmaninoff-engine` → `rustmaninoff-report` → parsers → `rustmaninoff`, skipping versions already on the index).
 
 ```sh
 git tag v0.6.4
