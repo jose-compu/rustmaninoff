@@ -68,7 +68,7 @@
         "applicationCategory": "SecurityApplication",
         "applicationSubCategory": "Infrastructure as Code scanner",
         "operatingSystem": "Linux, macOS",
-        "softwareVersion": "0.6.2",
+        "softwareVersion": "0.6.3",
         "license": "https://www.apache.org/licenses/LICENSE-2.0",
         "url": "https://jose-compu.github.io/rustmaninoff/",
         "downloadUrl": "https://crates.io/crates/rustmaninoff",
@@ -83,6 +83,7 @@
           "Opt-in Terraform plan JSON scanning (terraform_plan)",
           "Plan scans report creates and updates by default (0.5.4)",
           "Plan scan coverage published in docs/fidelity.md (0.5.6)",
+          "Any ingress snippet annotation fails CKV_K8S_153, including non-Lua snippets (0.6.3)",
           "Ingress snippet annotations that run Lua fail CKV_K8S_152 (0.6.2)",
           "Quoted attribute key may contain dots for Kubernetes annotation names (0.6.1)",
           "README and Action show saved-plan workflow; directory scans skip plan files (0.6.0)",
@@ -209,7 +210,7 @@
   <div class="wrap">
     <section class="hero">
       <img class="hero-banner" src="img/banner.jpg" alt="Rustmaninoff, IaC security scanner">
-      <p class="kicker">v0.6.2 · Apache-2.0 · GitHub Action + CLI</p>
+      <p class="kicker">v0.6.3 · Apache-2.0 · GitHub Action + CLI</p>
       <p class="badges" style="margin:0.6rem 0 0.8rem;display:flex;gap:0.4rem;flex-wrap:wrap;justify-content:center"><a href="https://crates.io/crates/rustmaninoff"><img src="https://img.shields.io/crates/v/rustmaninoff.svg" alt="crates.io"></a><a href="https://github.com/marketplace/actions/rustmaninoff"><img src="https://img.shields.io/badge/GitHub%20Action-Marketplace-2088FF?logo=githubactions&amp;logoColor=white" alt="GitHub Marketplace Action"></a><a href="https://github.com/jose-compu/rustmaninoff/actions/workflows/ci.yml"><img src="https://github.com/jose-compu/rustmaninoff/actions/workflows/ci.yml/badge.svg" alt="CI"></a><a href="https://github.com/jose-compu/rustmaninoff/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="License"></a></p><h1>Checkov-compatible CKV policies. Single Rust binary. GitHub Action. No Python.</h1>
       <p class="lede">Fast IaC security scanner for Terraform, CloudFormation, Kubernetes, and Dockerfiles — a Checkov-compatible alternative for CKV gates in CI. Same published CKV ids and skip comments, without the Python runtime — about 65× faster on a published synthetic corpus (self-reported). 536 checks; Docker 100% / K8s 93.8% of pinned Checkov ids. Install with cargo, Homebrew, Docker, or <a href="#github-action">jose-compu/rustmaninoff</a> on GitHub Actions with SARIF upload.</p><p style="text-align:center;margin:1rem 0"><img src="img/demo.svg" alt="Terminal demo: rustmaninoff fails CKV_AWS_3 on unencrypted EBS — Checkov-compatible IaC scan" width="720" style="max-width:100%;border-radius:10px"></p>
       <div class="cta-row">
@@ -268,7 +269,7 @@
       <pre><code>cargo install rustmaninoff --locked
 rustmaninoff scan . --framework terraform,cloudformation,kubernetes,docker</code></pre>
       <pre><code>brew install jose-compu/tap/rustmaninoff
-docker run --rm -v "$PWD":/src -w /src ghcr.io/jose-compu/rustmaninoff:0.6.2 scan .</code></pre>
+docker run --rm -v "$PWD":/src -w /src ghcr.io/jose-compu/rustmaninoff:0.6.3 scan .</code></pre>
     </section>
 
     <section class="section" id="github-action">
@@ -298,7 +299,7 @@ jobs:
         if: always()
         with:
           sarif_file: rustmaninoff.sarif</code></pre>
-      <p class="note">Inputs: <code>path</code>, <code>version</code> (default <code>0.6.2</code>), <code>fail-on</code>, <code>output</code>, <code>sarif-file</code>, <code>args</code>. Full Action docs: <a href="https://github.com/jose-compu/rustmaninoff/blob/main/ACTION.md">ACTION.md</a> · <a href="documentation.html#github-action">documentation</a>.</p>
+      <p class="note">Inputs: <code>path</code>, <code>version</code> (default <code>0.6.3</code>), <code>fail-on</code>, <code>output</code>, <code>sarif-file</code>, <code>args</code>. Full Action docs: <a href="https://github.com/jose-compu/rustmaninoff/blob/main/ACTION.md">ACTION.md</a> · <a href="documentation.html#github-action">documentation</a>.</p>
     </section>
 
     <section class="section" id="faq">
@@ -402,13 +403,13 @@ definition:
         </article>
         <article class="card">
           <h3>Still out of scope</h3>
-          <p>Milestone <strong>0.7.0</strong> is open: <strong>0.6.2</strong> ships Lua-in-snippet detection (<code>CKV_K8S_152</code>); <code>CKV_K8S_153</code> is next. Helm, Kustomize, local modules, and baselines are still ahead. See the <a href="roadmap.html">roadmap</a>.</p>
+          <p>Milestone <strong>0.7.0</strong> is open: <strong>0.6.3</strong> fails every ingress snippet annotation (<code>CKV_K8S_153</code>); <code>CKV_K8S_154</code> is next. Helm, Kustomize, local modules, and baselines are still ahead. See the <a href="roadmap.html">roadmap</a>.</p>
         </article>
       </div>
     </section>
 
     <footer class="footer">
-      <span>v0.6.2</span>
+      <span>v0.6.3</span>
       <a href="https://github.com/jose-compu/rustmaninoff">jose-compu/rustmaninoff</a>
       <a href="https://github.com/marketplace/actions/rustmaninoff">Marketplace Action</a>
       <a href="https://docs.rs/rustmaninoff">docs.rs</a>

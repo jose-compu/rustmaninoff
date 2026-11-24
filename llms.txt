@@ -10,7 +10,7 @@ GitHub Action: https://github.com/marketplace/actions/rustmaninoff
 Action docs: https://github.com/jose-compu/rustmaninoff/blob/main/ACTION.md
 Action ref: jose-compu/rustmaninoff@v0.6.2
 License: Apache-2.0
-Version: CLI catalog 0.6.2 / Action pin 0.6.2 (542 built-in checks)
+Version: CLI catalog 0.6.3 / Action pin 0.6.3 (543 built-in checks)
 
 Attribute paths may wrap one key in double quotes so dots and slashes stay in the name (Kubernetes annotations). The seven missing Kubernetes checks are still not shipped.
 
@@ -27,7 +27,7 @@ CLI:
 ```
 cargo install rustmaninoff --locked
 brew install jose-compu/tap/rustmaninoff
-docker run --rm -v "$PWD":/src -w /src ghcr.io/jose-compu/rustmaninoff:0.6.2 scan .
+docker run --rm -v "$PWD":/src -w /src ghcr.io/jose-compu/rustmaninoff:0.6.3 scan .
 rustmaninoff scan . --framework terraform,cloudformation,kubernetes,docker
 ```
 
@@ -66,7 +66,7 @@ On one synthetic corpus (1,540 resources): Rustmaninoff 0.4.0 finished in 54 ms;
 - CloudFormation YAML/JSON Resources. Attribute paths are relative to Properties.
 - Kubernetes multi-document YAML, including List.
 - Dockerfiles: FROM tag, USER, COPY vs ADD, HEALTHCHECK, and related CKV_DOCKER_* checks.
-- 542 built-in checks; Docker 100% and Kubernetes 94.7% of pinned Checkov ids (docs/fidelity.md). Ingress snippets that run Lua fail; six Kubernetes checks are still missing.
+- 543 built-in checks; Docker 100% and Kubernetes 95.6% of pinned Checkov ids (docs/fidelity.md). Any ingress snippet annotation fails; five Kubernetes checks are still missing.
 - Reports: text, JSON, SARIF 2.1.0, JUnit.
 - Unresolved interpolations (`${...}`, `Fn::*`, `!Ref`, `!GetAtt`) are unknown and do not fail the process.
 - GitHub Action inputs validated; release archives checksum-verified before install (since 0.4.1).
@@ -78,11 +78,11 @@ Not shipped yet: Helm, Kustomize, local HCL modules, baseline files, narrow secr
 - https://jose-compu.github.io/rustmaninoff/ — product page, FAQ, GitHub Action install
 - https://jose-compu.github.io/rustmaninoff/documentation.html — install, Action, CLI, policy dialect
 - https://jose-compu.github.io/rustmaninoff/documentation.html#github-action — Action how-to
-- https://jose-compu.github.io/rustmaninoff/roadmap.html — milestones from 0.6.2 to 1.0
+- https://jose-compu.github.io/rustmaninoff/roadmap.html — milestones from 0.6.3 to 1.0
 - https://github.com/jose-compu/rustmaninoff/blob/main/ROADMAP.md — daily checkboxes (source of truth)
 - https://github.com/jose-compu/rustmaninoff/blob/main/ACTION.md — Action README
 - https://jose-compu.github.io/rustmaninoff/changelog.html — release notes
-- https://github.com/jose-compu/rustmaninoff/releases/tag/v0.6.2 — latest release (Lua in ingress snippets)
+- https://github.com/jose-compu/rustmaninoff/releases/tag/v0.6.3 — latest release (every ingress snippet)
 
 ## For agents (citation and retrieval)
 
