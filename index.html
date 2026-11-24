@@ -133,7 +133,7 @@
           {
             "@type": "HowToStep",
             "name": "Run jose-compu/rustmaninoff",
-            "text": "Add uses: jose-compu/rustmaninoff@v0.6.2 with path, fail-on HIGH, and output sarif."
+            "text": "Add uses: jose-compu/rustmaninoff@v0.6.3 with path, fail-on HIGH, and output sarif."
           },
           {
             "@type": "HowToStep",
@@ -159,7 +159,7 @@
             "name": "How do I install the Rustmaninoff GitHub Action?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "In a workflow, use jose-compu/rustmaninoff@v0.6.2 after actions/checkout. Set output to sarif and optionally upload with github/codeql-action/upload-sarif. Marketplace: https://github.com/marketplace/actions/rustmaninoff"
+              "text": "In a workflow, use jose-compu/rustmaninoff@v0.6.3 after actions/checkout. Set output to sarif and optionally upload with github/codeql-action/upload-sarif. Marketplace: https://github.com/marketplace/actions/rustmaninoff"
             }
           },
           {
@@ -274,7 +274,7 @@ docker run --rm -v "$PWD":/src -w /src ghcr.io/jose-compu/rustmaninoff:0.6.3 sca
 
     <section class="section" id="github-action">
       <h2>GitHub Action — install in CI</h2>
-      <p class="note">Official composite Action: downloads a release binary, verifies SHA-256, scans Terraform / CloudFormation / Kubernetes / Dockerfiles, and emits SARIF for GitHub Code Scanning. Marketplace: <a href="https://github.com/marketplace/actions/rustmaninoff">github.com/marketplace/actions/rustmaninoff</a>. Pin with <code>jose-compu/rustmaninoff@v0.6.2</code>.</p>
+      <p class="note">Official composite Action: downloads a release binary, verifies SHA-256, scans Terraform / CloudFormation / Kubernetes / Dockerfiles, and emits SARIF for GitHub Code Scanning. Marketplace: <a href="https://github.com/marketplace/actions/rustmaninoff">github.com/marketplace/actions/rustmaninoff</a>. Pin with <code>jose-compu/rustmaninoff@v0.6.3</code>.</p>
       <pre><code># .github/workflows/iac-scan.yml
 name: IaC security
 on:
@@ -289,7 +289,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: jose-compu/rustmaninoff@v0.6.2
+      - uses: jose-compu/rustmaninoff@v0.6.3
         with:
           path: .
           fail-on: HIGH
@@ -315,7 +315,7 @@ jobs:
         </article>
         <article class="card">
           <h3>GitHub Action?</h3>
-          <p><code>uses: jose-compu/rustmaninoff@v0.6.2</code> then upload SARIF. See <a href="#github-action">install snippet</a> above.</p>
+          <p><code>uses: jose-compu/rustmaninoff@v0.6.3</code> then upload SARIF. See <a href="#github-action">install snippet</a> above.</p>
         </article>
       </div>
     </section>
