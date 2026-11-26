@@ -43,7 +43,7 @@
         "headline": "Rustmaninoff documentation — CLI and GitHub Action",
         "description": "Install Rustmaninoff via cargo, Homebrew, Docker, or GitHub Action. Scan flags, SARIF, Checkov-compatible CKV policies.",
         "url": "https://jose-compu.github.io/rustmaninoff/documentation.html",
-        "version": "0.6.7",
+        "version": "0.6.8",
         "author": {"@type": "Organization", "name": "jose-compu", "url": "https://github.com/jose-compu"},
         "isPartOf": {"@id": "https://jose-compu.github.io/rustmaninoff/#website"},
         "about": {"@id": "https://jose-compu.github.io/rustmaninoff/#app"}
@@ -54,7 +54,7 @@
         "url": "https://jose-compu.github.io/rustmaninoff/documentation.html#github-action",
         "step": [
           {"@type": "HowToStep", "name": "Checkout", "text": "uses: actions/checkout@v4"},
-          {"@type": "HowToStep", "name": "Scan", "text": "uses: jose-compu/rustmaninoff@v0.6.7 with path, fail-on, output sarif"},
+          {"@type": "HowToStep", "name": "Scan", "text": "uses: jose-compu/rustmaninoff@v0.6.8 with path, fail-on, output sarif"},
           {"@type": "HowToStep", "name": "Upload SARIF", "text": "uses: github/codeql-action/upload-sarif@v3"}
         ]
       }
@@ -94,7 +94,7 @@
   </header>
 
   <div class="wrap">
-    <p class="kicker" style="margin-top:1.6rem;">Documentation · v0.6.7</p>
+    <p class="kicker" style="margin-top:1.6rem;">Documentation · v0.6.8</p>
     <h1 style="margin:0 0 0.4rem;letter-spacing:-0.03em;">Using Rustmaninoff</h1>
     <p class="lede" style="margin-left:0;">Attribute scanner for Terraform, CloudFormation, Kubernetes, and Dockerfiles with Checkov-compatible CKV policies. Policies are Checkov-compatible YAML.</p>
 
@@ -117,11 +117,11 @@
         <h2 id="why">Why Rustmaninoff over Checkov and Trivy</h2>
         <p>Checkov and Trivy are broader platforms. Rustmaninoff is a small IaC attribute scanner for CI when you already know the CKV ids to enforce.</p>
         <ul>
-          <li><strong>Speed.</strong> 54 ms on 1,540 resources vs 3.50 s Checkov (~65×) and 6.27 s Trivy (~116×). No Python interpreter, no policy-db refresh on the scan path.</li>
+          <li><strong>Speed.</strong> 43 ms on 1,540 resources vs 2.53 s Checkov 3.4.11 (~59×) and 5.60 s Trivy 0.76.2 (~130×) (latest history.json row). No Python interpreter, no policy-db refresh on the scan path.</li>
           <li><strong>One static binary.</strong> Checkov needs a Python environment. Trivy also covers vulns, secrets, and SBOMs that an IaC-only job may not want.</li>
           <li><strong>Checkov-shaped policies, Rust engine.</strong> Published CKV ids, YAML pass-conditions, and <code># checkov:skip=</code> / <code>checkov.io/skip</code>. Not a Python port of Checkov.</li>
           <li><strong>Predictable CI.</strong> Unresolved interpolations are unknown, never fail. SARIF 2.1.0, JUnit, JSON, <code>--fail-on</code>.</li>
-          <li><strong>Focused catalog.</strong> 536 checks with published fidelity (Docker 100% / K8s 93.8% of pinned Checkov ids). Opt-in Terraform plan JSON (<code>--framework terraform_plan</code>). Helm, Kustomize, and secrets/vuln scanning still open.</li>
+          <li><strong>Focused catalog.</strong> 546 checks with published fidelity (Docker 11/11 / K8s 111/113 at 98.2% of pinned Checkov ids). Opt-in Terraform plan JSON (<code>--framework terraform_plan</code>). Helm, Kustomize, and secrets/vuln scanning still open.</li>
         </ul>
 
         <h2 id="install">Install</h2>
@@ -131,7 +131,7 @@ rustmaninoff scan .</code></pre>
         <p>Homebrew:</p>
         <pre><code>brew install jose-compu/tap/rustmaninoff</code></pre>
         <p>Docker (GHCR):</p>
-        <pre><code>docker run --rm -v "$PWD":/src -w /src ghcr.io/jose-compu/rustmaninoff:0.6.7 scan .</code></pre>
+        <pre><code>docker run --rm -v "$PWD":/src -w /src ghcr.io/jose-compu/rustmaninoff:0.6.8 scan .</code></pre>
         <p>From a checkout:</p>
         <pre><code>cargo build --release -p rustmaninoff
 ./target/release/rustmaninoff scan .</code></pre>
@@ -140,10 +140,10 @@ rustmaninoff scan .</code></pre>
         <h2 id="github-action">GitHub Action</h2>
         <p>Official Action on the <a href="https://github.com/marketplace/actions/rustmaninoff">GitHub Marketplace</a>. Composite Action at repo root (<code>action.yml</code>): downloads a release binary, verifies <code>.sha256</code>, validates inputs, and runs <code>rustmaninoff scan</code>. Full reference: <a href="https://github.com/jose-compu/rustmaninoff/blob/main/ACTION.md">ACTION.md</a>.</p>
         <pre><code>- uses: actions/checkout@v4
-- uses: jose-compu/rustmaninoff@v0.6.7
+- uses: jose-compu/rustmaninoff@v0.6.8
   with:
     path: .
-    version: "0.6.7"   # or "latest"
+    version: "0.6.8"   # or "latest"
     fail-on: HIGH
     output: sarif
     sarif-file: rustmaninoff.sarif
@@ -152,8 +152,9 @@ rustmaninoff scan .</code></pre>
   if: always()
   with:
     sarif_file: rustmaninoff.sarif</code></pre>
-        <p>Required permissions for SARIF upload: <code>security-events: write</code>. Pin the Action tag (<code>@v0.6.7</code>) in production; optionally pin by commit SHA for supply-chain hardening.</p>
+        <p>Required permissions for SARIF upload: <code>security-events: write</code>. Pin the Action tag (<code>@v0.6.8</code>) in production; optionally pin by commit SHA for supply-chain hardening.</p>
         <p>From <strong>0.6.5</strong>, <code>starting_with</code> and <code>contains</code> match any string item in a Kubernetes <code>command</code> or <code>args</code> array (prefix or substring inside a longer argument).</p>
+        <p>From <strong>0.6.8</strong>, the site and README cite the latest <code>benchmarks/history.json</code> row (refreshed published speed figures).</p>
         <p>From <strong>0.6.7</strong>, <code>CKV_K8S_151</code> fails a <code>kubelet</code> command when a cipher after <code>--tls-cipher-suites=</code> is outside the strong list; an unset flag still passes.</p>
         <p>From <strong>0.6.6</strong>, <code>CKV_K8S_105</code> fails a <code>kube-apiserver</code> command when a cipher after <code>--tls-cipher-suites=</code> is outside Checkov's strong list; an unset flag still passes.</p>
 
@@ -214,20 +215,20 @@ definition:
           <li>CloudFormation YAML and JSON <code>Resources</code>. Attribute paths are relative to <code>Properties</code>.</li>
           <li>Kubernetes multi-document YAML, including <code>List</code>.</li>
           <li>Dockerfiles: FROM, USER, ADD vs COPY, HEALTHCHECK, and privileged-ish RUN patterns.</li>
-          <li><strong>536</strong> built-in checks with pass/fail fixtures. Docker 100% and Kubernetes 93.8% of pinned Checkov ids (<a href="https://github.com/jose-compu/rustmaninoff/blob/main/docs/fidelity.md">fidelity.md</a>).</li>
+          <li><strong>546</strong> built-in checks with pass/fail fixtures. Docker 100% and Kubernetes 111/113 (98.2%) of pinned Checkov ids (<a href="https://github.com/jose-compu/rustmaninoff/blob/main/docs/fidelity.md">fidelity.md</a>).</li>
           <li>Text, JSON, SARIF 2.1.0, and JUnit reports.</li>
         </ul>
         <p>S3 encryption, versioning, and logging on current Terraform target <code>aws_s3_bucket_server_side_encryption_configuration</code>, <code>aws_s3_bucket_versioning</code>, and <code>aws_s3_bucket_logging</code>. <code>CKV_AWS_286</code> matches a static action subset, including <code>*</code> and <code>*:*</code>. <code>CKV_K8S_14</code> accepts a digest or a tag other than <code>latest</code>; an image whose last colon is a registry port and which has no tag is treated as pinned.</p>
         <p><strong>0.5.0 shipped:</strong> opt-in Terraform plan JSON (<code>--framework terraform_plan</code>). <strong>0.5.3:</strong> SARIF paths for GitHub code scanning. <strong>0.5.4:</strong> default plan scan reports creates and updates; <code>--plan-scope all</code> scans the whole state. <strong>0.5.5:</strong> plan scans follow <code>depends_on</code> and address references for companion checks. <strong>0.5.6:</strong> plan scan coverage is published in <a href="https://github.com/jose-compu/rustmaninoff/blob/main/docs/fidelity.md#plan-scan">docs/fidelity.md</a>. <strong>0.6.0 shipped:</strong> README and Action plan workflow (<a href="https://github.com/jose-compu/rustmaninoff/issues/83">#83</a>); milestone 0.6.0 is closed. <strong>Still open:</strong> the remaining Kubernetes ids, local HCL modules, Helm, Kustomize, and baselines. The order is the <a href="roadmap.html">roadmap</a>.</p>
 
         <h2 id="ci">CI without the Action</h2>
-        <p>Prefer <a href="#github-action">jose-compu/rustmaninoff@v0.6.7</a>. Manual install path:</p>
+        <p>Prefer <a href="#github-action">jose-compu/rustmaninoff@v0.6.8</a>. Manual install path:</p>
         <pre><code>- uses: actions/checkout@v4
-- run: cargo install rustmaninoff --locked --version 0.6.7
+- run: cargo install rustmaninoff --locked --version 0.6.8
 - run: rustmaninoff scan . --fail-on HIGH --output sarif --sarif-file rustmaninoff.sarif</code></pre>
 
         <h2 id="crates">Crates</h2>
-        <p>Workspace 0.6.7 on crates.io:</p>
+        <p>Workspace 0.6.8 on crates.io:</p>
         <ul>
           <li><a href="https://crates.io/crates/rustmaninoff">rustmaninoff</a> (CLI)</li>
           <li><a href="https://crates.io/crates/rustmaninoff-ir">rustmaninoff-ir</a></li>
@@ -246,7 +247,7 @@ definition:
     </div>
 
     <footer class="footer">
-      <span>v0.6.7</span>
+      <span>v0.6.8</span>
       <a href="https://github.com/jose-compu/rustmaninoff">jose-compu/rustmaninoff</a>
       <a href="https://github.com/marketplace/actions/rustmaninoff">Marketplace Action</a>
       <a href="llms.txt">llms.txt</a>
