@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.8 — 2026-11-26
+
+- Re-ran `scripts/bench.sh` and appended `benchmarks/history.json` with the **0.6.8** release binary on a Linux x86_64 runner (2026-11-26). Updated the README and the GitHub Pages site to cite the latest row instead of stale **0.4.0** figures. Added `scripts/workspace_version.py` for history labels.
+- No policy or engine changes. Milestone **0.7.0** stays open (7 of 12 boxes). Built-in catalog is **546** checks. `CKV_K8S_32` is next.
+
 ## 0.6.7 — 2026-11-26
 
 - `CKV_K8S_151` fails a `kubelet` command when a token after `--tls-cipher-suites=` is not on Checkov's strong-cipher list. An unset flag still passes. Other workloads still pass. The check reads `command`, not `args`.
