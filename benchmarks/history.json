@@ -70,6 +70,50 @@
         "checkov_3.4.10_real_world_s3_module": [13130, 12283, 12387]
       },
       "notes": "Medians of 3 runs after warmup, one session. Official release binaries. Catalogs differ across tools. The 2026-11-02 row is unchanged."
+    },
+    {
+      "machine": "Linux x86_64 (kernel 6.12.113+), 4 vCPU, 16 GiB RAM, cloud CI runner",
+      "date": "2026-11-26",
+      "rustmaninoff": "0.6.8 release binary (x86_64-unknown-linux-gnu)",
+      "checkov": "3.4.11",
+      "trivy": "0.76.2",
+      "catalog_checks": 546,
+      "corpus": {
+        "terraform_files": 40,
+        "terraform_resources": 1080,
+        "cfn_files": 20,
+        "cfn_resources": 300,
+        "k8s_files": 20,
+        "k8s_resources": 160,
+        "total_resources": 1540
+      },
+      "median_ms": {
+        "rustmaninoff_full": 43,
+        "rustmaninoff_terraform": 28,
+        "rustmaninoff_cloudformation": 25,
+        "rustmaninoff_kubernetes": 36,
+        "rustmaninoff_docker": 24,
+        "rustmaninoff_terraform_plan": 23,
+        "checkov_3.4.11_full": 2532,
+        "checkov_3.4.11_terraform": 2291,
+        "trivy_0.76.2_full": 5601,
+        "rustmaninoff_real_world_s3_module": 27,
+        "checkov_3.4.11_real_world_s3_module": 13088
+      },
+      "samples_ms": {
+        "rustmaninoff_full": [44, 43, 43],
+        "rustmaninoff_terraform": [28, 29, 28],
+        "rustmaninoff_cloudformation": [27, 25, 25],
+        "rustmaninoff_kubernetes": [36, 37, 36],
+        "rustmaninoff_docker": [24, 23, 24],
+        "rustmaninoff_terraform_plan": [24, 23, 23],
+        "checkov_3.4.11_full": [2532, 2446, 2597],
+        "checkov_3.4.11_terraform": [2212, 2295, 2291],
+        "trivy_0.76.2_full": [5607, 5563, 5601],
+        "rustmaninoff_real_world_s3_module": [27, 26, 27],
+        "checkov_3.4.11_real_world_s3_module": [12825, 13088, 13116]
+      },
+      "notes": "Medians of 3 runs after warmup, one session. Built with cargo build --release -p rustmaninoff on this runner. Catalogs differ across tools. Older rows unchanged."
     }
   ]
 }

@@ -25,4 +25,4 @@ Pull requests and pushes to `main` run `scripts/bench_ci_compare.py` in the `ben
 
 Main-branch medians are uploaded as workflow artifacts for trend tracking.
 
-Caveats: catalogs differ; machine and binary build affect timings; numbers in the README are medians of three runs after warmup on the machine noted there.
+Caveats: catalogs differ; machine and binary build affect timings. The README and the site cite the **latest** row in `history.json`. After a run, append a row (do not rewrite older rows). Label the binary with the workspace version from `python3 scripts/workspace_version.py`. Timings are medians of three runs after warmup on the machine noted in that row.

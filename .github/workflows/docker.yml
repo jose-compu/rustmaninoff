@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: Release version without leading v (e.g. 0.6.7). Empty = latest published release.
+        description: Release version without leading v (e.g. 0.6.8). Empty = latest published release.
         required: false
         default: ""
   pull_request:
