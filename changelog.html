@@ -77,8 +77,18 @@
 
   <div class="wrap">
     <p class="kicker" style="margin-top:1.6rem;">Release notes</p>
-    <p class="note">See the repository <a href="https://github.com/jose-compu/rustmaninoff/blob/main/CHANGELOG.md">CHANGELOG.md</a> for 0.6.5.</p>
+    <p class="note">See the repository <a href="https://github.com/jose-compu/rustmaninoff/blob/main/CHANGELOG.md">CHANGELOG.md</a> for 0.6.6.</p>
 <h1 style="margin:0 0 1.2rem;letter-spacing:-0.03em;">Changelog</h1>
+
+    <article class="card">
+      <h2 style="margin-top:0;">0.6.6 — 2026-11-26</h2>
+      <h3>Added</h3>
+      <ul>
+        <li><code>CKV_K8S_105</code> fails a <code>kube-apiserver</code> command when a token after <code>--tls-cipher-suites=</code> is not on Checkov's strong-cipher list. An unset flag still passes. The check reads <code>command</code>, not <code>args</code>.</li>
+        <li>Milestone <strong>0.7.0</strong> stays open (6 of 12 boxes). Catalog is <strong>545</strong> checks. <code>CKV_K8S_151</code> is next.</li>
+      </ul>
+      <p class="note"><a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.6.6">GitHub release v0.6.6</a> · <a href="https://github.com/jose-compu/rustmaninoff/compare/v0.6.5...v0.6.6">Full changelog</a></p>
+    </article>
 
     <article class="card">
       <h2 style="margin-top:0;">0.6.5 — 2026-11-25</h2>
@@ -296,7 +306,7 @@
     </article>
 
     <footer class="footer">
-      <span>v0.6.5</span>
+      <span>v0.6.6</span>
       <a href="https://github.com/jose-compu/rustmaninoff">jose-compu/rustmaninoff</a>
       <a href="llms.txt">llms.txt</a>
       <span>Apache-2.0</span>
