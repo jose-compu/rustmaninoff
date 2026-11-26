@@ -262,6 +262,7 @@ th, td {
 }
 
 th { color: var(--muted); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+th.num { text-align: right; }
 td.num { text-align: right; font-variant-numeric: tabular-nums; font-family: var(--mono); font-size: 0.85rem; }
 
 .bars { display: grid; gap: 0.7rem; }
