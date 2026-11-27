@@ -77,8 +77,28 @@
 
   <div class="wrap">
     <p class="kicker" style="margin-top:1.6rem;">Release notes</p>
-    <p class="note">See the repository <a href="https://github.com/jose-compu/rustmaninoff/blob/main/CHANGELOG.md">CHANGELOG.md</a> for 0.6.8.</p>
+    <p class="note">See the repository <a href="https://github.com/jose-compu/rustmaninoff/blob/main/CHANGELOG.md">CHANGELOG.md</a> for 0.6.9.</p>
 <h1 style="margin:0 0 1.2rem;letter-spacing:-0.03em;">Changelog</h1>
+
+    <article class="card">
+      <h2 style="margin-top:0;">0.6.9 — 2026-11-27</h2>
+      <h3>Added</h3>
+      <ul>
+        <li><code>CKV_K8S_32</code> fails a <code>PodSecurityPolicy</code> when annotation <code>seccomp.security.alpha.kubernetes.io/defaultProfileName</code> is missing or does not contain <code>docker/default</code> or <code>runtime/default</code>. A policy annotated <code>docker/default</code> passes.</li>
+        <li>Milestone <strong>0.7.0</strong> stays open (8 of 12 boxes). Catalog is <strong>547</strong> checks. Kubernetes coverage <strong>112/113 (99.1%)</strong>. <code>CKV_K8S_147</code> is next.</li>
+      </ul>
+      <p class="note"><a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.6.9">GitHub release v0.6.9</a> · <a href="https://github.com/jose-compu/rustmaninoff/compare/v0.6.8...v0.6.9">Full changelog</a></p>
+    </article>
+
+    <article class="card">
+      <h2 style="margin-top:0;">0.6.8 — 2026-11-26</h2>
+      <h3>Changed</h3>
+      <ul>
+        <li>Refreshed published benchmark figures on the site and README (<code>benchmarks/history.json</code> row for release <strong>0.6.8</strong>, 546 checks, Linux runner 2026-11-26). No policy changes.</li>
+        <li><code>CKV_K8S_32</code> was next.</li>
+      </ul>
+      <p class="note"><a href="https://github.com/jose-compu/rustmaninoff/releases/tag/v0.6.8">GitHub release v0.6.8</a> · <a href="https://github.com/jose-compu/rustmaninoff/compare/v0.6.7...v0.6.8">Full changelog</a></p>
+    </article>
 
     <article class="card">
       <h2 style="margin-top:0;">0.6.7 — 2026-11-26</h2>
@@ -316,7 +336,7 @@
     </article>
 
     <footer class="footer">
-      <span>v0.6.8</span>
+      <span>v0.6.9</span>
       <a href="https://github.com/jose-compu/rustmaninoff">jose-compu/rustmaninoff</a>
       <a href="llms.txt">llms.txt</a>
       <span>Apache-2.0</span>
