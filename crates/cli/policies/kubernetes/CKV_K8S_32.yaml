@@ -1,0 +1,25 @@
+metadata:
+  id: CKV_K8S_32
+  name: Ensure default seccomp profile set to docker/default or runtime/default
+  category: KUBERNETES
+  severity: HIGH
+  framework: kubernetes
+  guidelines: Adapted from Checkov CKV_K8S_32. https://github.com/bridgecrewio/checkov
+resource_types:
+- PodSecurityPolicy
+definition:
+  or:
+  - cond_type: attribute
+    attribute: 'metadata.annotations."seccomp.security.alpha.kubernetes.io/defaultProfileName"'
+    operator: contains
+    value: docker/default
+  - cond_type: attribute
+    attribute: 'metadata.annotations."seccomp.security.alpha.kubernetes.io/defaultProfileName"'
+    operator: contains
+    value: runtime/default
+fixtures:
+  fail: "apiVersion: policy/v1beta1\nkind: PodSecurityPolicy\nmetadata:\n  name: bad\nspec:\n  seLinux:\n    rule: RunAsAny\n\
+    \  runAsUser:\n    rule: RunAsAny\n  fsGroup:\n    rule: RunAsAny\n  supplementalGroups:\n    rule: RunAsAny\n"
+  pass: "apiVersion: policy/v1beta1\nkind: PodSecurityPolicy\nmetadata:\n  name: good\n  annotations:\n    seccomp.security.alpha.kubernetes.io/defaultProfileName:\
+    \ docker/default\nspec:\n  seLinux:\n    rule: RunAsAny\n  runAsUser:\n    rule: RunAsAny\n  fsGroup:\n    rule: RunAsAny\n\
+    \  supplementalGroups:\n    rule: RunAsAny\n"

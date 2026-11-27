@@ -1,6 +1,6 @@
 # Rustmaninoff roadmap
 
-Current release: **0.6.8**. This file is the queue for daily releases. Tick a box in the same commit that ships the work.
+Current release: **0.6.9**. This file is the queue for daily releases. Tick a box in the same commit that ships the work.
 
 Position, unchanged: Checkov-compatible CKV policies, one Rust binary, fast. Run it next to Trivy. Trivy keeps CVEs, image layers, and SBOMs. Rustmaninoff does not grow a vulnerability database ([#8](https://github.com/jose-compu/rustmaninoff/issues/8) is closed as out of scope).
 
@@ -46,14 +46,14 @@ Do not re-schedule this work.
 | Opt-in `terraform_plan` on `terraform show -json` (planned values, child modules, data sources, `after_unknown` does not fail the process) | 0.5.0 ([#18](https://github.com/jose-compu/rustmaninoff/issues/18)) |
 | Terraform-marked sensitive plan values redacted to `(sensitive value)` before checks and reports | 0.5.1 |
 
-546 checks break down as Terraform 373, CloudFormation 51, Kubernetes 111, Docker 11. Families: `CKV_AWS` 404 (Terraform and CloudFormation files together), `CKV_K8S` 111, `CKV_DOCKER` 11, `CKV2_AWS` 20.
+547 checks break down as Terraform 373, CloudFormation 51, Kubernetes 112, Docker 11. Families: `CKV_AWS` 404 (Terraform and CloudFormation files together), `CKV_K8S` 112, `CKV_DOCKER` 11, `CKV2_AWS` 20.
 
 The pinned catalog is `tools/checkov-ids/snapshot.json`, scraped from `bridgecrewio/checkov` by `scripts/fetch_checkov_ids.py`. It has three buckets only: Dockerfile attribute checks, Kubernetes attribute checks, and every Terraform **resource** check (the file is named `terraform_aws`, the directory scraped is `checkov/terraform/checks/resource/`). Graph checks are not in the scrape. CloudFormation is not in the scrape.
 
 | Surface in that snapshot | Checkov ids | Exact id in Rustmaninoff | Coverage |
 | --- | ---: | ---: | ---: |
 | Docker attribute | 11 | 11 | 100% |
-| Kubernetes attribute | 113 | 111 | 98.2% |
+| Kubernetes attribute | 113 | 112 | 99.1% |
 | Whole Terraform resource directory | 928 | 341 | 36.7% |
 | `CKV_AWS_*` inside that directory | 361 | 341 | 94.5% (20 missing) |
 | `CKV_AZURE_*` | 242 | 0 | none |
@@ -62,7 +62,7 @@ The pinned catalog is `tools/checkov-ids/snapshot.json`, scraped from `bridgecre
 
 The 36.2% row in [docs/fidelity.md](docs/fidelity.md) is labeled "terraform AWS resource checks". The denominator is all 928 Terraform resource ids. The AWS slice is 336 of 361. The other 202 ids with zero coverage are `CKV_ALI` 40, `CKV_YC` 24, `CKV_OCI` 22, `CKV_NCP` 22, `CKV_PAN` 14, `CKV_TC` 14, `CKV_GIT` 6, `CKV_LIN` 5, `CKV_GLB` 4, `CKV_OPENSTACK` 4, `CKV_DIO` 4, `CKV_OKTA` 1, plus 41 `CKV_K8S_*` ids that also appear in the Terraform resource tree (40 of those 41 already exist on the Kubernetes side). Those smaller clouds are not scheduled below.
 
-Kubernetes ids still missing: `CKV_K8S_32`, `CKV_K8S_147`.
+Kubernetes ids still missing: `CKV_K8S_147`.
 
 Terraform AWS resource ids still missing: `CKV_AWS_45`, `CKV_AWS_70`, `CKV_AWS_121`, `CKV_AWS_165`, `CKV_AWS_192`, `CKV_AWS_208`, `CKV_AWS_250`, `CKV_AWS_256`, `CKV_AWS_274`, `CKV_AWS_287`, `CKV_AWS_288`, `CKV_AWS_289`, `CKV_AWS_290`, `CKV_AWS_342`, `CKV_AWS_355`, `CKV_AWS_375`, `CKV_AWS_379`, `CKV_AWS_385`, `CKV_AWS_387`, `CKV_AWS_393`.
 
@@ -117,7 +117,7 @@ Goal: every id in the Kubernetes snapshot is implemented, or fidelity.md records
 - [x] Match `starting_with` (and the substring form the check needs) across items of a command or args array. Shipped in 0.6.5.
 - [x] `CKV_K8S_105` with pass and fail fixtures. Shipped in 0.6.6.
 - [x] `CKV_K8S_151` with pass and fail fixtures. Shipped in 0.6.7.
-- [ ] `CKV_K8S_32` with pass and fail fixtures.
+- [x] `CKV_K8S_32` with pass and fail fixtures. Shipped in 0.6.9.
 - [ ] `CKV_K8S_147` with pass and fail fixtures.
 - [ ] `CKV_K8S_34`: either match Checkov's Tiller check, or keep the current meaning, give it the id Checkov uses for that meaning, and write the divergence into fidelity.md so the old id is not counted as coverage.
 - [ ] Regenerate `docs/fidelity.md`. Kubernetes shows 100%, or 100% of the ids that remain after documented divergences. Checkov-compare stays green.
