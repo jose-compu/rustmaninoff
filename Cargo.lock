@@ -857,7 +857,7 @@ dependencies = [
 
 [[package]]
 name = "rustmaninoff"
-version = "0.6.8"
+version = "0.6.9"
 dependencies = [
  "anyhow",
  "assert_cmd",
@@ -880,7 +880,7 @@ dependencies = [
 
 [[package]]
 name = "rustmaninoff-engine"
-version = "0.6.8"
+version = "0.6.9"
 dependencies = [
  "criterion",
  "rayon",
@@ -894,7 +894,7 @@ dependencies = [
 
 [[package]]
 name = "rustmaninoff-ir"
-version = "0.6.8"
+version = "0.6.9"
 dependencies = [
  "regex",
  "serde",
@@ -904,7 +904,7 @@ dependencies = [
 
 [[package]]
 name = "rustmaninoff-parser-cfn"
-version = "0.6.8"
+version = "0.6.9"
 dependencies = [
  "rustmaninoff-ir",
  "serde_json",
@@ -913,14 +913,14 @@ dependencies = [
 
 [[package]]
 name = "rustmaninoff-parser-docker"
-version = "0.6.8"
+version = "0.6.9"
 dependencies = [
  "rustmaninoff-ir",
 ]
 
 [[package]]
 name = "rustmaninoff-parser-k8s"
-version = "0.6.8"
+version = "0.6.9"
 dependencies = [
  "rustmaninoff-ir",
  "serde_yaml",
@@ -928,7 +928,7 @@ dependencies = [
 
 [[package]]
 name = "rustmaninoff-parser-terraform"
-version = "0.6.8"
+version = "0.6.9"
 dependencies = [
  "hcl-rs",
  "proptest",
@@ -940,7 +940,7 @@ dependencies = [
 
 [[package]]
 name = "rustmaninoff-report"
-version = "0.6.8"
+version = "0.6.9"
 dependencies = [
  "rustmaninoff-engine",
  "rustmaninoff-ir",
