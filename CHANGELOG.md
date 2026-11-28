@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.10 — 2026-11-28
+
+- `CKV_AWS_27` passes an SQS queue when `sqs_managed_sse_enabled` is true or `kms_master_key_id` is set. A queue with neither, or with managed SSE false and no KMS key, still fails. `AWS::SQS::Queue` uses the same rule for `SqsManagedSseEnabled` and `KmsMasterKeyId`.
+- Milestone **0.7.0** stays open (**8 of 12**). Built-in catalog is **547** checks. Kubernetes coverage is **112/113 (99.1%)**. `CKV_K8S_147` is next.
+
 ## 0.6.9 — 2026-11-27
 
 - `CKV_K8S_32` fails a `PodSecurityPolicy` when annotation `seccomp.security.alpha.kubernetes.io/defaultProfileName` is missing or does not contain `docker/default` or `runtime/default`. A policy annotated `docker/default` passes. Other Kubernetes kinds are unchanged.

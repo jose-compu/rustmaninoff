@@ -128,6 +128,81 @@ fn assert_fixture(
 }
 
 #[test]
+fn ckv_aws_27_sse_or_kms() {
+    let policies = builtin_policies().expect("embedded policies");
+    let tf_policies: Vec<_> = policies
+        .iter()
+        .filter(|p| p.id.as_ref() == "CKV_AWS_27" && p.framework == Some(Framework::Terraform))
+        .cloned()
+        .collect();
+    let cfn_policies: Vec<_> = policies
+        .iter()
+        .filter(|p| p.id.as_ref() == "CKV_AWS_27" && p.framework == Some(Framework::CloudFormation))
+        .cloned()
+        .collect();
+    assert!(!tf_policies.is_empty());
+    assert!(!cfn_policies.is_empty());
+
+    let tf_source = r#"
+resource "aws_sqs_queue" "sse" {
+  sqs_managed_sse_enabled = true
+}
+resource "aws_sqs_queue" "kms" {
+  kms_master_key_id = "alias/aws/sqs"
+}
+resource "aws_sqs_queue" "plain" {
+  name = "plain"
+}
+resource "aws_sqs_queue" "disabled" {
+  sqs_managed_sse_enabled = false
+}
+"#;
+    let tf_out = rustmaninoff_parser_terraform::parse_file(Path::new("sqs.tf"), tf_source);
+    assert!(tf_out.diagnostics.is_empty());
+    let tf_findings = rustmaninoff_engine::evaluate(&tf_out.resources, &tf_policies);
+
+    let status = |findings: &[rustmaninoff_engine::Finding], name: &str| {
+        findings
+            .iter()
+            .find(|f| f.resource_name.as_ref() == name)
+            .map(|f| f.status)
+            .unwrap_or_else(|| panic!("no finding for {name}"))
+    };
+    assert_eq!(status(&tf_findings, "sse"), Status::Passed);
+    assert_eq!(status(&tf_findings, "kms"), Status::Passed);
+    assert_eq!(status(&tf_findings, "plain"), Status::Failed);
+    assert_eq!(status(&tf_findings, "disabled"), Status::Failed);
+
+    let cfn_source = r#"
+AWSTemplateFormatVersion: "2010-09-09"
+Resources:
+  Sse:
+    Type: AWS::SQS::Queue
+    Properties:
+      SqsManagedSseEnabled: true
+  Kms:
+    Type: AWS::SQS::Queue
+    Properties:
+      KmsMasterKeyId: alias/aws/sqs
+  Plain:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: plain
+  Disabled:
+    Type: AWS::SQS::Queue
+    Properties:
+      SqsManagedSseEnabled: false
+"#;
+    let cfn_out = rustmaninoff_parser_cfn::parse_file(Path::new("sqs.yaml"), cfn_source);
+    assert!(cfn_out.diagnostics.is_empty());
+    let cfn_findings = rustmaninoff_engine::evaluate(&cfn_out.resources, &cfn_policies);
+    assert_eq!(status(&cfn_findings, "Sse"), Status::Passed);
+    assert_eq!(status(&cfn_findings, "Kms"), Status::Passed);
+    assert_eq!(status(&cfn_findings, "Plain"), Status::Failed);
+    assert_eq!(status(&cfn_findings, "Disabled"), Status::Failed);
+}
+
+#[test]
 fn scan_reports_text_json_sarif_and_junit() {
     let dir = std::env::temp_dir().join(format!(
         "rustmaninoff-scan-{}",

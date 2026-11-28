@@ -8,9 +8,13 @@ metadata:
 resource_types:
 - aws_sqs_queue
 definition:
-  cond_type: attribute
-  attribute: kms_master_key_id
-  operator: exists
+  or:
+  - cond_type: attribute
+    attribute: sqs_managed_sse_enabled
+    operator: is_true
+  - cond_type: attribute
+    attribute: kms_master_key_id
+    operator: exists
 fixtures:
   fail: "resource \"aws_sqs_queue\" \"bad\" {\n  name = \"plain\"\n}\n"
-  pass: "resource \"aws_sqs_queue\" \"good\" {\n  kms_master_key_id = \"alias/aws/sqs\"\n}\n"
+  pass: "resource \"aws_sqs_queue\" \"sse\" {\n  sqs_managed_sse_enabled = true\n}\nresource \"aws_sqs_queue\" \"kms\" {\n  kms_master_key_id = \"alias/aws/sqs\"\n}\n"
