@@ -1,6 +1,6 @@
 # Rustmaninoff roadmap
 
-Current release: **0.6.9**. This file is the queue for daily releases. Tick a box in the same commit that ships the work.
+Current release: **0.6.10**. This file is the queue for daily releases. Tick a box in the same commit that ships the work.
 
 Position, unchanged: Checkov-compatible CKV policies, one Rust binary, fast. Run it next to Trivy. Trivy keeps CVEs, image layers, and SBOMs. Rustmaninoff does not grow a vulnerability database ([#8](https://github.com/jose-compu/rustmaninoff/issues/8) is closed as out of scope).
 

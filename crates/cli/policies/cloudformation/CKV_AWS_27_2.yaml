@@ -8,11 +8,13 @@ metadata:
 resource_types:
 - AWS::SQS::Queue
 definition:
-  cond_type: attribute
-  attribute: KmsMasterKeyId
-  operator: exists
+  or:
+  - cond_type: attribute
+    attribute: SqsManagedSseEnabled
+    operator: is_true
+  - cond_type: attribute
+    attribute: KmsMasterKeyId
+    operator: exists
 fixtures:
-  fail: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Bad:\n    Type: AWS::SQS::Queue\n    Properties:\n      QueueName:\
-    \ plain\n"
-  pass: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Good:\n    Type: AWS::SQS::Queue\n    Properties:\n     \
-    \ KmsMasterKeyId: alias/aws/sqs\n"
+  fail: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Bad:\n    Type: AWS::SQS::Queue\n    Properties:\n      QueueName: plain\n"
+  pass: "AWSTemplateFormatVersion: \"2010-09-09\"\nResources:\n  Sse:\n    Type: AWS::SQS::Queue\n    Properties:\n      SqsManagedSseEnabled: true\n  Kms:\n    Type: AWS::SQS::Queue\n    Properties:\n      KmsMasterKeyId: alias/aws/sqs\n"
